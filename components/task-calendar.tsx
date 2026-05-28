@@ -186,7 +186,7 @@ function DayCell({cell, isToday}: {cell: DayInfo; isToday: boolean}) {
   return (
     <div
       className={[
-        "flex min-h-[64px] flex-col gap-1.5 rounded-lg p-0.5",
+        "flex min-h-[60px] flex-col gap-1.5 rounded-lg ",
         dimmed ? "opacity-40" : "",
         isToday ? "today-bg" : "",
       ].join(" ")}

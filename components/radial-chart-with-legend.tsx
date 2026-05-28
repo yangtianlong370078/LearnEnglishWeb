@@ -57,12 +57,12 @@ export default function RadialChartWithLegend() {
         <div className="relative shrink-0">
           <RadialChart
             data={storageData}
-            height={180}
-            innerRadius="40%"
+            height={250}
+            innerRadius="50%"
             outerRadius="100%"
-            width={180}
+            width={250}
           >
-            <RadialChart.Bar background cornerRadius={12} dataKey="value" />
+            <RadialChart.Bar background barSize={18} cornerRadius={12} dataKey="value" />
             <RadialChart.Tooltip content={<RadialTooltip valueFormatter={(v) => `${v} GB`} />} />
           </RadialChart>
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
