@@ -1,0 +1,199 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+@import "@heroui/styles/css";
+@import "@heroui-pro/react/css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+	--font-sans: "font", sans-serif;
+	--font-mono: "monospace", monospace;
+}
+
+/* ── 全局基础 ── */
+html {
+  /* html 提供兜底底色（当 body::before 还未渲染时不闪白） */
+  background-color: oklch(0.95 0.006 240);
+  min-height: 100%;
+}
+html.dark {
+  background-color: oklch(0.09 0.008 240);
+}
+
+body {
+  /* body 透明，且必须创建堆叠上下文（z-index:0 + position），
+     这样 body::before { z-index:-1 } 才能正确落在内容之后、html背景之前 */
+  background: transparent !important;
+  position: relative;
+  z-index: 0;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+/* ── Aurora 光晕：body::before，fixed 超出视口铺满，z-index:-1 ──
+   用明确的 width/height（120vw/120vh）避免 inset:-10% 在某些浏览器上被裁剪 */
+body::before {
+  content: "";
+  position: fixed;
+  top: -10vh;
+  left: -10vw;
+  width: 120vw;
+  height: 120vh;
+  pointer-events: none;
+  z-index: -1;
+  transform-origin: center;
+  will-change: transform;
+  /* 亮色：柔和彩光 */
+  background:
+    radial-gradient(ellipse 60% 55% at 12% 18%, oklch(0.80 0.13 280 / 0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 48% at 88% 14%, oklch(0.83 0.12 190 / 0.35) 0%, transparent 58%),
+    radial-gradient(ellipse 55% 52% at 78% 82%, oklch(0.80 0.13 320 / 0.3) 0%, transparent 58%),
+    radial-gradient(ellipse 48% 44% at 18% 84%, oklch(0.86 0.11 55 / 0.3) 0%, transparent 58%),
+    oklch(0.95 0.006 240);
+  animation: aurora 14s ease-in-out infinite alternate;
+}
+
+html.dark body::before {
+  /* 暗色：亮度 0.40-0.45，低饱和 */
+  background:
+    radial-gradient(ellipse 60% 55% at 12% 18%, oklch(0.43 0.07 280 / 0.6) 0%, transparent 62%),
+    radial-gradient(ellipse 50% 48% at 88% 14%, oklch(0.40 0.07 190 / 0.52) 0%, transparent 58%),
+    radial-gradient(ellipse 55% 52% at 78% 82%, oklch(0.45 0.07 320 / 0.5) 0%, transparent 58%),
+    radial-gradient(ellipse 48% 44% at 18% 84%, oklch(0.42 0.06 55  / 0.42) 0%, transparent 58%),
+    oklch(0.12 0.008 240);
+  animation: aurora 14s ease-in-out infinite alternate;
+}
+
+/* 关键帧均使用 scale >= 1.05，配合 inset:-10% 确保任何时刻都铺满视口 */
+@keyframes aurora {
+  0%   { transform: scale(1.05) rotate(0deg);   }
+  40%  { transform: scale(1.10) rotate(1.2deg); }
+  70%  { transform: scale(1.06) rotate(-0.8deg);}
+  100% { transform: scale(1.09) rotate(1.8deg); }
+}
+
+/* ── 毛玻璃：覆盖 HeroUI v3 的 --surface* 变量为半透明 ──
+   HeroUI v3 Card/Accordion 等用 .surface--default 类，背景来自 var(--surface) */
+:root {
+  --surface: oklch(1 0 0 / 0.42) !important;
+  --surface-secondary: oklch(0.98 0.002 286 / 0.40) !important;
+  --surface-tertiary: oklch(0.96 0.002 286 / 0.38) !important;
+}
+.dark {
+  --surface: oklch(0.22 0.006 286 / 0.50) !important;
+  --surface-secondary: oklch(0.26 0.004 286 / 0.46) !important;
+  --surface-tertiary: oklch(0.28 0.003 248 / 0.42) !important;
+}
+
+/* 给所有 surface 块加毛玻璃模糊 + 玻璃描边 + 顶部高光 */
+/* HeroUI v3 Card 实际使用 .card / .card--default / [data-slot="card"]，
+   以及其他组件的 .accordion / .disclosure-group / .alert。
+   为了一次性覆盖，同时针对多个选择器应用毛玻璃 + 描边 */
+.surface,
+.surface--default,
+.surface--secondary,
+.surface--tertiary,
+.card,
+.card--default,
+[data-slot="card"],
+.accordion,
+.disclosure-group,
+.alert {
+  /*backdrop-filter: blur(20px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+   亮色：保持原描边 + 顶部高光 
+  border: 1px solid rgb(255 255 255 / 0.3) !important;
+  box-shadow:
+    0 2px 20px rgb(0 0 80 / 0.075),
+    inset 0 1px 0 rgb(255 255 255 / 0.5) !important;
+	*/
+}
+.dark .surface,
+.dark .surface--default,
+.dark .surface--secondary,
+.dark .surface--tertiary,
+.dark .card,
+.dark .card--default,
+.dark [data-slot="card"],
+.dark .accordion,
+.dark .disclosure-group,
+.dark .alert {
+  /* 暗色：极轻描边，只比卡片背景略亮一点 */
+  border: none !important;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.07),
+    0 2px 20px rgb(0 0 0 / 0.3) !important;
+}
+
+/* 同样的玻璃描边给 Button / Chip / Input 等通用容器（按需扩展） */
+.button,
+.chip,
+.input,
+.input-group,
+.kbd,
+.tag,
+.segment {
+  border-color: rgb(255 255 255 / 0.28) !important;
+}
+.dark .button,
+.dark .chip,
+.dark .input,
+.dark .input-group,
+.dark .kbd,
+.dark .tag,
+.dark .segment {
+  border-color: rgb(255 255 255 / 0.10) !important;
+}
+
+/* 兜底：保留旧的 bg-content 规则（万一某些组件用） */
+.bg-content1 {
+  background-color: rgb(255 255 255 / 0.45) !important;
+  backdrop-filter: blur(20px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+}
+.bg-content2 {
+  background-color: rgb(255 255 255 / 0.38) !important;
+  backdrop-filter: blur(18px) saturate(155%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(155%) !important;
+}
+.bg-content3 {
+  background-color: rgb(255 255 255 / 0.32) !important;
+  backdrop-filter: blur(16px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+}
+.bg-content4 {
+  background-color: rgb(255 255 255 / 0.26) !important;
+  backdrop-filter: blur(14px) saturate(148%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(148%) !important;
+}
+
+.dark .bg-content1 { background-color: rgb(15 20 40 / 0.48) !important; }
+.dark .bg-content2 { background-color: rgb(20 28 52 / 0.44) !important; }
+.dark .bg-content3 { background-color: rgb(26 36 62 / 0.40) !important; }
+.dark .bg-content4 { background-color: rgb(32 44 72 / 0.36) !important; }
+
+/* ── Navbar 毛玻璃 ── */
+header {
+  background-color: rgb(255 255 255 / 0.60) !important;
+  backdrop-filter: blur(24px) saturate(170%) !important;
+  -webkit-backdrop-filter: blur(24px) saturate(170%) !important;
+  border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;
+  box-shadow: 0 1px 12px rgb(0 0 0 / 0.05) !important;
+}
+.dark header {
+  background-color: rgb(10 16 34 / 0.58) !important;
+  border-bottom: 1px solid rgb(255 255 255 / 0.06) !important;
+  box-shadow: 0 1px 12px rgb(0 0 0 / 0.28) !important;
+}
+
+/* ── 兜底：data-slot=base 描边（适用于使用此 slot 的组件） ── */
+[data-slot="base"] {
+  border: 1px solid rgb(255 255 255 / 0.3) !important;
+  box-shadow: 0 2px 18px rgb(0 0 80 / 0.05), inset 0 1px 0 rgb(255 255 255 / 0.42) !important;
+}
+.dark [data-slot="base"] {
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.5),
+    0 2px 20px rgb(0 0 0 / 0.3) !important;
+}
