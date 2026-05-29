@@ -1,7 +1,10 @@
 "use client";
 
-import {useMemo, useState} from "react";
-import {Button, Card, Chip} from "@heroui/react";
+import { useMemo, useState } from "react";
+import { Button, Card, Chip } from "@heroui/react";
+
+import RadialChartWithLegend from "@/components/radial-chart-with-legend";
+import { Separator } from "@heroui/react";
 
 type DayStatus = "pending" | "weekend" | "done" | "missed" | "warn" | "empty";
 
@@ -170,23 +173,23 @@ const STATUS_BAR: Record<DayStatus, string> = {
   empty: "",
 };
 
-function Legend({color, label}: {color: string; label: string}) {
+function Legend({ color, label }: { color: string; label: string }) {
   return (
     <div className="flex items-center gap-1.5">
-      <span className="h-2.5 w-2.5 rounded-sm" style={{background: color}} />
+      <span className="h-2.5 w-2.5 rounded-sm" style={{ background: color }} />
       <span>{label}</span>
     </div>
   );
 }
 
-function DayCell({cell, isToday}: {cell: DayInfo; isToday: boolean}) {
+function DayCell({ cell, isToday }: { cell: DayInfo; isToday: boolean }) {
   const dimmed = !cell.inMonth;
   const showBar = cell.status !== "empty" && cell.label !== "";
 
   return (
     <div
       className={[
-        "flex min-h-[60px] flex-col gap-1.5 rounded-lg ",
+        "flex min-h-[60px] flex-col gap-0 rounded-lg ",
         dimmed ? "opacity-40" : "",
         isToday ? "today-bg" : "",
       ].join(" ")}
@@ -229,22 +232,22 @@ export default function TaskCalendar() {
     return {
       year: y,
       month: m,
-      task: {count: 50, weekend: 3},
+      task: { count: 50, weekend: 3 },
       statisticsLearns: [
-        {year: y, month: m, day: 1, count: 2},
-        {year: y, month: m, day: 2, count: 2},
-        {year: y, month: m, day: 3, count: 2},
-        {year: y, month: m, day: 4, count: 2},
-        {year: y, month: m, day: 6, count: 2},
-        {year: y, month: m, day: 7, count: 2},
-        {year: y, month: m, day: 8, count: 2},
-        {year: y, month: m, day: 9, count: 2},
-        {year: y, month: m, day: 10, count: 2},
-        {year: y, month: m, day: 11, count: 2},
-        {year: y, month: m, day: 13, count: 2},
-        {year: y, month: m, day: 20, count: 32},
-        {year: y, month: m, day: 22, count: 3},
-        {year: y, month: m, day: 28, count: 1},
+        { year: y, month: m, day: 1, count: 2 },
+        { year: y, month: m, day: 2, count: 2 },
+        { year: y, month: m, day: 3, count: 2 },
+        { year: y, month: m, day: 4, count: 2 },
+        { year: y, month: m, day: 6, count: 2 },
+        { year: y, month: m, day: 7, count: 2 },
+        { year: y, month: m, day: 8, count: 2 },
+        { year: y, month: m, day: 9, count: 2 },
+        { year: y, month: m, day: 10, count: 2 },
+        { year: y, month: m, day: 11, count: 2 },
+        { year: y, month: m, day: 13, count: 2 },
+        { year: y, month: m, day: 20, count: 32 },
+        { year: y, month: m, day: 22, count: 3 },
+        { year: y, month: m, day: 28, count: 1 },
       ],
     };
   }, [cursor]);
@@ -266,89 +269,101 @@ export default function TaskCalendar() {
       task += c.taskCount;
       done += c.doneCount;
     });
-    return {task, done};
+    return { task, done };
   }, [cells]);
 
   return (
-    <Card className="w-full rounded-2xl">
-      <Card.Header className="flex-row items-center justify-between">
-        <div className="flex flex-col gap-1">
-          <Card.Title className="text-base">任务日历</Card.Title>
-          <Card.Description className="text-xs text-default-500">
-            按月查看每日任务量与完成情况
-          </Card.Description>
-        </div>
-        <div className="flex items-center gap-2">
-          <Chip color="success" size="sm" variant="soft">
-            已完成 {totals.done}
-          </Chip>
-          <Chip color="warning" size="sm" variant="soft">
-            待完成 {Math.max(0, totals.task - totals.done)}
-          </Chip>
-        </div>
-      </Card.Header>
 
-      <Card.Content className="flex flex-col gap-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-1">
-            <Button isIconOnly aria-label="上一月" size="sm" variant="flat" onPress={goPrev}>
-              ‹
-            </Button>
-            <Button isIconOnly aria-label="下一月" size="sm" variant="flat" onPress={goNext}>
-              ›
-            </Button>
-            <Button
-              className="ml-1"
-              isDisabled={isCurrentMonth}
-              size="sm"
-              variant="flat"
-              onPress={goToday}
-            >
-              今天
-            </Button>
-          </div>
-          <div className="text-sm font-medium text-default-700">{monthLabel}</div>
-          <div className="w-[88px]" aria-hidden />
-        </div>
+    <div>
+      <div className="flex flex-col gap-1.5 px-4 pb-2">
 
-        <div className="rounded-xl border border-default-200/60 bg-content1/40 p-3">
-          <div className="mb-2 grid grid-cols-7 gap-2">
-            {WEEK_LABELS.map((w) => (
-              <div
-                key={w}
-                className="text-center text-xs font-medium tracking-wide text-default-500"
+        <span className="text-foreground text-base font-semibold">任务日历</span>
+        <span className="text-xs whitespace-nowrap text-muted">按月查看每日任务量与完成情况</span>
+
+
+      </div>
+      <Card className="" variant="secondary">
+
+
+        <Card.Header className="flex-row items-center justify-between">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-1">
+              <Button isIconOnly aria-label="上一月" size="sm" variant="flat" onPress={goPrev}>
+                ‹
+              </Button>
+              <Button isIconOnly aria-label="下一月" size="sm" variant="flat" onPress={goNext}>
+                ›
+              </Button>
+              <Button
+                className="ml-1"
+                isDisabled={isCurrentMonth}
+                size="sm"
+                variant="flat"
+                onPress={goToday}
               >
-                {w}
-              </div>
-            ))}
+                今天
+              </Button>
+            </div>
+            <div className="text-sm font-medium text-default-700">{monthLabel}</div>
+            <div className="w-[88px]" aria-hidden />
           </div>
-
-          <div className="grid grid-cols-7 gap-2">
-            {(() => {
-              const rows: DayInfo[][] = [];
-              for (let r = 0; r < cells.length / 7; r++) {
-                rows.push(cells.slice(r * 7, r * 7 + 7));
-              }
-              return rows
-                .filter((row) => row.some((c) => c.inMonth))
-                .flat()
-                .map((cell, i) => (
-                  <DayCell
-                    key={i}
-                    cell={cell}
-                    isToday={cell.date.toDateString() === today.toDateString()}
-                  />
-                ));
-            })()}
+          <div className="flex items-center gap-2">
+            <Chip color="success" size="sm" variant="soft">
+              已完成 {totals.done}
+            </Chip>
+            <Chip color="warning" size="sm" variant="soft">
+              待完成 {Math.max(0, totals.task - totals.done)}
+            </Chip>
           </div>
-        </div>
+        </Card.Header>
 
-        <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-1 text-[11px] text-default-500">
+
+        <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+
+          <Card className="w-full rounded-2xl">
+            <div className="mb-2 grid grid-cols-7 gap-2">
+              {WEEK_LABELS.map((w) => (
+                <div
+                  key={w}
+                  className="text-center text-xs font-medium tracking-wide text-default-500"
+                >
+                  {w}
+                </div>
+              ))}
+            </div>
+
+            <div className="grid grid-cols-7 gap-2">
+              {(() => {
+                const rows: DayInfo[][] = [];
+                for (let r = 0; r < cells.length / 7; r++) {
+                  rows.push(cells.slice(r * 7, r * 7 + 7));
+                }
+                return rows
+                  .filter((row) => row.some((c) => c.inMonth))
+                  .flat()
+                  .map((cell, i) => (
+                    <DayCell
+                      key={i}
+                      cell={cell}
+                      isToday={cell.date.toDateString() === today.toDateString()}
+                    />
+                  ));
+              })()}
+            </div>
+          </Card>
+
+          {/* <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-1 text-[11px] text-default-500">
           <Legend color="#FF6B3D" label="待完成" />
           <Legend color="#F5B400" label="部分完成" />
           <Legend color="#1FB89A" label="已完成 / 休" />
+        </div> */}
+
+
+
+          <RadialChartWithLegend />
+
         </div>
-      </Card.Content>
-    </Card>
+      </Card>
+    </div>
   );
 }

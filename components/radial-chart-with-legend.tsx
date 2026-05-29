@@ -53,16 +53,16 @@ export default function RadialChartWithLegend() {
         <Card.Title className="text-base">Storage Breakdown</Card.Title>
         <Card.Description className="text-muted text-xs">88 GB of 128 GB used</Card.Description>
       </Card.Header>
-      <Card.Content className="flex items-center gap-6">
+      <Card.Content className="grid place-items-center min-h-[320px]">
         <div className="relative shrink-0">
           <RadialChart
             data={storageData}
-            height={250}
+            height={220}
             innerRadius="50%"
             outerRadius="100%"
-            width={250}
+            width={220}
           >
-            <RadialChart.Bar background barSize={18} cornerRadius={12} dataKey="value" />
+            <RadialChart.Bar background barSize={16} cornerRadius={12} dataKey="value" />
             <RadialChart.Tooltip content={<RadialTooltip valueFormatter={(v) => `${v} GB`} />} />
           </RadialChart>
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
@@ -70,7 +70,7 @@ export default function RadialChartWithLegend() {
             <span className="text-muted text-xs">GB used</span>
           </div>
         </div>
-        <div className="flex flex-1 flex-col gap-3">
+        <div className="flex flex-1 flex-col gap-3 ">
           {storageData.map((entry, idx) => (
             <div key={entry.name} className="flex items-center gap-3">
               <span

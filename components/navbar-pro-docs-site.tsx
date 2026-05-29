@@ -1,11 +1,11 @@
 "use client";
 
-import {Display, Moon, Sun} from "@gravity-ui/icons";
-import {Kbd, SearchField} from "@heroui/react";
-import {useEffect, useState} from "react";
-import {useTheme} from "next-themes";
+import { Display, Moon, Sun } from "@gravity-ui/icons";
+import { Kbd, SearchField } from "@heroui/react";
+import { useEffect, useState } from "react";
+import { useTheme } from "next-themes";
 
-import {Navbar, Segment} from "@heroui-pro/react";
+import { Navbar, Segment } from "@heroui-pro/react";
 
 const BrandLogo = () => (
   <svg fill="none" height="22" viewBox="0 0 83 26" xmlns="http://www.w3.org/2000/svg">
@@ -33,14 +33,14 @@ const BrandLogo = () => (
 );
 
 const navItems = [
-  {href: "#docs", label: "Docs"},
-  {href: "#pro", label: "Pro"},
-  {href: "#blog", label: "Blog"},
+  { href: "#docs", label: "Docs" },
+  { href: "#pro", label: "Pro" },
+  { href: "#blog", label: "Blog" },
 ];
 
 export default function NavbarProDocsSite() {
   const [currentItem, setCurrentItem] = useState("#docs");
-  const {theme, setTheme} = useTheme();
+  const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => setMounted(true), []);

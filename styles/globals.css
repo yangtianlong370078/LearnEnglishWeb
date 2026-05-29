@@ -11,7 +11,7 @@
 	--font-mono: "monospace", monospace;
 }
 
-/* ── 全局基础 ── */
+/* ── 全局基础底色 ── */
 html {
   /* html 提供兜底底色（当 body::before 还未渲染时不闪白） */
   background-color: oklch(0.95 0.006 240);
@@ -46,10 +46,10 @@ body::before {
   will-change: transform;
   /* 亮色：柔和彩光 */
   background:
-    radial-gradient(ellipse 60% 55% at 12% 18%, oklch(0.80 0.13 280 / 0.4) 0%, transparent 60%),
-    radial-gradient(ellipse 50% 48% at 88% 14%, oklch(0.83 0.12 190 / 0.35) 0%, transparent 58%),
-    radial-gradient(ellipse 55% 52% at 78% 82%, oklch(0.80 0.13 320 / 0.3) 0%, transparent 58%),
-    radial-gradient(ellipse 48% 44% at 18% 84%, oklch(0.86 0.11 55 / 0.3) 0%, transparent 58%),
+    radial-gradient(ellipse 80% 75% at 12% 18%, oklch(0.80 0.13 280 / 0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 58% at 78% 14%, oklch(0.83 0.12 190 / 0.35) 0%, transparent 58%),
+    radial-gradient(ellipse 65% 62% at 78% 82%, oklch(0.80 0.13 320 / 0.3) 0%, transparent 58%),
+    radial-gradient(ellipse 58% 56% at 18% 84%, oklch(0.86 0.11 55 / 0.3) 0%, transparent 58%),
     oklch(0.95 0.006 240);
   animation: aurora 14s ease-in-out infinite alternate;
 }
@@ -57,10 +57,10 @@ body::before {
 html.dark body::before {
   /* 暗色：亮度 0.40-0.45，低饱和 */
   background:
-    radial-gradient(ellipse 60% 55% at 12% 18%, oklch(0.53 0.07 280 / 0.6) 0%, transparent 62%),
-    radial-gradient(ellipse 50% 48% at 88% 14%, oklch(0.50 0.07 190 / 0.52) 0%, transparent 58%),
-    radial-gradient(ellipse 55% 52% at 78% 82%, oklch(0.55 0.07 320 / 0.5) 0%, transparent 58%),
-    radial-gradient(ellipse 48% 44% at 18% 84%, oklch(0.52 0.06 55  / 0.42) 0%, transparent 58%),
+    radial-gradient(ellipse 90% 85% at 12% 18%, oklch(0.53 0.07 280 / 0.6) 0%, transparent 62%),
+    radial-gradient(ellipse 80% 68% at 78% 14%, oklch(0.50 0.07 190 / 0.52) 0%, transparent 58%),
+    radial-gradient(ellipse 75% 72% at 78% 82%, oklch(0.55 0.07 320 / 0.5) 0%, transparent 58%),
+    radial-gradient(ellipse 68% 66% at 18% 84%, oklch(0.52 0.06 55  / 0.42) 0%, transparent 58%),
     oklch(0.12 0.008 240);
   animation: aurora 14s ease-in-out infinite alternate;
 }
