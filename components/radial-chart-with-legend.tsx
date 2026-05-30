@@ -10,8 +10,8 @@ const CHART_COLORS = ["var(--chart-4)", "var(--chart-3)", "var(--chart-2)", "var
 
 const storageData = [
   // {fill: "var(--chart-4)", name: "Documents", value: 42},
-  {fill: "var(--chart-3)", name: "Media", value: 28},
-  {fill: "var(--chart-2)", name: "System", value: 18},
+  {fill: "var(--chart-3)", name: "任务完成", value: 28},
+  {fill: "var(--chart-2)", name: "时间已过", value: 18},
 ];
 
 interface RadialTooltipProps {
@@ -50,8 +50,8 @@ export default function RadialChartWithLegend() {
   return (
     <Card className="w-full rounded-2xl">
       <Card.Header>
-        <Card.Title className="text-base">Storage Breakdown</Card.Title>
-        <Card.Description className="text-muted text-xs">88 GB of 128 GB used</Card.Description>
+        <Card.Title className="text-base">任务明细</Card.Title>
+        <Card.Description className="text-muted text-xs">任务300；已完成200；还剩100</Card.Description>
       </Card.Header>
       <Card.Content className="grid place-items-center min-h-[320px]">
         <div className="relative shrink-0">
@@ -63,11 +63,11 @@ export default function RadialChartWithLegend() {
             width={220}
           >
             <RadialChart.Bar background barSize={16} cornerRadius={12} dataKey="value" />
-            <RadialChart.Tooltip content={<RadialTooltip valueFormatter={(v) => `${v} GB`} />} />
+            <RadialChart.Tooltip content={<RadialTooltip valueFormatter={(v) => `${v} %`} />} />
           </RadialChart>
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-foreground text-xl font-bold">88</span>
-            <span className="text-muted text-xs">GB used</span>
+            <span className="text-foreground text-xl font-bold">88/100</span>
+            <span className="text-muted text-xs">任务完成率</span>
           </div>
         </div>
         <div className="flex flex-1 flex-col gap-3 ">
@@ -78,8 +78,8 @@ export default function RadialChartWithLegend() {
                 style={{backgroundColor: CHART_COLORS[idx % CHART_COLORS.length]}}
               />
               <div className="flex flex-1 items-center justify-between">
-                <span className="text-foreground text-sm">{entry.name}</span>
-                <span className="text-foreground text-sm font-semibold">{entry.value} GB</span>
+                <span className="text-foreground text-sm">{entry.name+' '}</span>
+                <span className="text-foreground text-sm font-semibold">{entry.value}%</span>
               </div>
             </div>
           ))}
