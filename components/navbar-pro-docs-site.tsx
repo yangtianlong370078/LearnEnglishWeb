@@ -91,6 +91,7 @@ export default function NavbarProDocsSite() {
           </SearchField>
 
           <Segment
+            // @ts-expect-error suppressHydrationWarning 由 HeroUI V3 Segment 支持但类型尚未屘露
             suppressHydrationWarning
             className="gap-0"
             selectedKey={mounted ? (theme ?? "system") : "system"}

@@ -6,7 +6,7 @@ import {Card} from "@heroui/react";
 
 import {ChartTooltip, RadialChart} from "@heroui-pro/react";
 
-const CHART_COLORS = ["var(--chart-4)", "var(--chart-3)", "var(--chart-2)", "var(--chart-1)"];
+const CHART_COLORS = ["var(--chart-2)", "var(--chart-3)"];
 
 const storageData = [
   // {fill: "var(--chart-4)", name: "Documents", value: 42},

@@ -9,17 +9,9 @@ import { ChevronLeft, ChevronRight } from "@gravity-ui/icons";
 import BarChartComparisonDemo from "@/components/bar-chart-comparison-demo";
 import AreaChartMultiAreaDemo from "@/components/area-chart-multi-area-demo";
 
-export interface MonthValue {
-  year: number;
-  month: number; // 1-12
-}
-
-export interface MonthCompletion {
-  year: number;
-  month: number; // 1-12
-  /** Completion percentage 0-100. `null` means no data ("-"). */
-  percent: number | null;
-}
+// 从 types 目录导入并重新导出，保持对外兼容
+import type { MonthValue, MonthCompletion } from "@/types";
+export type { MonthValue, MonthCompletion };
 
 interface JeDatePickerProps {
   value?: MonthValue;

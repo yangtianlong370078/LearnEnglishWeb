@@ -1,10 +1,10 @@
 "use client";
 
 import { SquareChartBar, Target } from "@gravity-ui/icons";
-import { KPI, TrendChip } from "@heroui-pro/react";
-
-import { ChartTooltip, PieChart } from "@heroui-pro/react";
+import { KPI, TrendChip, ChartTooltip, PieChart } from "@heroui-pro/react";
 import type { ReactNode } from "react";
+import type { WordStats } from "@/types";
+
 const CHART_COLORS = [
   "var(--chart-4)",
   "var(--chart-3)",
@@ -12,11 +12,15 @@ const CHART_COLORS = [
   "var(--chart-1)",
 ];
 
-const browserData = [
-  { name: "已掌握", value: 19 },
-  { name: "未熟练", value: 10 },
-  { name: "强化中", value: 9 },
-];
+/** 示例数据（未对接接口时使用） */
+const DEMO_STATS: WordStats = {
+  masteredCount: 19,
+  learningCount: 10,
+  reviewingCount: 9,
+  totalCount: 38,
+  weeklyStudied: 25,
+  completionRate: 0.423,
+};
 
 const sparklineUp = [
   { value: 30 },
@@ -58,7 +62,20 @@ function PieTooltip({
   );
 }
 
-export default function KpiWithChartInline() {
+interface KpiWithChartInlineProps {
+  /** 来自接口的统计数据，未传入时使用示例数据 */
+  stats?: WordStats;
+}
+
+export default function KpiWithChartInline({ stats }: KpiWithChartInlineProps = {}) {
+  const s = stats ?? DEMO_STATS;
+
+  const pieData = [
+    { name: "已掌握", value: s.masteredCount },
+    { name: "未熟练", value: s.learningCount },
+    { name: "强化中", value: s.reviewingCount },
+  ];
+
   return (
     <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
       <KPI>
@@ -74,12 +91,12 @@ export default function KpiWithChartInline() {
                 className="text-3xl"
                 maximumFractionDigits={1}
                 style="percent"
-                value={0.423}
+                value={s.completionRate}
               />
               <div className="flex items-center gap-1.5">
                 <TrendChip trend="down" variant="tertiary">
                   5.9%
-                  <TrendChip.Suffix>本周已学25</TrendChip.Suffix>
+                  <TrendChip.Suffix>本周已学{s.weeklyStudied}</TrendChip.Suffix>
                 </TrendChip>
               </div>
             </div>
@@ -95,12 +112,12 @@ export default function KpiWithChartInline() {
                 <PieChart.Pie
                   cx="50%"
                   cy="50%"
-                  data={browserData}
+                  data={pieData}
                   dataKey="value"
                   nameKey="name"
                   outerRadius={50}
                 >
-                  {browserData.map((_, idx) => (
+                  {pieData.map((_, idx) => (
                     <PieChart.Cell
                       key={idx}
                       fill={CHART_COLORS[idx % CHART_COLORS.length]}
@@ -111,9 +128,7 @@ export default function KpiWithChartInline() {
               </PieChart>
 
               <div className="flex flex-1 flex-col gap-3 w-max ">
-                {browserData.map((entry, idx) => {
-                  const pct = ((entry.value / 999) * 100).toFixed(1);
-
+                {pieData.map((entry, idx) => {
                   return (
                     <div key={entry.name} className="flex items-center gap-1">
                       <span
@@ -131,7 +146,6 @@ export default function KpiWithChartInline() {
                           <span className="text-foreground text-sm font-semibold">
                             {entry.value}
                           </span>
-                          {/* <span className="text-muted text-xs">({pct}%)</span> */}
                         </div>
                       </div>
                     </div>
@@ -153,7 +167,7 @@ export default function KpiWithChartInline() {
             <KPI.Value
               className="text-3xl"
               maximumFractionDigits={0}
-              value={2441}
+              value={s.totalCount}
             />
             <div className="flex items-center gap-1.5">
               <TrendChip trend="up" variant="tertiary">

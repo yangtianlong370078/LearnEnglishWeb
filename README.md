@@ -1,42 +1,335 @@
-# Next.js & HeroUI Template
 
-This is a template for creating applications using Next.js 16 (app directory) and HeroUI (v3).
+# React \+ HeroUI V3 前端项目开发文档
 
-[Try it on CodeSandbox](https://githubbox.com/heroui-inc/heroui/next-app-template)
+## 1\. 项目概述
 
-## Technologies Used
+### 1\.1 项目简介
 
-- [Next.js 16](https://nextjs.org/docs/getting-started)
-- [HeroUI v3](https://heroui.com/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org/)
-- [next-themes](https://github.com/pacocoursey/next-themes)
+本项目基于 **React 1****9**** \+ HeroUI V3** 构建的现代化企业级前端应用，采用模块化、组件化、工程化架构设计，适配中大型后台管理系统、业务平台类场景。项目遵循高复用、低耦合、可扩展的架构原则，统一代码规范与交互标准，内置 React19 原生编译优化、异步状态管理、完善的性能优化方案、状态管理、路由权限、请求封装体系，可支撑长期迭代与多人协作开发。
 
-## How to Use
+前端通过标准化 RESTful 接口与 **\.NET 10 WebApi** 后端服务进行数据交互，请求路由、参数格式、异常处理、版本适配均针对\.NET 10 接口特性做专属适配，保证前后端数据通信一致性、稳定性与兼容性。
 
-### Use the template with create-next-app
+### 1\.2 技术栈明细
 
-To create a new project based on this template using `create-next-app`, run the following command:
+#### 核心基础栈
 
-```bash
-npx create-next-app -e https://github.com/heroui-inc/next-app-template
-```
+- **核心框架**：React 19 稳定版（全量函数组件\+Hooks开发，原生支持编译自动优化、异步Action、简化Context与Ref能力，摒弃类组件及冗余手动优化代码）
 
-### Install dependencies
+- **UI组件库**：HeroUI V3（轻量化、高定制化、适配深色/浅色主题，统一全局UI规范）
 
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
+- **构建工具**：Vite（极速冷启动、按需编译、产物优化，替代传统Webpack）
 
-```bash
+- **语言支持**：TypeScript 5\+（全项目类型约束，杜绝隐式any，提升代码健壮性）
+
+#### 路由与状态管理
+
+- **路由管理**：React Router V6（扁平化路由配置、路由守卫、懒加载、权限路由）
+
+- **全局状态**：Zustand（轻量高效、模块化状态、无冗余嵌套，替代Redux繁琐写法）
+
+- **本地状态**：React 19 原生Hooks（useState、useReducer、useActionState、useFormStatus 规范使用，依托原生能力简化异步、表单状态管理）
+
+#### 网络与接口适配
+
+- **请求库**：Axios（二次深度封装）
+
+- **接口适配**：适配 \.NET 10 WebApi 路由规范、数据返回格式、异常码体系、跨域策略
+
+- **数据处理**：请求拦截、响应拦截、统一参数序列化、后端枚举映射、空值兼容处理
+
+#### 样式与工具
+
+- **样式方案**：Tailwind CSS \+ HeroUI 主题定制（原子化样式，杜绝冗余CSS，全局主题统一）
+
+- **工具库**：Lodash、Dayjs、CryptoJS（按需引入，杜绝全量打包）
+
+- **表单方案**：React Hook Form \+ Zod（高性能表单校验、类型化表单规则）
+
+#### 工程规范与校验
+
+- **代码规范**：ESLint \+ Prettier（强制代码格式化、语法校验）
+
+- **提交规范**：Husky \+ Lint\-Staged \+ Commitlint（统一Git提交信息、提交前代码校验）
+
+- **类型校验**：全文件TS类型约束，接口、参数、状态全类型定义
+
+## 2\. 项目环境与依赖版本要求
+
+- **Node版本**：≥ 18\.16\.0（推荐20\+，适配Vite最新特性）
+
+- **包管理器**：pnpm 8\+（优先使用，提升依赖安装速度、减少冗余依赖）
+
+- **系统环境**：Windows / MacOS / Linux 全平台兼容
+
+- **后端依赖**：\.NET 10 WebApi（RESTful 接口、Token鉴权、标准HTTP状态码）
+
+## 3\. 快速启动
+
+### 3\.1 安装依赖
+
+```Plain Text
+# 推荐pnpm安装
+pnpm install
+
+# 备用npm安装
 npm install
 ```
 
-### Run the development server
+### 3\.2 本地开发启动
 
-```bash
-npm run dev
+```Plain Text
+# 本地开发环境（默认代理后端.NET 10接口）
+pnpm dev
 ```
 
-## License
+### 3\.3 代码校验与格式化
 
-Licensed under the [MIT license](https://github.com/heroui-inc/next-app-template/blob/main/LICENSE).
+```Plain Text
+# ESLint语法校验
+pnpm lint
+
+# 自动修复可修复的语法错误
+pnpm lint:fix
+
+# Prettier代码格式化
+pnpm format
+```
+
+### 3\.4 项目打包
+
+```Plain Text
+# 生产环境打包
+pnpm build
+
+# 打包预览
+pnpm preview
+```
+
+## 4\. 核心项目目录结构（架构级规范）
+
+项目采用 **分层架构 \+ 业务模块化** 设计，区分公共基础层、业务应用层、配置层，完全解耦基础能力与业务代码，支持大型项目长期迭代。
+
+```Plain Text
+├── .vscode/                # VSCode统一配置（团队开发规范、格式化、校验）
+├── public/                 # 静态资源（不参与打包，直接输出）
+├── src/
+│   ├── api/                # 接口请求层【核心】适配.NET 10 WebApi
+│   │   ├── request.ts      # Axios二次封装、拦截器、全局异常处理
+│   │   ├── config.ts       # 接口域名、超时时间、请求头全局配置
+│   │   └── modules/        # 按业务模块拆分接口（用户、权限、订单等）
+│   ├── assets/             # 打包静态资源（图片、字体、全局图标）
+│   ├── components/         # 公共组件层
+│   │   ├── business/       # 业务公共组件（多页面复用业务组件）
+│   │   └── common/         # 基础通用组件（弹窗、表格、搜索、空状态等）
+│   ├── config/             # 全局项目配置
+│   │   ├── router.ts       # 路由全局配置
+│   │   └── theme.ts        # HeroUI V3全局主题定制配置
+│   ├── hooks/              # 全局自定义Hooks（可复用逻辑抽离）
+│   ├── layouts/            # 全局布局组件（侧边栏、顶部导航、主布局）
+│   ├── pages/              # 业务页面层（按业务模块拆分目录）
+│   ├── router/             # 路由核心逻辑
+│   │   ├── index.ts        # 路由注册
+│   │   ├── guard.ts        # 路由守卫、权限校验、登录拦截
+│   │   └── lazy.ts         # 页面懒加载封装
+│   ├── store/              # 全局状态管理（Zustand模块化）
+│   ├── styles/             # 全局样式、重置样式、自定义样式
+│   ├── types/              # 全局TS类型定义（接口类型、枚举、全局声明）
+│   ├── utils/              # 全局工具函数
+│   │   ├── format.ts       # 数据格式化
+│   │   ├── validate.ts     # 通用校验规则
+│   │   └── storage.ts      # 本地缓存封装
+│   ├── App.tsx             # 根组件
+│   └── main.tsx            # 项目入口文件
+├── .eslintrc.js            # ESLint代码校验规则
+├── .prettierrc             # Prettier格式化规则
+├── tsconfig.json           # TypeScript全局配置
+├── vite.config.ts          # Vite打包与工程配置
+└── package.json            # 项目依赖与脚本
+```
+
+## 5\. 核心架构设计（重点）
+
+### 5\.1 接口请求架构（适配\.NET 10 WebApi）
+
+针对 **\.NET 10 WebApi** 后端特性做专属封装，统一前后端交互规范，解决\.NET接口常见的路由、参数、返回值、异常适配问题。
+
+#### 核心适配规则
+
+- **路由规范**：适配\.NET WebApi 默认路由 `/api/\[Controller\]/\[Action\]`，接口地址统一前缀`/api`
+
+- **数据格式**：适配\.NET 统一返回结构体 `\{ code: number, data: T, msg: string, success: boolean \}`
+
+- **参数适配**：GET请求参数自动序列化，POST/PUT请求统一JSON传参，兼容\.NET FromBody、FromQuery特性
+
+- **时间适配**：自动处理\.NET后端返回的时间戳、UTC时间，统一格式化本地时间
+
+- **异常处理**：对接\.NET 10 全局异常码，统一处理401（登录失效）、403（权限不足）、500（服务异常）等场景
+
+- **Token鉴权**：请求拦截自动携带 Authorization Bearer Token，适配\.NET JWT鉴权体系
+
+#### 请求分层设计
+
+接口严格分层，**页面不直接调用Axios**，所有请求统一走 api 模块，保证接口可维护、可复用、可统一修改。
+
+- 底层：axios 基础封装（拦截器、超时、请求头）
+
+- 中层：业务接口模块（按功能拆分，统一类型定义）
+
+- 上层：页面/组件调用（仅调用接口函数，不处理请求逻辑）
+
+### 5\.2 HeroUI V3 架构适配
+
+摒弃原生UI零散使用方式，对HeroUI V3进行**全局二次封装**，统一项目UI标准，规避原生组件兼容性问题，提升开发效率。
+
+- **主题统一**：全局定制主色、辅助色、圆角、阴影、字体尺寸，统一全局视觉规范
+
+- **组件封装**：对Table、Modal、Form、Select等高频组件二次封装，内置加载状态、空数据、异常状态、默认样式
+
+- **样式融合**：HeroUI 内置样式与Tailwind CSS结合，支持灵活样式覆盖，避免样式冲突
+
+- **按需引入**：所有HeroUI组件按需导入，杜绝全量打包，减小产物体积
+
+### 5\.3 状态管理架构
+
+采用 **Zustand 模块化状态**，替代传统Redux冗余架构，区分全局状态与局部状态，严格遵循状态使用规范。
+
+- **全局状态**：用户信息、权限、菜单、主题、全局加载状态（统一存放store）
+
+- **页面状态**：页面私有数据、表单数据、列表数据（组件内部useState/useReducer管理）
+
+- **状态优化**：使用状态切片订阅，避免全局状态更新导致组件无效重渲染
+
+### 5\.4 路由与权限架构
+
+- **路由分层**：静态路由（固定页面）\+ 动态路由（后端\.NET接口返回权限路由）
+
+- **路由懒加载**：所有业务页面组件懒加载，首屏极致优化
+
+- **权限控制**：基于\.NET后端返回的角色、权限标识，实现路由级、按钮级双重权限控制
+
+- **路由守卫**：统一登录校验、权限校验、页面跳转拦截、未登录重定向
+
+## 6\. 强制编码规范（团队统一标准）
+
+### 6\.1 组件开发规范
+
+- 所有组件**强制函数组件 \+ Hooks**，禁止使用类组件
+
+- 公共组件必须定义完整TS Props类型，禁止隐式any、任意属性
+
+- 组件单一职责原则：一个组件只做一件事，复杂组件拆分细粒度子组件
+
+- 遵循React19编译优化特性：无需无脑手动堆砌useMemo、useCallback，仅对特殊高频复杂计算场景手动缓存，依托原生编译器自动优化重渲染，精简代码同时保障性能
+
+- 页面组件、公共组件命名统一大驼峰（PascalCase），工具函数、hooks小驼峰（camelCase）
+
+### 6\.2 接口与数据规范
+
+- 所有\.NET接口请求、响应必须编写对应TS类型，严格约束数据结构
+
+- 接口模块按业务拆分，单个模块文件不超过500行，避免臃肿
+
+- 禁止页面内直接写接口地址、请求逻辑，必须统一调用api层方法
+
+- 接口异常统一全局捕获，页面只处理业务层面异常提示，不重复写拦截逻辑
+
+### 6\.3 样式开发规范
+
+- 优先使用Tailwind原子化样式，自定义样式统一抽取至全局样式文件
+
+- 禁止行内大量style样式，杜绝\!important强制覆盖样式
+
+- HeroUI组件样式覆盖统一通过全局主题配置或自定义class实现
+
+- 适配响应式布局，兼容不同屏幕尺寸，统一后台系统视觉适配规则
+
+### 6\.4 Git提交规范
+
+统一提交格式，规范版本迭代记录：`type\(模块\): 描述`
+
+- feat: 新增功能
+
+- fix: 修复bug
+
+- refactor: 代码重构（无功能变更）
+
+- perf: 性能优化
+
+- docs: 文档修改
+
+- style: 样式、格式调整
+
+## 7\. 全方位性能优化方案
+
+### 7\.1 构建打包优化（Vite）
+
+- **依赖预构建**：Vite预构建第三方依赖，提升本地热更新速度
+
+- **按需引入**：HeroUI、Lodash、图标库全部按需导入，剔除冗余代码
+
+- **分包策略**：第三方依赖、业务代码、公共代码拆分打包，利用浏览器缓存
+
+- **资源压缩**：生产环境开启JS、CSS、图片压缩，清除console、debug代码
+
+### 7\.2 运行时性能优化
+
+- **组件缓存**：依托React19原生编译器自动依赖分析与重渲染优化，减少手动React\.memo、useMemo、useCallback冗余写法，仅针对超复杂计算、固定回调场景做精准缓存，杜绝无效重渲染
+
+- **页面懒加载**：路由级懒加载、组件级懒加载、图片懒加载
+
+- **列表优化**：长列表使用虚拟滚动，避免DOM节点过多导致页面卡顿
+
+- **请求优化**：接口请求防抖、节流，重复请求取消机制，避免冗余网络请求
+
+### 7\.3 体验优化
+
+- 全局加载状态、接口请求loading、空数据、异常兜底状态
+
+- Token过期自动刷新、静默登录、无感知续期
+
+- 接口失败重试、网络异常兜底提示
+
+- 页面缓存、表单数据缓存，避免重复操作
+
+## 8\. 工程化与质量保障
+
+- **全量TS约束**：无隐式any，页面、组件、接口、状态全类型覆盖，减少运行时报错
+
+- **强制代码校验**：提交代码自动触发ESLint校验，不规范代码禁止提交
+
+- **统一格式化**：Prettier统一代码缩进、换行、空格规范，杜绝代码风格混乱
+
+- **原生特性赋能**：全面落地React19稳定特性，简化Context使用、移除冗余forwardRef、原生接管表单异步状态、Ref回调自动清理，精简代码量、降低维护成本、减少内存泄漏风险
+
+## 9\. 前后端协作规范（\.NET 10 WebApi）
+
+- **接口前缀统一**：所有后端接口统一 `/api` 前缀，前端代理统一转发，避免跨域问题
+
+- **数据结构对齐**：前端TS类型严格对齐\.NET后端实体类字段，字段名、类型、枚举保持一致
+
+- **异常码统一**：前后端约定统一业务异常码，前端统一弹窗、提示、跳转逻辑
+
+- **版本兼容**：适配\.NET 10 新特性接口，兼容RESTful标准请求方式（GET/POST/PUT/DELETE）
+
+- **权限对齐**：前端权限标识、角色字段与\.NET后端权限体系完全统一，避免权限校验不一致
+
+## 10\. 常见问题与注意事项
+
+- **接口跨域**：本地开发通过Vite代理转发\.NET接口，生产环境由后端配置跨域策略
+
+- **HeroUI样式冲突**：禁止直接修改组件源码，统一通过主题配置和自定义class覆盖样式
+
+- **状态滥用**：局部状态禁止存入全局store，避免全局状态臃肿、更新冗余
+
+- **版本特性适配**：严格遵循React19最佳实践，禁止滥用手动优化API、兼容新版Context、Ref、Action特性，不保留React18遗留冗余写法
+
+- **重复请求**：高频操作接口已内置取消重复请求逻辑，无需页面单独处理
+
+## 11\. 版本与维护
+
+- **技术版本**：锁定 React 19 稳定版、HeroUI V3 最新兼容版本，长期跟进版本迭代，规避破坏性更新，保障项目稳定性
+
+- **迭代规范**：业务迭代遵循模块化开发，新增功能对应新增模块，不改动基础架构
+
+- **兼容保障**：保证\.NET 10 WebApi接口迭代向前兼容，前端无需频繁适配改造
+

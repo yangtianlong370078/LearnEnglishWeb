@@ -10,8 +10,8 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Log the error to an error reporting service
-    /* eslint-disable no-console */
+    // 上报错误到错误监控服务
+    // eslint-disable-next-line no-console
     console.error(error);
   }, [error]);
 

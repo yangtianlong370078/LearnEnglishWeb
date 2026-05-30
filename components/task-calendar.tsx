@@ -5,7 +5,6 @@ import {
   Button,
   Label,
   Card,
-  Chip,
   ButtonGroup,
   Modal,
   NumberField,
@@ -16,32 +15,10 @@ import {
 
 import RadialChartWithLegend from "@/components/radial-chart-with-legend";
 
-import { ChevronLeft, ChevronRight } from "@gravity-ui/icons";
-import { Edit, Gear,Plus } from "@gravity-ui/icons";
+import { ChevronLeft, ChevronRight, Gear, Plus } from "@gravity-ui/icons";
 
-import { Separator } from "@heroui/react";
-
-import JeDatePicker, {
-  MonthCompletion,
-  MonthValue,
-} from "./task-year-calendar";
-
-const sampleStats: MonthCompletion[] = [
-  { year: 2025, month: 1, percent: 0 },
-  { year: 2025, month: 2, percent: 20 },
-  { year: 2025, month: 3, percent: 0 },
-  { year: 2025, month: 4, percent: 60 },
-  { year: 2025, month: 5, percent: null },
-  { year: 2025, month: 6, percent: null },
-  { year: 2025, month: 7, percent: 96 },
-  { year: 2025, month: 8, percent: 3 },
-  { year: 2025, month: 9, percent: 100 },
-  { year: 2025, month: 10, percent: null },
-  { year: 2025, month: 11, percent: 0 },
-  { year: 2025, month: 12, percent: 1 },
-  { year: 2026, month: 4, percent: 100 },
-  { year: 2026, month: 5, percent: 30 },
-];
+import JeDatePicker from "./task-year-calendar";
+import type { MonthCompletion, MonthValue, MonthlyData } from "@/types";
 
 type DayStatus = "pending" | "weekend" | "done" | "missed" | "warn" | "empty";
 
@@ -54,25 +31,6 @@ interface DayInfo {
   isFuture: boolean;
   status: DayStatus;
   label: string;
-}
-
-interface StatisticsLearn {
-  year: number;
-  month: number;
-  day: number;
-  count: number;
-}
-
-interface MonthlyTask {
-  count: number;
-  weekend: 0 | 1 | 2 | 3;
-}
-
-interface MonthlyData {
-  year: number;
-  month: number;
-  statisticsLearns: StatisticsLearn[];
-  task: MonthlyTask | null;
 }
 
 const WEEK_LABELS = ["周一", "周二", "周三", "周四", "周五", "周六", "周日"];
@@ -355,7 +313,7 @@ function CreateTaskButton() {
               <Button slot="close" variant="secondary">
                 取消
               </Button>
-              <Button slot="close">保存</Button>
+              <Button onPress={handleSave}>保存</Button>
             </Modal.Footer>
             </Modal.Dialog>
           </Modal.Container>
@@ -369,10 +327,16 @@ export default function TaskCalendar({
   value,
   onChange,
   onShowYearView,
+  monthlyData,
+  yearStats,
 }: {
   value?: MonthValue;
   onChange?: (v: MonthValue) => void;
   onShowYearView?: (stats: MonthCompletion[]) => void;
+  /** 来自接口的月度数据，未传入时使用示例数据 */
+  monthlyData?: MonthlyData;
+  /** 年历各月完成情况，未传入时展示空 */
+  yearStats?: MonthCompletion[];
 } = {}) {
   const today = useMemo(() => new Date(), []);
   const [innerCursor, setInnerCursor] = useState(
@@ -392,8 +356,9 @@ export default function TaskCalendar({
     }
   };
 
-  // ---- Demo dataset ----
+  // 月度数据：使用外部传入的接口数据，无则回退示例数据
   const data: MonthlyData = useMemo(() => {
+    if (monthlyData) return monthlyData;
     const y = cursor.getFullYear();
     const m = cursor.getMonth() + 1;
     return {
@@ -417,7 +382,7 @@ export default function TaskCalendar({
         { year: y, month: m, day: 28, count: 1 },
       ],
     };
-  }, [cursor]);
+  }, [monthlyData, cursor]);
 
   const cells = useMemo(
     () => buildGrid(cursor, data, today),
@@ -458,7 +423,7 @@ export default function TaskCalendar({
                 </Button>
                 <Button
                   aria-label="选择月份"
-                  onPress={() => onShowYearView?.(sampleStats)}
+                  onPress={() => onShowYearView?.(yearStats ?? [])}
                 >
                   <ButtonGroup.Separator />
                   <span className="text-sm font-medium">{monthLabel}</span>
@@ -474,7 +439,7 @@ export default function TaskCalendar({
               className="ml-1"
               isDisabled={isCurrentMonth}
               size="sm"
-              variant="flat"
+              variant="ghost"
               onPress={goToday}
             >
               今天
