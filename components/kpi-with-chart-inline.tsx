@@ -64,9 +64,9 @@ export default function KpiWithChartInline() {
       <KPI>
         <KPI.Content className="grid-cols-[1fr_1fr] items-end">
           <div className="flex flex-col justify-between h-full gap-2 ">
-            <KPI.Header>
+            <KPI.Header className="w-max">
               <SquareChartBar className="text-muted size-4" />
-              <KPI.Title>任务完成率</KPI.Title>
+              <KPI.Title>已学习统计</KPI.Title>
             </KPI.Header>
 
             <div className="flex flex-col gap-1">
@@ -79,14 +79,14 @@ export default function KpiWithChartInline() {
               <div className="flex items-center gap-1.5">
                 <TrendChip trend="down" variant="tertiary">
                   5.9%
-                  <TrendChip.Suffix>对比过去7天</TrendChip.Suffix>
+                  <TrendChip.Suffix>本周已学25</TrendChip.Suffix>
                 </TrendChip>
               </div>
             </div>
           </div>
 
           <div className="flex items-center justify-end w-full">
-            <div className="flex items-center justify-center w-max">
+            <div className="flex items-center justify-center w-full gap-2 sm:gap-6">
               <PieChart
                 height={104}
                 width={104}
@@ -110,7 +110,7 @@ export default function KpiWithChartInline() {
                 <PieChart.Tooltip content={<PieTooltip />} />
               </PieChart>
 
-              <div className="flex flex-1 flex-col gap-3 w-1/2 ml-[10px] ">
+              <div className="flex flex-1 flex-col gap-3 w-max ">
                 {browserData.map((entry, idx) => {
                   const pct = ((entry.value / 999) * 100).toFixed(1);
 
