@@ -136,8 +136,10 @@ export default function RadialChartWithLegend({
             outerRadius="100%"
             width={220}
           >
+            <RadialChart.AngleAxis angleAxisId={0} domain={[0, 100]} tick={false} type="number" />
             <RadialChart.Bar
               background
+              angleAxisId={0}
               barSize={16}
               cornerRadius={12}
               dataKey="value"

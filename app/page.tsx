@@ -30,10 +30,20 @@ export default function Home() {
   const [animating, setAnimating] = useState(false);
 
   // 拉取后端学习统计数据（StatisticsLearnCountTwo）
+  // 1) 进入页面立即用 localStorage 缓存渲染（stale）；
+  // 2) 同时后台请求最新数据（revalidate），ETag 命中 304 时无 body 传输。
   useEffect(() => {
     let cancelled = false;
 
-    setStatsLoading(true);
+    const cached = statisticsApi.getCachedMonthlyStatistics();
+    if (cached) {
+      setMonthlyList(cached.monthly);
+      setYearStats(cached.yearStats);
+      setStatsLoading(false); // 先把骨架屏关掉，再去后台校验
+    } else {
+      setStatsLoading(true);
+    }
+
     statisticsApi
       .getMonthlyStatisticsWithYearStats()
       .then((res) => {
@@ -42,7 +52,7 @@ export default function Home() {
         setYearStats(res.yearStats);
       })
       .catch((err) => {
-        // 失败时仅打印日志，组件渲染空状态
+        // 失败时仅打印日志，若已有缓存则保持显示
         // eslint-disable-next-line no-console
         console.error("加载学习统计失败:", err);
       })

@@ -24,6 +24,20 @@ const HOP_BY_HOP = new Set([
   "content-length",
 ]);
 
+/**
+ * 不应透传给浏览器的响应头。
+ * - content-encoding / content-length：Node fetch (undici) 已经把
+ *   gzip/br 自动解压成明文 body，再把原始 Content-Encoding 透传给浏览器
+ *   会导致浏览器二次解码失败（表现为 axios Network Error）。
+ */
+const RESPONSE_STRIP = new Set([
+  "content-encoding",
+  "content-length",
+  "transfer-encoding",
+  "connection",
+  "keep-alive",
+]);
+
 function buildHeaders(req: NextRequest): HeadersInit {
   const headers: Record<string, string> = {};
 
@@ -58,7 +72,7 @@ async function proxy(
     const respHeaders = new Headers();
 
     upstream.headers.forEach((value, key) => {
-      if (!HOP_BY_HOP.has(key.toLowerCase())) {
+      if (!RESPONSE_STRIP.has(key.toLowerCase())) {
         respHeaders.set(key, value);
       }
     });

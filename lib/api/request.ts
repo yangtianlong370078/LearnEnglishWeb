@@ -38,6 +38,11 @@ request.interceptors.request.use(
 // ── 响应拦截器：适配 .NET 10 返回结构、全局异常处理 ──────────────
 request.interceptors.response.use(
   (response: AxiosResponse<ApiResponse>) => {
+    // 304 Not Modified：无响应体，直接放行交由调用方复用本地缓存
+    if (response.status === 304) {
+      return response;
+    }
+
     const res = response.data;
 
     // .NET 接口业务层错误
