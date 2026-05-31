@@ -4,4 +4,5 @@
 export * as taskApi from "./modules/task";
 export * as wordApi from "./modules/word";
 export * as authApi from "./modules/auth";
+export * as statisticsApi from "./modules/statistics";
 export { get, post, put, del } from "./request";

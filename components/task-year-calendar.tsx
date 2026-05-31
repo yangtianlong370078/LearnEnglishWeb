@@ -10,7 +10,7 @@ import BarChartComparisonDemo from "@/components/bar-chart-comparison-demo";
 import AreaChartMultiAreaDemo from "@/components/area-chart-multi-area-demo";
 
 // 从 types 目录导入并重新导出，保持对外兼容
-import type { MonthValue, MonthCompletion } from "@/types";
+import type { MonthValue, MonthCompletion, MonthlyData } from "@/types";
 export type { MonthValue, MonthCompletion };
 
 interface JeDatePickerProps {
@@ -19,6 +19,8 @@ interface JeDatePickerProps {
   onChange?: (value: MonthValue) => void;
   /** Optional per-month statistics rendered below each month label. */
   stats?: MonthCompletion[];
+  /** 缓存的全部月度数据，用于年度面积图按年展示 */
+  monthlyList?: MonthlyData[];
   /** Minimum / maximum selectable year. */
   minYear?: number;
   maxYear?: number;
@@ -53,6 +55,7 @@ export default function TaskYearCalendar({
   defaultValue,
   onChange,
   stats,
+  monthlyList,
   minYear = 1970,
   maxYear = 2100,
   formatTrigger = DEFAULT_TRIGGER_FORMAT,
@@ -201,7 +204,7 @@ export default function TaskYearCalendar({
           </div>
         </Card>
 
-        <AreaChartMultiAreaDemo />
+        <AreaChartMultiAreaDemo monthlyList={monthlyList} year={panelYear} />
       </div>
     </Card>
   );

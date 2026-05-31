@@ -1,46 +1,99 @@
-"use client";
+﻿"use client";
 
-import {Card} from "@heroui/react";
+import { useMemo } from "react";
 
-import {AreaChart} from "@heroui-pro/react";
+import { Card } from "@heroui/react";
+import { AreaChart } from "@heroui-pro/react";
 
-const trafficData = [
-  {month: "1", organic: 2000, paidAds: 1000},
-  {month: "2", organic: 5000, paidAds: 3000},
-  {month: "3", organic: 8000, paidAds: 5000},
-  {month: "4", organic: 7000, paidAds: 6000},
-  {month: "5", organic: 9500, paidAds: 4000},
-  {month: "6", organic: 8000, paidAds: 9500},
-  {month: "7", organic: 12000, paidAds: 7000},
-  {month: "8", organic: 11000, paidAds: 6500},
-  {month: "9", organic: 14000, paidAds: 8000},
-  {month: "10", organic: 13000, paidAds: 9000},
-  {month: "11", organic: 16000, paidAds: 10000},
-  {month: "12", organic: 15000, paidAds: 9500},
-];
+import type { MonthlyData } from "@/types";
 
-export default function AreaChartMultiAreaDemo() {
+export interface AreaChartMultiAreaDemoProps {
+  /** 缓存的全部月度数据（来自 StatisticsLearnCountTwo 接口） */
+  monthlyList?: MonthlyData[];
+  /** 要展示的年份，默认当前年 */
+  year?: number;
+}
+
+interface MonthChartItem {
+  [key: string]: string | number;
+  month: string;
+  /** 当月已完成数量（statisticsLearns 求和） */
+  done: number;
+  /** 当月任务总数（无任务则为 0） */
+  task: number;
+}
+
+function buildYearData(
+  year: number,
+  monthlyList: MonthlyData[],
+): MonthChartItem[] {
+  const indexed = new Map<number, MonthlyData>();
+
+  monthlyList.forEach((m) => {
+    if (m.year === year) indexed.set(m.month, m);
+  });
+
+  return Array.from({ length: 12 }, (_, i) => {
+    const month = i + 1;
+    const data = indexed.get(month);
+    const done =
+      data?.statisticsLearns.reduce((sum, s) => sum + (s.count ?? 0), 0) ?? 0;
+    const task = data?.task?.count ?? 0;
+
+    return { month: String(month), done, task };
+  });
+}
+
+export default function AreaChartMultiAreaDemo({
+  monthlyList = [],
+  year,
+}: AreaChartMultiAreaDemoProps = {}) {
+  const currentYear = year ?? new Date().getFullYear();
+
+  const chartData = useMemo(
+    () => buildYearData(currentYear, monthlyList),
+    [currentYear, monthlyList],
+  );
+
+  const totals = useMemo(() => {
+    let done = 0;
+    let task = 0;
+
+    chartData.forEach((d) => {
+      done += d.done;
+      task += d.task;
+    });
+    const rate = task > 0 ? Math.floor((done / task) * 100) : 0;
+
+    return { done, task, rate };
+  }, [chartData]);
+
   return (
     <Card className="w-full  rounded-2xl">
       <Card.Header className="flex-row items-center justify-between">
-        <Card.Title className="text-base">年度任务明细</Card.Title>
+        <Card.Title className="text-base">{currentYear}年任务明细</Card.Title>
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <span className="size-3 rounded-full" style={{backgroundColor: "var(--chart-3)"}} />
-            <span className="text-muted text-xs">新学单词</span>
+            <span className="text-muted text-xs">已完成</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="size-3 rounded-full" style={{backgroundColor: "var(--chart-1)"}} />
-            <span className="text-muted text-xs">任务单词</span>
+            <span className="text-muted text-xs">任务量</span>
           </div>
         </div>
       </Card.Header>
       <Card.Content className="flex flex-col gap-4">
         <div className="flex flex-col">
-          <span className="text-foreground text-lg font-semibold">231,856</span>
-          <span className="text-muted text-xs">任务完成率</span>
+          <span className="text-foreground text-lg font-semibold">
+            {totals.done.toLocaleString()} / {totals.task.toLocaleString()}
+            <span className="text-muted ml-2 text-sm font-normal">
+              （{totals.rate}%）
+            </span>
+          </span>
+          <span className="text-muted text-xs">本年任务完成率</span>
         </div>
-        <AreaChart data={trafficData} height={200}>
+        <AreaChart data={chartData} height={200}>
           <defs>
             <linearGradient id="organic-fill" x1="0" x2="0" y1="0" y2="1">
               <stop offset="0%" stopColor="var(--chart-3)" stopOpacity={0.2} />
@@ -52,25 +105,29 @@ export default function AreaChartMultiAreaDemo() {
             </linearGradient>
           </defs>
           <AreaChart.Grid vertical={false} />
-          <AreaChart.XAxis dataKey="month" tickMargin={8} />
+          <AreaChart.XAxis
+            dataKey="month"
+            tickFormatter={(v: string) => `${v}月`}
+            tickMargin={8}
+          />
           <AreaChart.YAxis
-            tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${v}`)}
-            width={30}
+            tickFormatter={(v: number) => (v >= 1000 ? `${(v / 1000).toFixed(1)}k` : `${v}`)}
+            width={36}
           />
           <AreaChart.Area
-            dataKey="organic"
+            dataKey="done"
             dot={false}
             fill="url(#organic-fill)"
-            name="Organic"
+            name="已完成"
             stroke="var(--chart-3)"
             strokeWidth={2}
             type="monotone"
           />
           <AreaChart.Area
-            dataKey="paidAds"
+            dataKey="task"
             dot={false}
             fill="url(#paidads-fill)"
-            name="Paid Ads"
+            name="任务量"
             stroke="var(--chart-1)"
             strokeWidth={2}
             type="monotone"

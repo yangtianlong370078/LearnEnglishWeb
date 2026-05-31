@@ -10,6 +10,8 @@ import {
   NumberField,
   Checkbox,
   CheckboxGroup,
+  Skeleton,
+  Spinner,
   useOverlayState,
 } from "@heroui/react";
 
@@ -129,8 +131,12 @@ function buildGrid(
         if (doneCount >= taskCount) status = "done";
         else if (doneCount === 0) status = "missed";
         else status = "warn";
-      } else {
+      } else if (taskCount > 0) {
         status = "pending";
+      } else {
+        // 未来日期但无任务量，则不显示
+        status = "empty";
+        label = "";
       }
     }
 
@@ -165,8 +171,10 @@ function buildGrid(
 }
 
 const STATUS_BAR: Record<DayStatus, string> = {
-  pending: "bg-[#FF6B3D] text-white",
-  weekend: "bg-[#1FB89A] text-white",
+  pending:
+    "bg-[lab(93.0314%_0.0993609_-0.364041)] text-[#5e5e5e] dark:bg-white/5 dark:text-white/40",
+  weekend:
+    "bg-[lab(93.0314%_0.0993609_-0.364041)] text-[#5e5e5e] dark:bg-white/5 dark:text-white/40",
   done: "bg-[#1FB89A] text-white",
   missed: "bg-[#FF6B3D] text-white",
   warn: "bg-[#F5B400] text-white",
@@ -329,14 +337,17 @@ export default function TaskCalendar({
   onShowYearView,
   monthlyData,
   yearStats,
+  isLoading = false,
 }: {
   value?: MonthValue;
   onChange?: (v: MonthValue) => void;
   onShowYearView?: (stats: MonthCompletion[]) => void;
-  /** 来自接口的月度数据，未传入时使用示例数据 */
+  /** 来自接口的月度数据，未传入时以空数据渲染 */
   monthlyData?: MonthlyData;
   /** 年历各月完成情况，未传入时展示空 */
   yearStats?: MonthCompletion[];
+  /** 是否正在加载数据，为 true 时显示骨架屏动画 */
+  isLoading?: boolean;
 } = {}) {
   const today = useMemo(() => new Date(), []);
   const [innerCursor, setInnerCursor] = useState(
@@ -356,31 +367,14 @@ export default function TaskCalendar({
     }
   };
 
-  // 月度数据：使用外部传入的接口数据，无则回退示例数据
+  // 月度数据：仅使用接口数据，无数据时返回空结构
   const data: MonthlyData = useMemo(() => {
     if (monthlyData) return monthlyData;
-    const y = cursor.getFullYear();
-    const m = cursor.getMonth() + 1;
     return {
-      year: y,
-      month: m,
-      task: { count: 50, weekend: 3 },
-      statisticsLearns: [
-        { year: y, month: m, day: 1, count: 2 },
-        { year: y, month: m, day: 2, count: 2 },
-        { year: y, month: m, day: 3, count: 2 },
-        { year: y, month: m, day: 4, count: 2 },
-        { year: y, month: m, day: 6, count: 2 },
-        { year: y, month: m, day: 7, count: 2 },
-        { year: y, month: m, day: 8, count: 2 },
-        { year: y, month: m, day: 9, count: 2 },
-        { year: y, month: m, day: 10, count: 2 },
-        { year: y, month: m, day: 11, count: 2 },
-        { year: y, month: m, day: 13, count: 2 },
-        { year: y, month: m, day: 20, count: 32 },
-        { year: y, month: m, day: 22, count: 3 },
-        { year: y, month: m, day: 28, count: 1 },
-      ],
+      year: cursor.getFullYear(),
+      month: cursor.getMonth() + 1,
+      task: null,
+      statisticsLearns: [],
     };
   }, [monthlyData, cursor]);
 
@@ -475,24 +469,40 @@ export default function TaskCalendar({
             ))}
           </div>
 
-          <div className="grid grid-cols-7 gap-2">
-            {(() => {
-              const rows: DayInfo[][] = [];
-              for (let r = 0; r < cells.length / 7; r++) {
-                rows.push(cells.slice(r * 7, r * 7 + 7));
-              }
-              return rows
-                .filter((row) => row.some((c) => c.inMonth))
-                .flat()
-                .map((cell, i) => (
-                  <DayCell
-                    key={i}
-                    cell={cell}
-                    isToday={cell.date.toDateString() === today.toDateString()}
-                  />
-                ));
-            })()}
-          </div>
+          {isLoading ? (
+            <div className="relative">
+              <div className="grid grid-cols-7 gap-2" aria-hidden>
+                {Array.from({ length: 35 }).map((_, i) => (
+                  <div key={i} className="flex flex-col gap-1">
+                    <Skeleton className="mx-auto h-7 w-7 rounded-full" />
+                    <Skeleton className="h-6 w-full rounded-md" />
+                  </div>
+                ))}
+              </div>
+              <div className="pointer-events-none absolute inset-0 flex items-center justify-center">
+                <Spinner aria-label="加载中" />
+              </div>
+            </div>
+          ) : (
+            <div className="grid grid-cols-7 gap-2">
+              {(() => {
+                const rows: DayInfo[][] = [];
+                for (let r = 0; r < cells.length / 7; r++) {
+                  rows.push(cells.slice(r * 7, r * 7 + 7));
+                }
+                return rows
+                  .filter((row) => row.some((c) => c.inMonth))
+                  .flat()
+                  .map((cell, i) => (
+                    <DayCell
+                      key={i}
+                      cell={cell}
+                      isToday={cell.date.toDateString() === today.toDateString()}
+                    />
+                  ));
+              })()}
+            </div>
+          )}
         </Card>
 
         {/* <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 pt-1 text-[11px] text-default-500">
@@ -501,7 +511,19 @@ export default function TaskCalendar({
           <Legend color="#1FB89A" label="已完成 / 休" />
         </div> */}
 
-        <RadialChartWithLegend />
+        {isLoading ? (
+          <Card className="flex items-center justify-center rounded-2xl">
+            <Skeleton className="h-48 w-48 rounded-full" />
+          </Card>
+        ) : (
+          <RadialChartWithLegend
+            monthValue={{
+              year: cursor.getFullYear(),
+              month: cursor.getMonth() + 1,
+            }}
+            monthlyData={data}
+          />
+        )}
       </div>
     </Card>
   );

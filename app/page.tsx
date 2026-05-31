@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 
 import KpiWithChartInline from "@/components/kpi-with-chart-inline";
@@ -11,6 +11,8 @@ import type {
   MonthCompletion,
   MonthValue,
 } from "@/components/task-year-calendar";
+import { statisticsApi } from "@/lib/api";
+import type { MonthlyData } from "@/types/task";
 
 export default function Home() {
   const today = new Date();
@@ -22,8 +24,45 @@ export default function Home() {
   const [yearStats, setYearStats] = useState<MonthCompletion[] | undefined>(
     undefined,
   );
+  const [monthlyList, setMonthlyList] = useState<MonthlyData[]>([]);
+  const [statsLoading, setStatsLoading] = useState(true);
   // 动画结束后清掉 willChange / filter，避免 GPU 合成层导致的文字模糊
   const [animating, setAnimating] = useState(false);
+
+  // 拉取后端学习统计数据（StatisticsLearnCountTwo）
+  useEffect(() => {
+    let cancelled = false;
+
+    setStatsLoading(true);
+    statisticsApi
+      .getMonthlyStatisticsWithYearStats()
+      .then((res) => {
+        if (cancelled) return;
+        setMonthlyList(res.monthly);
+        setYearStats(res.yearStats);
+      })
+      .catch((err) => {
+        // 失败时仅打印日志，组件渲染空状态
+        // eslint-disable-next-line no-console
+        console.error("加载学习统计失败:", err);
+      })
+      .finally(() => {
+        if (!cancelled) setStatsLoading(false);
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  // 当前选中月份对应的 MonthlyData
+  const currentMonthly = useMemo(
+    () =>
+      monthlyList.find(
+        (m) => m.year === monthValue.year && m.month === monthValue.month,
+      ),
+    [monthlyList, monthValue],
+  );
 
   const sharedStyle = animating
     ? ({
@@ -88,7 +127,10 @@ export default function Home() {
               }}
             >
               <TaskCalendar
+                isLoading={statsLoading}
+                monthlyData={currentMonthly}
                 value={monthValue}
+                yearStats={yearStats}
                 onChange={setMonthValue}
                 onShowYearView={(stats) => {
                   setYearStats(stats);
@@ -128,6 +170,7 @@ export default function Home() {
             >
               <TaskYearCalendar
                 inline
+                monthlyList={monthlyList}
                 stats={yearStats}
                 value={monthValue}
                 onChange={setMonthValue}
