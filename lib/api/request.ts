@@ -55,6 +55,7 @@ request.interceptors.response.use(
         // Token 失效，清除本地凭证并跳转登录
         if (typeof window !== "undefined") {
           localStorage.removeItem("token");
+          document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
           window.location.href = "/login";
         }
         break;
