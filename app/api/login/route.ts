@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
  * 不再生效，因此通过此 Route Handler 用 Node 原生 fetch 转发。
  */
 const BACKEND_URL =
-  process.env.DOTNET_API_URL ?? "https://localhost:6121";
+  process.env.DOTNET_API_URL ?? "https://localhost:54807";
 
 export async function POST(req: NextRequest) {
   const body = await req.text();
