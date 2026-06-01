@@ -75,7 +75,7 @@ export default function AreaChartMultiAreaDemo({
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-1.5">
             <span className="size-3 rounded-full" style={{backgroundColor: "var(--chart-3)"}} />
-            <span className="text-muted text-xs">已完成</span>
+            <span className="text-muted text-xs">已学习</span>
           </div>
           <div className="flex items-center gap-1.5">
             <span className="size-3 rounded-full" style={{backgroundColor: "var(--chart-1)"}} />
@@ -118,7 +118,7 @@ export default function AreaChartMultiAreaDemo({
             dataKey="done"
             dot={false}
             fill="url(#organic-fill)"
-            name="已完成"
+            name="已学习"
             stroke="var(--chart-3)"
             strokeWidth={2}
             type="monotone"

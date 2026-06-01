@@ -32,22 +32,11 @@ export default function Home() {
   // 拉取后端学习统计数据（StatisticsLearnCountTwo）
   // 1) 进入页面立即用 localStorage 缓存渲染（stale）；
   // 2) 同时后台请求最新数据（revalidate），ETag 命中 304 时无 body 传输。
-  useEffect(() => {
-    let cancelled = false;
-
-    const cached = statisticsApi.getCachedMonthlyStatistics();
-    if (cached) {
-      setMonthlyList(cached.monthly);
-      setYearStats(cached.yearStats);
-      setStatsLoading(false); // 先把骨架屏关掉，再去后台校验
-    } else {
-      setStatsLoading(true);
-    }
-
+  const refreshStats = (showLoading = false) => {
+    if (showLoading) setStatsLoading(true);
     statisticsApi
       .getMonthlyStatisticsWithYearStats()
       .then((res) => {
-        if (cancelled) return;
         setMonthlyList(res.monthly);
         setYearStats(res.yearStats);
       })
@@ -57,12 +46,21 @@ export default function Home() {
         console.error("加载学习统计失败:", err);
       })
       .finally(() => {
-        if (!cancelled) setStatsLoading(false);
+        setStatsLoading(false);
       });
+  };
 
-    return () => {
-      cancelled = true;
-    };
+  useEffect(() => {
+    const cached = statisticsApi.getCachedMonthlyStatistics();
+    if (cached) {
+      setMonthlyList(cached.monthly);
+      setYearStats(cached.yearStats);
+      setStatsLoading(false); // 先把骨架屏关掉，再去后台校验
+    } else {
+      setStatsLoading(true);
+    }
+    refreshStats();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 当前选中月份对应的 MonthlyData
@@ -146,6 +144,7 @@ export default function Home() {
                   setYearStats(stats);
                   setView("year");
                 }}
+                onTaskSaved={() => refreshStats()}
               />
             </motion.div>
           ) : (

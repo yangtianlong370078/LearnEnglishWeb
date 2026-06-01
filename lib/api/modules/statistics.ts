@@ -202,3 +202,30 @@ export async function getMonthlyStatisticsWithYearStats(): Promise<CachedStats> 
     throw err;
   }
 }
+
+/**
+ * 保存/更新月度学习任务（对应后端 SaveLearntask 接口）
+ * 成功后清除本地 ETag 缓存，确保下次调用 getMonthlyStatisticsWithYearStats 能取到最新数据
+ */
+export async function saveLearntask(params: {
+  count: number;
+  year: number;
+  month: number;
+  weekend: 0 | 1 | 2 | 3;
+}): Promise<void> {
+  const dateStr = `${params.year}-${String(params.month).padStart(2, "0")}-01`;
+
+  await request.post("/Statistics/SaveLearntask", null, {
+    params: {
+      id: 0,
+      count: params.count,
+      date: dateStr,
+      weekend: params.weekend,
+    },
+  });
+
+  // 清除 ETag，确保下次请求强制从服务端拉取最新数据
+  if (typeof window !== "undefined") {
+    localStorage.removeItem(STATS_ETAG_KEY);
+  }
+}

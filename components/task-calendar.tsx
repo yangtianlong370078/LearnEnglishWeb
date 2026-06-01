@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import {
   Button,
   Label,
@@ -16,6 +16,7 @@ import {
 } from "@heroui/react";
 
 import RadialChartWithLegend from "@/components/radial-chart-with-legend";
+import { saveLearntask } from "@/lib/api/modules/statistics";
 
 import { ChevronLeft, ChevronRight, Gear, Plus } from "@gravity-ui/icons";
 
@@ -230,14 +231,64 @@ function DayCell({ cell, isToday }: { cell: DayInfo; isToday: boolean }) {
   );
 }
 
-function CreateTaskButton() {
-  const state = useOverlayState();
-  const [wordCount, setWordCount] = useState<number | null>(null);
-  const [weekend, setWeekend] = useState<string[]>([]);
+function weekendToArray(w: 0 | 1 | 2 | 3): string[] {
+  if (w === 1) return ["sat"];
+  if (w === 2) return ["sun"];
+  if (w === 3) return ["sat", "sun"];
+  return [];
+}
 
-  const handleSave = () => {
-    // TODO: 将 wordCount / weekend 传出去
-    state.close();
+function arrayToWeekend(arr: string[]): 0 | 1 | 2 | 3 {
+  const hasSat = arr.includes("sat");
+  const hasSun = arr.includes("sun");
+  if (hasSat && hasSun) return 3;
+  if (hasSat) return 1;
+  if (hasSun) return 2;
+  return 0;
+}
+
+interface CreateTaskButtonProps {
+  taskCount?: number;
+  weekendMode?: 0 | 1 | 2 | 3;
+  cursorDate: Date;
+  onSaved?: () => void;
+}
+
+function CreateTaskButton({
+  taskCount = 0,
+  weekendMode = 0,
+  cursorDate,
+  onSaved,
+}: CreateTaskButtonProps) {
+  const state = useOverlayState();
+  const [wordCount, setWordCount] = useState<number | null>(
+    taskCount > 0 ? taskCount : null,
+  );
+  const [weekend, setWeekend] = useState<string[]>(
+    weekendToArray(weekendMode),
+  );
+  const [isSaving, setIsSaving] = useState(false);
+
+  // 切换月份时自动同步表单值
+  useEffect(() => {
+    setWordCount(taskCount > 0 ? taskCount : null);
+    setWeekend(weekendToArray(weekendMode));
+  }, [taskCount, weekendMode, cursorDate]);
+
+  const handleSave = async () => {
+    setIsSaving(true);
+    try {
+      await saveLearntask({
+        count: wordCount ?? 0,
+        year: cursorDate.getFullYear(),
+        month: cursorDate.getMonth() + 1,
+        weekend: arrayToWeekend(weekend),
+      });
+      state.close();
+      onSaved?.();
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   return (
@@ -321,7 +372,9 @@ function CreateTaskButton() {
               <Button slot="close" variant="secondary">
                 取消
               </Button>
-              <Button onPress={handleSave}>保存</Button>
+              <Button isDisabled={isSaving} onPress={handleSave}>
+                {isSaving ? "保存中..." : "保存"}
+              </Button>
             </Modal.Footer>
             </Modal.Dialog>
           </Modal.Container>
@@ -338,6 +391,7 @@ export default function TaskCalendar({
   monthlyData,
   yearStats,
   isLoading = false,
+  onTaskSaved,
 }: {
   value?: MonthValue;
   onChange?: (v: MonthValue) => void;
@@ -348,6 +402,8 @@ export default function TaskCalendar({
   yearStats?: MonthCompletion[];
   /** 是否正在加载数据，为 true 时显示骨架屏动画 */
   isLoading?: boolean;
+  /** 任务保存成功后的回调，通常用于触发父组件刷新数据 */
+  onTaskSaved?: () => void;
 } = {}) {
   const today = useMemo(() => new Date(), []);
   const [innerCursor, setInnerCursor] = useState(
@@ -443,7 +499,12 @@ export default function TaskCalendar({
         </div>
 
         <div className="flex items-center gap-2">
-          <CreateTaskButton />
+          <CreateTaskButton
+            cursorDate={cursor}
+            taskCount={data.task?.count}
+            weekendMode={data.task?.weekend}
+            onSaved={onTaskSaved}
+          />
         </div>
 
         {/* <div className="flex items-center gap-2">

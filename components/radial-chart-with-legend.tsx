@@ -116,8 +116,8 @@ export default function RadialChartWithLegend({
 
   const remain = hasTask ? Math.max(0, taskCount - totalCount) : 0;
   const description = hasTask
-    ? `任务${taskCount}；已完成${totalCount}；还剩${remain}`
-    : `已完成${totalCount}；本月未设置任务`;
+    ? `任务${taskCount}；已学习${totalCount}；还剩${remain}`
+    : `已学习${totalCount}；本月未设置任务`;
 
   return (
     <Card className="w-full rounded-2xl">
