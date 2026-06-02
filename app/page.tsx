@@ -85,7 +85,7 @@ export default function Home() {
       <FullWidthSearch />
 
       {/* KPI 区域 */}
-      <KpiWithChartInline />
+      <KpiWithChartInline monthlyList={monthlyList} />
 
       {/* 数据统计看板：月/年视图平滑切换 */}
       <div className="relative isolate">

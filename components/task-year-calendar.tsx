@@ -4,7 +4,7 @@ import { Button, Popover, Card, Chip, ButtonGroup } from "@heroui/react";
 
 import { ReactNode, useMemo, useState } from "react";
 
-import { ChevronLeft, ChevronRight } from "@gravity-ui/icons";
+import { ChevronLeft, ChevronRight, Calendar } from "@gravity-ui/icons";
 
 import BarChartComparisonDemo from "@/components/bar-chart-comparison-demo";
 import AreaChartMultiAreaDemo from "@/components/area-chart-multi-area-demo";
@@ -121,7 +121,12 @@ export default function TaskYearCalendar({
                 <Button onPress={() => canPrev && setPanelYear((y) => y - 1)}>
                   <ChevronLeft />
                 </Button>
-                <Button>
+                <Button
+                  onPress={() => {
+                    handleConfirm();
+                    onShowMonthView?.();
+                  }}
+                >
                   <ButtonGroup.Separator />
                   <div className="text-sm font-medium text-default-700">
                     {panelYear}年
@@ -131,6 +136,13 @@ export default function TaskYearCalendar({
                   <ButtonGroup.Separator />
                   <ChevronRight />
                 </Button>
+
+                {panelYear !== today.getFullYear() && (
+                  <Button aria-label="回到本年" onPress={handleThisMonth}>
+                    <ButtonGroup.Separator />
+                    <Calendar />
+                  </Button>
+                )}
               </ButtonGroup>
             </div>
           </div>
@@ -188,19 +200,18 @@ export default function TaskYearCalendar({
 
           {/* Footer actions */}
           <div className="flex  gap-3 px-2 py-2">
-           
             <Button
               onPress={() => {
                 handleConfirm();
                 onShowMonthView?.();
               }}
             >
-              详情
+              查看详情
             </Button>
 
-             <Button variant="secondary" onPress={handleThisMonth}>
+            {/* <Button variant="secondary" onPress={handleThisMonth}>
               本月
-            </Button>
+            </Button> */}
           </div>
         </Card>
 

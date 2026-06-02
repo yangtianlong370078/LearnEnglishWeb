@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import {
   Button,
+  Chip,
   Label,
   Card,
   ButtonGroup,
@@ -13,12 +14,22 @@ import {
   Skeleton,
   Spinner,
   useOverlayState,
+  SearchField,
 } from "@heroui/react";
 
 import RadialChartWithLegend from "@/components/radial-chart-with-legend";
 import { saveLearntask } from "@/lib/api/modules/statistics";
 
-import { ChevronLeft, ChevronRight, Gear, Plus } from "@gravity-ui/icons";
+import {
+  Calendar,
+  ChevronLeft,
+  ChevronRight,
+  CircleCheckFill,
+  CircleExclamationFill,
+  CircleMinusFill,
+  Gear,
+  Plus,
+} from "@gravity-ui/icons";
 
 import JeDatePicker from "./task-year-calendar";
 import type { MonthCompletion, MonthValue, MonthlyData } from "@/types";
@@ -252,6 +263,8 @@ interface CreateTaskButtonProps {
   weekendMode?: 0 | 1 | 2 | 3;
   cursorDate: Date;
   onSaved?: () => void;
+  totalTask?: number;
+  totalDone?: number;
 }
 
 function CreateTaskButton({
@@ -259,14 +272,19 @@ function CreateTaskButton({
   weekendMode = 0,
   cursorDate,
   onSaved,
+  totalTask = 0,
+  totalDone = 0,
 }: CreateTaskButtonProps) {
+  const today = new Date();
+  const isBeforeCurrentMonth =
+    cursorDate.getFullYear() < today.getFullYear() ||
+    (cursorDate.getFullYear() === today.getFullYear() &&
+      cursorDate.getMonth() < today.getMonth());
   const state = useOverlayState();
   const [wordCount, setWordCount] = useState<number | null>(
     taskCount > 0 ? taskCount : null,
   );
-  const [weekend, setWeekend] = useState<string[]>(
-    weekendToArray(weekendMode),
-  );
+  const [weekend, setWeekend] = useState<string[]>(weekendToArray(weekendMode));
   const [isSaving, setIsSaving] = useState(false);
 
   // 切换月份时自动同步表单值
@@ -291,10 +309,44 @@ function CreateTaskButton({
     }
   };
 
+  if (isBeforeCurrentMonth) {
+    if (totalTask > 0 && totalDone >= totalTask) {
+      return (
+        <Chip
+          size="lg"
+          className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+        >
+          <CircleCheckFill className="mr-1 inline-block size-3.5" />
+          已完成
+        </Chip>
+      );
+    }
+    if (totalTask > 0 && totalDone < totalTask) {
+      return (
+        <Chip
+          size="lg"
+          className="bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
+        >
+          <CircleExclamationFill className="mr-1 inline-block size-3.5" />
+          未完成
+        </Chip>
+      );
+    }
+    return (
+      <Chip
+        size="lg"
+        className="bg-gray-100 text-gray-600 dark:bg-gray-800/50 dark:text-gray-400"
+      >
+        <CircleMinusFill className="mr-1 inline-block size-3.5" />
+        无任务
+      </Chip>
+    );
+  }
+
   return (
     <>
       <Button variant="primary" onPress={state.open}>
-        <Plus />
+        {taskCount > 0 ? <Gear /> : <Plus />}
         任务
       </Button>
       <Modal state={state}>
@@ -302,15 +354,14 @@ function CreateTaskButton({
           <Modal.Container placement="center" size="md">
             <Modal.Dialog>
               <Modal.Header>
-                
                 <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
-                <Gear className="size-5" />
-              </Modal.Icon>
-              <Modal.Heading>设置任务</Modal.Heading>
-              <p className="mt-1.5 text-sm leading-5 text-muted">
-                填写任务单词数量，平均分配至本月任务天数，存在余数时，从首日开始逐日顺次补加 1，直至任务全部分配完成。
-              </p>
-
+                  <Gear className="size-5" />
+                </Modal.Icon>
+                <Modal.Heading>设置任务</Modal.Heading>
+                <p className="mt-1.5 text-sm leading-5 text-muted">
+                  填写任务单词数量，平均分配至本月任务天数，存在余数时，从首日开始逐日顺次补加
+                  1，直至任务全部分配完成。
+                </p>
               </Modal.Header>
               <Modal.Body className="flex flex-col gap-5 py-2">
                 <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
@@ -320,9 +371,12 @@ function CreateTaskButton({
                   >
                     单词数量
                   </label>
+
                   <NumberField
+                    variant="secondary"
                     aria-label="单词数量"
                     minValue={0}
+                    maxValue={999}
                     fullWidth
                     value={wordCount ?? NaN}
                     onChange={(v) => setWordCount(Number.isNaN(v) ? null : v)}
@@ -338,6 +392,28 @@ function CreateTaskButton({
                         placeholder="输入任务单词数量"
                         className="w-full"
                       />
+
+                      {wordCount !== null && (
+                        <button
+                          type="button"
+                          onClick={() => setWordCount(null)}
+                          className="inline-flex items-center justify-center px-2 hover:opacity-70"
+                        >
+                          <svg
+                            height="16"
+                            viewBox="0 0 16 16"
+                            width="16"
+                            xmlns="http://www.w3.org/2000/svg"
+                          >
+                            <path
+                              clipRule="evenodd"
+                              d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
+                              fill="currentColor"
+                              fillRule="evenodd"
+                            />
+                          </svg>
+                        </button>
+                      )}
                     </NumberField.Group>
                   </NumberField>
                 </div>
@@ -368,14 +444,14 @@ function CreateTaskButton({
                   </CheckboxGroup>
                 </div>
               </Modal.Body>
-             <Modal.Footer>
-              <Button slot="close" variant="secondary">
-                取消
-              </Button>
-              <Button isDisabled={isSaving} onPress={handleSave}>
-                {isSaving ? "保存中..." : "保存"}
-              </Button>
-            </Modal.Footer>
+              <Modal.Footer>
+                <Button slot="close" variant="secondary">
+                  取消
+                </Button>
+                <Button isDisabled={isSaving} onPress={handleSave}>
+                  {isSaving ? "保存中..." : "保存"}
+                </Button>
+              </Modal.Footer>
             </Modal.Dialog>
           </Modal.Container>
         </Modal.Backdrop>
@@ -471,6 +547,7 @@ export default function TaskCalendar({
                 <Button onPress={goPrev}>
                   <ChevronLeft />
                 </Button>
+
                 <Button
                   aria-label="选择月份"
                   onPress={() => onShowYearView?.(yearStats ?? [])}
@@ -482,10 +559,17 @@ export default function TaskCalendar({
                   <ButtonGroup.Separator />
                   <ChevronRight />
                 </Button>
+
+                {!isCurrentMonth && (
+                  <Button aria-label="回到本月" onPress={goToday}>
+                    <ButtonGroup.Separator />
+                    <Calendar />
+                  </Button>
+                )}
               </ButtonGroup>
             </div>
 
-            <Button
+            {/* <Button
               className="ml-1"
               isDisabled={isCurrentMonth}
               size="sm"
@@ -493,7 +577,7 @@ export default function TaskCalendar({
               onPress={goToday}
             >
               今天
-            </Button>
+            </Button> */}
           </div>
           {/* <div className="w-[88px]" aria-hidden /> */}
         </div>
@@ -504,6 +588,8 @@ export default function TaskCalendar({
             taskCount={data.task?.count}
             weekendMode={data.task?.weekend}
             onSaved={onTaskSaved}
+            totalTask={totals.task}
+            totalDone={totals.done}
           />
         </div>
 
@@ -558,7 +644,9 @@ export default function TaskCalendar({
                     <DayCell
                       key={i}
                       cell={cell}
-                      isToday={cell.date.toDateString() === today.toDateString()}
+                      isToday={
+                        cell.date.toDateString() === today.toDateString()
+                      }
                     />
                   ));
               })()}
