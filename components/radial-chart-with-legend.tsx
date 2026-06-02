@@ -8,6 +8,8 @@ import { ChartTooltip, RadialChart } from "@heroui-pro/react";
 
 import type { MonthValue, MonthlyData } from "@/types";
 
+
+
 const CHART_COLOR_TIME = "var(--chart-2)";
 const CHART_COLOR_TASK = "var(--chart-3)";
 
@@ -126,6 +128,8 @@ export default function RadialChartWithLegend({
         <Card.Description className="text-muted text-xs">
           {description}
         </Card.Description>
+
+       
       </Card.Header>
       <Card.Content className="grid place-items-center min-h-[320px]">
         <div className="relative shrink-0">

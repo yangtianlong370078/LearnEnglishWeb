@@ -4,7 +4,6 @@ import { useState } from "react";
 import { Button, Kbd, Link, TextField, InputGroup } from "@heroui/react";
 import NextLink from "next/link";
 import clsx from "clsx";
-
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
@@ -99,6 +98,9 @@ export const Navbar = () => {
             </Button>
           </div>
         </div>
+
+
+        
 
         <div className="flex sm:hidden items-center gap-2">
           <Link

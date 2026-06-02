@@ -20,6 +20,8 @@ import {
 import RadialChartWithLegend from "@/components/radial-chart-with-legend";
 import { saveLearntask } from "@/lib/api/modules/statistics";
 
+
+
 import {
   Calendar,
   ChevronLeft,
@@ -219,7 +221,7 @@ function DayCell({ cell, isToday }: { cell: DayInfo; isToday: boolean }) {
           className={[
             "flex h-7 w-7 items-center justify-center rounded-full text-sm tabular-nums",
             isToday
-              ? "font-extrabold text-primary underline decoration-2 underline-offset-2"
+              ? " underline  text-primary font-extrabold decoration-2 underline-offset-2"
               : cell.isWeekend
                 ? "font-semibold text-default-500"
                 : "font-semibold text-default-800",

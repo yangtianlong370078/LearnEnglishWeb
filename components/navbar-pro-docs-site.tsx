@@ -1,11 +1,13 @@
 "use client";
 
-import { Display, Moon, Sun } from "@gravity-ui/icons";
-import { Kbd, SearchField } from "@heroui/react";
+import { Display, Moon, Sun , Bell,Person,Gear,ShieldCheck,Comment,ArrowRightFromSquare } from "@gravity-ui/icons";
+import { Kbd, SearchField,Button, Avatar,Dropdown,Label,Separator} from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 
-import { Navbar, Segment } from "@heroui-pro/react";
+import { Navbar, Segment  } from "@heroui-pro/react";
+
+import  {MaterBasic}  from  "@/components/meter-base";
 
 const BrandLogo = () => (
   <svg fill="none" height="22" viewBox="0 0 83 26" xmlns="http://www.w3.org/2000/svg">
@@ -47,7 +49,7 @@ export default function NavbarProDocsSite() {
 
   return (
     <Navbar maxWidth="full" position="static" shouldBlockScroll={false}>
-      <Navbar.Header>
+      <Navbar.Header className="relative">
         <Navbar.MenuToggle className="md:hidden" />
 
         <Navbar.Brand>
@@ -71,11 +73,12 @@ export default function NavbarProDocsSite() {
             </Navbar.Item>
           ))}
         </Navbar.Content>
+        <div className="absolute inset-0 m-auto w-fit h-fit"> <MaterBasic /></div>
 
         <Navbar.Spacer />
 
         <Navbar.Content className="hidden md:flex">
-          <SearchField
+          {/* <SearchField
             aria-label="Search documentation"
             className="w-[200px]"
             variant="secondary"
@@ -88,7 +91,7 @@ export default function NavbarProDocsSite() {
                 <Kbd.Content>K</Kbd.Content>
               </Kbd>
             </SearchField.Group>
-          </SearchField>
+          </SearchField> */}
 
           <Segment
             // @ts-expect-error suppressHydrationWarning 由 HeroUI V3 Segment 支持但类型尚未屘露
@@ -108,7 +111,56 @@ export default function NavbarProDocsSite() {
               <Display className="size-3.5" />
             </Segment.Item>
           </Segment>
+
+           <Navbar.Item>
+              <Bell data-slot="icon" />
+            </Navbar.Item>
+
         </Navbar.Content>
+
+
+
+
+          <Dropdown>
+            <Button isIconOnly aria-label="User menu" variant="ghost">
+              <Avatar className="size-7">
+                <Avatar.Image
+                  alt="User avatar"
+                  src="https://img.heroui.chat/image/avatar?w=200&h=200&u=1"
+                />
+                <Avatar.Fallback>AJ</Avatar.Fallback>
+              </Avatar>
+            </Button>
+            <Dropdown.Popover className="min-w-[200px]" placement="bottom end">
+              <Dropdown.Menu>
+                <Dropdown.Item id="account" textValue="Your account">
+                  <Person className="text-muted size-4" />
+                  <Label>Your account</Label>
+                </Dropdown.Item>
+                <Dropdown.Item id="preferences" textValue="Preferences">
+                  <Gear className="text-muted size-4" />
+                  <Label>Preferences</Label>
+                </Dropdown.Item>
+                <Separator />
+                <Dropdown.Item id="security" textValue="Security & privacy">
+                  <ShieldCheck className="text-muted size-4" />
+                  <Label>Security & privacy</Label>
+                </Dropdown.Item>
+                <Dropdown.Item id="feedback" textValue="Send feedback">
+                  <Comment className="text-muted size-4" />
+                  <Label>Send feedback</Label>
+                </Dropdown.Item>
+                <Separator />
+                <Dropdown.Item id="sign-out" textValue="Log out">
+                  <ArrowRightFromSquare className="text-muted size-4" />
+                  <Label>Log out</Label>
+                </Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown.Popover>
+          </Dropdown>
+
+
+
       </Navbar.Header>
 
       <Navbar.Menu>

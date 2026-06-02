@@ -26,8 +26,6 @@ export default function Home() {
   );
   const [monthlyList, setMonthlyList] = useState<MonthlyData[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
-  // 动画结束后清掉 willChange / filter，避免 GPU 合成层导致的文字模糊
-  const [animating, setAnimating] = useState(false);
 
   // 拉取后端学习统计数据（StatisticsLearnCountTwo）
   // 1) 进入页面立即用 localStorage 缓存渲染（stale）；
@@ -72,13 +70,6 @@ export default function Home() {
     [monthlyList, monthValue],
   );
 
-  const sharedStyle = animating
-    ? ({
-        transformOrigin: "top center",
-        willChange: "transform, opacity",
-      } as const)
-    : ({ transformOrigin: "top center" } as const);
-
   return (
     <div className="flex flex-col gap-4">
       {/* 搜索框 */}
@@ -98,41 +89,14 @@ export default function Home() {
           </span>
         </div>
 
-        <AnimatePresence
-          initial={false}
-          mode="popLayout"
-          onExitComplete={() => setAnimating(false)}
-        >
+        <AnimatePresence initial={false} mode="wait">
           {view === "month" ? (
             <motion.div
               key="month"
-              animate={{
-                opacity: 1,
-                scale: 1,
-                transition: {
-                  duration: 0.5,
-                  ease: [0.22, 1, 0.36, 1],
-                  opacity: { duration: 0.45, delay: 0.05 },
-                },
-              }}
-              exit={{
-                opacity: 0,
-                scale: 1.04,
-                transition: { duration: 0.32, ease: [0.4, 0, 0.2, 1] },
-              }}
-              initial={{ opacity: 0, scale: 0.96 }}
-              style={sharedStyle}
-              onAnimationStart={() => setAnimating(true)}
-              onAnimationComplete={(def) => {
-                // 入场动画完成后清掉合成层 hint,消除文字模糊
-                if (
-                  typeof def === "object" &&
-                  def !== null &&
-                  "opacity" in def
-                ) {
-                  setAnimating(false);
-                }
-              }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+              initial={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
             >
               <TaskCalendar
                 isLoading={statsLoading}
@@ -150,32 +114,10 @@ export default function Home() {
           ) : (
             <motion.div
               key="year"
-              animate={{
-                opacity: 1,
-                scale: 1,
-                transition: {
-                  duration: 0.5,
-                  ease: [0.22, 1, 0.36, 1],
-                  opacity: { duration: 0.45, delay: 0.05 },
-                },
-              }}
-              exit={{
-                opacity: 0,
-                scale: 0.96,
-                transition: { duration: 0.32, ease: [0.4, 0, 0.2, 1] },
-              }}
-              initial={{ opacity: 0, scale: 1.04 }}
-              style={sharedStyle}
-              onAnimationStart={() => setAnimating(true)}
-              onAnimationComplete={(def) => {
-                if (
-                  typeof def === "object" &&
-                  def !== null &&
-                  "opacity" in def
-                ) {
-                  setAnimating(false);
-                }
-              }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0, transition: { duration: 0.2 } }}
+              initial={{ opacity: 0 }}
+              transition={{ duration: 0.3 }}
             >
               <TaskYearCalendar
                 inline
