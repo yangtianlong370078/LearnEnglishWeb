@@ -35,9 +35,9 @@ const BrandLogo = () => (
 );
 
 const navItems = [
-  { href: "#docs", label: "Docs" },
-  { href: "#pro", label: "Pro" },
-  { href: "#blog", label: "Blog" },
+  { href: "#docs", label: "主页" },
+  { href: "#pro", label: "学习" },
+  { href: "#blog", label: "试题" },
 ];
 
 export default function NavbarProDocsSite() {
@@ -48,13 +48,13 @@ export default function NavbarProDocsSite() {
   useEffect(() => setMounted(true), []);
 
   return (
-    <Navbar maxWidth="full" position="static" shouldBlockScroll={false}>
-      <Navbar.Header className="relative">
+    <Navbar maxWidth="full" position="static" shouldBlockScroll={false} className="bg-transparent">
+      <Navbar.Header className="relative ">
         <Navbar.MenuToggle className="md:hidden" />
 
         <Navbar.Brand>
           <BrandLogo />
-          <span className="sr-only">HeroUI</span>
+          <span className="sr-only">记忆助手</span>
         </Navbar.Brand>
 
         <Navbar.Content className="hidden gap-0 md:flex">

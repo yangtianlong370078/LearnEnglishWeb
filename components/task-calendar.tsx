@@ -138,7 +138,7 @@ function buildGrid(
         label = String(doneCount);
       }
     } else {
-      label = doneCount > 0 ? `${taskCount}/${doneCount}` : String(taskCount);
+      label = doneCount > 0 ? `${doneCount}/${taskCount}` : String(taskCount);
       if (isWeekend) {
         status = "weekend";
       } else if (isPast || isToday) {
@@ -233,7 +233,7 @@ function DayCell({ cell, isToday }: { cell: DayInfo; isToday: boolean }) {
       {showBar ? (
         <div
           className={`flex h-6 items-center justify-center rounded-md px-1 text-[11px] font-medium tabular-nums shadow-sm transition-transform hover:scale-[1.03] ${STATUS_BAR[cell.status]}`}
-          title={`任务: ${cell.taskCount} / 完成: ${cell.doneCount}`}
+          title={`学习:${cell.doneCount} / 任务:${cell.taskCount}`}
         >
           {cell.label}
         </div>

@@ -126,6 +126,7 @@ function writeCache(etag: string | null, data: CachedStats): void {
     localStorage.setItem(STATS_CACHE_KEY, JSON.stringify(data));
     if (etag) localStorage.setItem(STATS_ETAG_KEY, etag);
     else localStorage.removeItem(STATS_ETAG_KEY);
+    window.dispatchEvent(new CustomEvent("stats:updated"));
   } catch {
     /* 容量满 / 隐私模式等异常忽略，回退到无缓存 */
   }
