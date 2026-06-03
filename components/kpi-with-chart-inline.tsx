@@ -121,6 +121,8 @@ export default function KpiWithChartInline({
   const s = stats;
   const isUp = growthRate >= 0;
 
+  const isTodayUp = s.growthRate >= 0;
+
   const pieData = [
     { name: "已掌握", value: s.masteredCount },
     { name: "未熟练", value: s.unskilledCount },
@@ -148,8 +150,8 @@ export default function KpiWithChartInline({
 
 
               <div className="flex items-center gap-1.5">
-                <TrendChip trend={isUp ? "up" : "down"} variant="tertiary">
-                  {growthRate}%
+                <TrendChip trend={isTodayUp ? "up" : "down"} variant="tertiary">
+                   {Math.abs(s.growthRate).toFixed(1)}%
                   <TrendChip.Suffix>今天已学{s.todayCount}</TrendChip.Suffix>
                 </TrendChip>
               </div>

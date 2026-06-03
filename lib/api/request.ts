@@ -70,6 +70,10 @@ request.interceptors.response.use(
         return Promise.reject(new Error("请求的资源不存在"));
       case ApiCode.SERVER_ERROR:
         return Promise.reject(new Error("服务器内部错误，请稍后重试"));
+      case 502:
+        // eslint-disable-next-line no-console
+        console.error("[api] 502 响应体:", error.response?.data);
+        return Promise.reject(new Error("网关错误，请检查后端服务是否正常运行"));
       default:
         break;
     }
