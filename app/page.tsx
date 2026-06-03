@@ -13,6 +13,7 @@ import type {
 } from "@/components/task-year-calendar";
 import { statisticsApi } from "@/lib/api";
 import type { MonthlyData } from "@/types/task";
+import type { WordStats } from "@/types/word";
 
 export default function Home() {
   const today = new Date();
@@ -26,6 +27,7 @@ export default function Home() {
   );
   const [monthlyList, setMonthlyList] = useState<MonthlyData[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
+  const [studyStats, setStudyStats] = useState<WordStats | undefined>(undefined);
 
   // 拉取后端学习统计数据（StatisticsLearnCountTwo）
   // 1) 进入页面立即用 localStorage 缓存渲染（stale）；
@@ -58,6 +60,17 @@ export default function Home() {
       setStatsLoading(true);
     }
     refreshStats();
+
+    // KPI：先用本地缓存立即渲染，再后台静默拉取最新数据（ETag 未变则无 body 传输）
+    const cachedKpi = statisticsApi.getCachedStudyStatistics();
+    if (cachedKpi) setStudyStats(cachedKpi);
+    statisticsApi
+      .getStudyStatistics()
+      .then(setStudyStats)
+      .catch((err) => {
+        // eslint-disable-next-line no-console
+        console.error("加载学习 KPI 失败:", err);
+      });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
@@ -76,7 +89,7 @@ export default function Home() {
       <FullWidthSearch />
 
       {/* KPI 区域 */}
-      <KpiWithChartInline monthlyList={monthlyList} />
+      <KpiWithChartInline monthlyList={monthlyList} stats={studyStats} />
 
       {/* 数据统计看板：月/年视图平滑切换 */}
       <div className="relative isolate">

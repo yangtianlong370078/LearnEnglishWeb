@@ -8,6 +8,7 @@ import type {
   MonthlyData,
   StatisticsLearn,
 } from "@/types/task";
+import type { WordStats } from "@/types/word";
 
 /** 后端返回的每日学习记录原始结构 */
 interface StatisticsLearnRaw {
@@ -228,5 +229,77 @@ export async function saveLearntask(params: {
   // 清除 ETag，确保下次请求强制从服务端拉取最新数据
   if (typeof window !== "undefined") {
     localStorage.removeItem(STATS_ETAG_KEY);
+  }
+}
+
+/**
+ * 获取学习统计 KPI 数据（对应后端 GetStudyStatistics 接口）
+ * 支持 ETag 协商缓存 + localStorage 本地缓存：
+ *   1. 首次请求从服务端拉取，写入本地缓存；
+ *   2. 后续请求携带 If-None-Match，服务端未变化时返回 304，复用本地缓存；
+ *   3. 网络异常时若有缓存仍返回，避免白屏。
+ * ETag 键使用 "stats:kpi:etag:v1"，与月统计接口的 STATS_ETAG_KEY 相互独立。
+ */
+const KPI_CACHE_KEY = "stats:kpi:v1";
+const KPI_ETAG_KEY = "stats:kpi:etag:v1";
+
+function readKpiCache(): { etag: string | null; data: WordStats | null } {
+  if (typeof window === "undefined") return { etag: null, data: null };
+  try {
+    const etag = localStorage.getItem(KPI_ETAG_KEY);
+    const raw = localStorage.getItem(KPI_CACHE_KEY);
+    const data = raw ? (JSON.parse(raw) as WordStats) : null;
+
+    return { etag, data };
+  } catch {
+    return { etag: null, data: null };
+  }
+}
+
+function writeKpiCache(etag: string | null, data: WordStats): void {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(KPI_CACHE_KEY, JSON.stringify(data));
+    if (etag) localStorage.setItem(KPI_ETAG_KEY, etag);
+    else localStorage.removeItem(KPI_ETAG_KEY);
+  } catch {
+    /* 容量满 / 隐私模式等异常忽略 */
+  }
+}
+
+/** 读取上次本地缓存的 KPI 数据（用于首屏即时渲染） */
+export function getCachedStudyStatistics(): WordStats | null {
+  return readKpiCache().data;
+}
+
+export async function getStudyStatistics(): Promise<WordStats> {
+  const { etag: cachedEtag, data: cachedData } = readKpiCache();
+
+  try {
+    const res = await request.get<{ success: boolean; studyStatistics: WordStats }>(
+      "/Statistics/GetStudyStatistics",
+      {
+        headers: cachedEtag ? { "If-None-Match": cachedEtag } : undefined,
+        validateStatus: (s) => s === 304 || (s >= 200 && s < 300),
+      },
+    );
+
+    // 304 Not Modified：服务端数据未变，复用本地缓存
+    if (res.status === 304 && cachedData) {
+      return cachedData;
+    }
+
+    const data = res.data.studyStatistics;
+    const newEtag =
+      (res.headers?.etag as string | undefined) ??
+      (res.headers?.ETag as string | undefined) ??
+      null;
+
+    writeKpiCache(newEtag, data);
+
+    return data;
+  } catch (err) {
+    if (cachedData) return cachedData;
+    throw err;
   }
 }

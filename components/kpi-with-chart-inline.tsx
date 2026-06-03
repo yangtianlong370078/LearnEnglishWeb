@@ -8,6 +8,7 @@ import {
   PieChart,
   Segment,
 } from "@heroui-pro/react";
+import { Skeleton } from "@heroui/react";
 import type { ReactNode } from "react";
 import type { WordStats } from "@/types";
 import type { MonthlyData } from "@/types/task";
@@ -18,16 +19,6 @@ const CHART_COLORS = [
   "var(--chart-2)",
   "var(--chart-1)",
 ];
-
-/** 示例数据（未对接接口时使用） */
-const DEMO_STATS: WordStats = {
-  masteredCount: 19,
-  learningCount: 10,
-  reviewingCount: 9,
-  totalCount: 38,
-  weeklyStudied: 25,
-  completionRate: 0.423,
-};
 
 function PieTooltip({
   active,
@@ -55,7 +46,7 @@ function PieTooltip({
 }
 
 interface KpiWithChartInlineProps {
-  /** 来自接口的统计数据，未传入时使用示例数据 */
+  /** 来自接口的统计数据，未传入时展示骨架屏 */
   stats?: WordStats;
   /** 缓存的全部月度数据，用于计算近60天趋势 */
   monthlyList?: MonthlyData[];
@@ -67,14 +58,7 @@ export default function KpiWithChartInline({
   stats,
   monthlyList,
 }: KpiWithChartInlineProps = {}) {
-  const s = stats ?? DEMO_STATS;
   const [selectedPeriod, setSelectedPeriod] = useState<"1D" | "15D" | "30D">("15D");
-
-  const pieData = [
-    { name: "已掌握", value: s.masteredCount },
-    { name: "未熟练", value: s.learningCount },
-    { name: "强化中", value: s.reviewingCount },
-  ];
 
   // 从 monthlyList 中提取每日 count，根据所选周期计算环比趋势
   const { lastTotal, prevTotal, sparklineData } = useMemo(() => {
@@ -124,7 +108,24 @@ export default function KpiWithChartInline({
     );
   }, [lastTotal, prevTotal]);
 
+  // 骨架屏：首次加载尚未获取到真实数据时展示
+  if (!stats) {
+    return (
+      <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+        <Skeleton className="h-[160px] w-full rounded-xl" />
+        <Skeleton className="h-[160px] w-full rounded-xl" />
+      </div>
+    );
+  }
+
+  const s = stats;
   const isUp = growthRate >= 0;
+
+  const pieData = [
+    { name: "已掌握", value: s.masteredCount },
+    { name: "未熟练", value: s.unskilledCount },
+    { name: "强化中", value: s.reinforcementCount },
+  ];
 
   return (
     <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
@@ -137,16 +138,19 @@ export default function KpiWithChartInline({
             </KPI.Header>
 
             <div className="flex flex-col gap-1">
+
+
               <KPI.Value
                 className="text-3xl"
-                maximumFractionDigits={1}
-                style="percent"
-                value={s.completionRate}
+                maximumFractionDigits={0}
+                value={s.masteredCount + s.unskilledCount}
               />
+
+
               <div className="flex items-center gap-1.5">
-                <TrendChip trend="down" variant="tertiary">
-                  5.9%
-                  <TrendChip.Suffix>本周已学{s.weeklyStudied}</TrendChip.Suffix>
+                <TrendChip trend={isUp ? "up" : "down"} variant="tertiary">
+                  {growthRate}%
+                  <TrendChip.Suffix>今天已学{s.todayCount}</TrendChip.Suffix>
                 </TrendChip>
               </div>
             </div>

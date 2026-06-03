@@ -29,18 +29,16 @@ export interface WordQueryParams {
   pageSize: number;
 }
 
-/** KPI 统计数据 */
+/** KPI 统计数据（对应后端 StudyStatisticsDto） */
 export interface WordStats {
   /** 已掌握数量 */
   masteredCount: number;
-  /** 学习中数量 */
-  learningCount: number;
+  /** 未熟练数量 */
+  unskilledCount: number;
   /** 强化中数量 */
-  reviewingCount: number;
-  /** 总数 */
-  totalCount: number;
-  /** 本周学习数 */
-  weeklyStudied: number;
-  /** 整体完成率 0-1 */
-  completionRate: number;
+  reinforcementCount: number;
+  /** 今日学习数量 */
+  todayCount: number;
+  /** 日均对比增长率（百分比，正数增长，负数减少） */
+  growthRate: number;
 }

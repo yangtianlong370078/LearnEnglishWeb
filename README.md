@@ -1,4 +1,3 @@
-
 # React \+ HeroUI V3 前端项目开发文档
 
 ## 1\. 项目概述
@@ -67,7 +66,7 @@
 
 ### 3\.1 安装依赖
 
-```Plain Text
+```Plain
 # 推荐pnpm安装
 pnpm install
 
@@ -77,14 +76,14 @@ npm install
 
 ### 3\.2 本地开发启动
 
-```Plain Text
+```Plain
 # 本地开发环境（默认代理后端.NET 10接口）
 pnpm dev
 ```
 
 ### 3\.3 代码校验与格式化
 
-```Plain Text
+```Plain
 # ESLint语法校验
 pnpm lint
 
@@ -97,7 +96,7 @@ pnpm format
 
 ### 3\.4 项目打包
 
-```Plain Text
+```Plain
 # 生产环境打包
 pnpm build
 
@@ -109,7 +108,7 @@ pnpm preview
 
 项目采用 **分层架构 \+ 业务模块化** 设计，区分公共基础层、业务应用层、配置层，完全解耦基础能力与业务代码，支持大型项目长期迭代。
 
-```Plain Text
+```Plain
 ├── .vscode/                # VSCode统一配置（团队开发规范、格式化、校验）
 ├── public/                 # 静态资源（不参与打包，直接输出）
 ├── src/
@@ -332,4 +331,3 @@ pnpm preview
 - **迭代规范**：业务迭代遵循模块化开发，新增功能对应新增模块，不改动基础架构
 
 - **兼容保障**：保证\.NET 10 WebApi接口迭代向前兼容，前端无需频繁适配改造
-
