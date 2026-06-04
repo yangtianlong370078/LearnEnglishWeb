@@ -152,7 +152,7 @@ export default function KpiWithChartInline({
               <div className="flex items-center gap-1.5">
                 <TrendChip trend={isTodayUp ? "up" : "down"} variant="tertiary">
                    {Math.abs(s.growthRate).toFixed(1)}%
-                  <TrendChip.Suffix>今天已学{s.todayCount}</TrendChip.Suffix>
+                  <TrendChip.Suffix>今天学习{s.todayCount}</TrendChip.Suffix>
                 </TrendChip>
               </div>
             </div>
@@ -242,7 +242,7 @@ export default function KpiWithChartInline({
             <div className="flex items-center gap-1.5">
               <TrendChip trend={isUp ? "up" : "down"} variant="tertiary">
                 {Math.abs(growthRate).toFixed(1)}%
-                <TrendChip.Suffix>过去{PERIOD_DAYS[selectedPeriod]}天</TrendChip.Suffix>
+                <TrendChip.Suffix>环比过去{PERIOD_DAYS[selectedPeriod]}天</TrendChip.Suffix>
               </TrendChip>
             </div>
           </div>
