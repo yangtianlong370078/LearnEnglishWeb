@@ -121,7 +121,16 @@ export default function Home() {
                   setYearStats(stats);
                   setView("year");
                 }}
-                onTaskSaved={() => refreshStats()}
+                onTaskSaved={() => {
+                  refreshStats();
+                  statisticsApi
+                    .getStudyStatistics()
+                    .then(setStudyStats)
+                    .catch((err) => {
+                      // eslint-disable-next-line no-console
+                      console.error("刷新学习 KPI 失败:", err);
+                    });
+                }}
               />
             </motion.div>
           ) : (
