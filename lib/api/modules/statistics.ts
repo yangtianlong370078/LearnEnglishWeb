@@ -267,9 +267,44 @@ function writeKpiCache(etag: string | null, data: WordStats): void {
   }
 }
 
+/**
+ * 根据后端下发的 minDate / lastDate / lastCount，结合今天日期实时计算
+ * todayCount 与 growthRate，确保即使从缓存读取也不会返回过期数值。
+ */
+function computeKpiRealtime(data: WordStats): WordStats {
+  
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+
+  const lastDate = data.lastDate ? new Date(data.lastDate) : null;
+  if (lastDate) lastDate.setHours(0, 0, 0, 0);
+
+  const minDate = data.minDate ? new Date(data.minDate) : null;
+  if (minDate) minDate.setHours(0, 0, 0, 0);
+
+  if (minDate && lastDate) {
+    const days = Math.round(
+      (today.getTime() - minDate.getTime()) / 86_400_000,
+    );
+    const average = days > 0 ? data.masteredCount / days : 0;
+    const todayCount =
+      lastDate.getTime() === today.getTime() ? (data.lastCount ?? 0) : 0;
+    const growthRate =
+      average === 0
+        ? 0
+        : Math.round(((todayCount - average) / average) * 10000) / 100;
+
+    return { ...data, todayCount, growthRate };
+  }
+
+  return data;
+}
+
 /** 读取上次本地缓存的 KPI 数据（用于首屏即时渲染） */
 export function getCachedStudyStatistics(): WordStats | null {
-  return readKpiCache().data;
+  const data = readKpiCache().data;
+
+  return data ? computeKpiRealtime(data) : null;
 }
 
 export async function getStudyStatistics(): Promise<WordStats> {
@@ -286,7 +321,7 @@ export async function getStudyStatistics(): Promise<WordStats> {
 
     // 304 Not Modified：服务端数据未变，复用本地缓存
     if (res.status === 304 && cachedData) {
-      return cachedData;
+      return computeKpiRealtime(cachedData);
     }
 
     const data = res.data.studyStatistics;
@@ -297,9 +332,9 @@ export async function getStudyStatistics(): Promise<WordStats> {
 
     writeKpiCache(newEtag, data);
 
-    return data;
+    return computeKpiRealtime(data);
   } catch (err) {
-    if (cachedData) return cachedData;
+    if (cachedData) return computeKpiRealtime(cachedData);
     throw err;
   }
 }

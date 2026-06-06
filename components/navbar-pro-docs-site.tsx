@@ -4,7 +4,13 @@ import { Display, Moon, Sun , Bell,Person,Gear,ShieldCheck,Comment,ArrowRightFro
 import { Kbd, SearchField,Button, Avatar,Dropdown,Label,Separator} from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
+import { useRouter, usePathname } from "next/navigation";
+import NextLink from "next/link";
+import { siteConfig } from "@/config/site";
+import {
 
+  Logo,
+} from "@/components/icons";
 import { Navbar, Segment  } from "@heroui-pro/react";
 
 import  {MaterBasic}  from  "@/components/meter-base";
@@ -34,14 +40,9 @@ const BrandLogo = () => (
   </svg>
 );
 
-const navItems = [
-  { href: "#docs", label: "主页" },
-  { href: "#pro", label: "学习" },
-  { href: "#blog", label: "试题" },
-];
-
 export default function NavbarProDocsSite() {
-  const [currentItem, setCurrentItem] = useState("#docs");
+  const router = useRouter();
+  const pathname = usePathname();
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
@@ -52,21 +53,26 @@ export default function NavbarProDocsSite() {
       <Navbar.Header className="relative ">
         <Navbar.MenuToggle className="md:hidden" />
 
-        <Navbar.Brand>
+        {/* <Navbar.Brand>
           <BrandLogo />
           <span className="sr-only">记忆助手</span>
-        </Navbar.Brand>
+        </Navbar.Brand> */}
+
+        <NextLink className="flex items-center gap-1" href="/">
+                    <Logo />
+                    <p className="font-bold text-inherit">{siteConfig.name}</p>
+                  </NextLink>
 
         <Navbar.Content className="hidden gap-0 md:flex">
-          {navItems.map((item) => (
+          {siteConfig.navItems.map((item) => (
             <Navbar.Item
               key={item.href}
               className="px-2"
               href={item.href}
-              isCurrent={item.href === currentItem}
+              isCurrent={item.href === pathname}
               onClick={(e) => {
                 e.preventDefault();
-                setCurrentItem(item.href);
+                router.push(item.href);
               }}
             >
               {item.label}
@@ -164,14 +170,14 @@ export default function NavbarProDocsSite() {
       </Navbar.Header>
 
       <Navbar.Menu>
-        {navItems.map((item) => (
+        {siteConfig.navItems.map((item) => (
           <Navbar.MenuItem
             key={item.href}
             href={item.href}
-            isCurrent={item.href === currentItem}
+            isCurrent={item.href === pathname}
             onClick={(e) => {
               e.preventDefault();
-              setCurrentItem(item.href);
+              router.push(item.href);
             }}
           >
             {item.label}

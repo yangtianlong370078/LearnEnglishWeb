@@ -1,28 +1,25 @@
 export type SiteConfig = typeof siteConfig;
 
 export const siteConfig = {
-  name: "Next.js + HeroUI",
+  name: "记忆助手",
   description: "Make beautiful websites regardless of your design experience.",
   navItems: [
     {
-      label: "Home",
+      label: "首页",
       href: "/",
     },
     {
-      label: "Docs",
-      href: "/docs",
+      label: "学单词",
+      href: "/learnwords",
     },
     {
-      label: "Pricing",
-      href: "/pricing",
+      label: "练听力",
+      href: "/listening",
     },
+    
     {
-      label: "Blog",
-      href: "/blog",
-    },
-    {
-      label: "About",
-      href: "/about",
+      label: "试题",
+      href: "/exam",
     },
   ],
   navMenuItems: [

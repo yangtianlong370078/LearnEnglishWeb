@@ -37,8 +37,14 @@ export interface WordStats {
   unskilledCount: number;
   /** 强化中数量 */
   reinforcementCount: number;
-  /** 今日学习数量 */
+  /** 今日学习数量（前端根据 lastDate/lastCount 实时计算） */
   todayCount: number;
-  /** 日均对比增长率（百分比，正数增长，负数减少） */
+  /** 日均对比增长率（百分比，正数增长，负数减少；前端实时计算） */
   growthRate: number;
+  /** 最早缓存记录的日期（ISO 字符串），用于计算日均学习量 */
+  minDate?: string | null;
+  /** 最近缓存记录的日期（ISO 字符串） */
+  lastDate?: string | null;
+  /** 最近缓存记录当天的学习数量 */
+  lastCount?: number;
 }

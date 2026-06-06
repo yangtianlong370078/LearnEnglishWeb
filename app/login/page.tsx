@@ -17,14 +17,18 @@ export default function LoginPage() {
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    if (!loginID.trim() || !password.trim()) {
+    // 用 FormData 直接读取 DOM 值，避免浏览器自动填充未触发 onChange 导致 state 为空
+    const data = new FormData(e.currentTarget);
+    const loginIDValue = ((data.get("loginID") as string) ?? "").trim();
+    const passwordValue = ((data.get("password") as string) ?? "").trim();
+    if (!loginIDValue || !passwordValue) {
       setError("请输入账户和密码");
       return;
     }
     setError("");
     setLoading(true);
     try {
-      const result = await login({ loginID: loginID.trim(), password });
+      const result = await login({ loginID: loginIDValue, password: passwordValue });
       storage.setToken(result.token);
       storage.set("user", result.user);
       router.push("/");
@@ -113,6 +117,7 @@ export default function LoginPage() {
                     autoComplete="username"
                     className="w-full rounded-xl border border-separator bg-background/60 py-2.5 pl-9 pr-4 text-sm text-foreground placeholder:text-muted outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
                     id="loginID"
+                    name="loginID"
                     placeholder="请输入账户"
                     type="text"
                     value={loginID}
@@ -146,6 +151,7 @@ export default function LoginPage() {
                     autoComplete="current-password"
                     className="w-full rounded-xl border border-separator bg-background/60 py-2.5 pl-9 pr-10 text-sm text-foreground placeholder:text-muted outline-none transition-all focus:border-primary focus:ring-2 focus:ring-primary/20"
                     id="password"
+                    name="password"
                     placeholder="请输入密码"
                     type={showPassword ? "text" : "password"}
                     value={password}

@@ -219,13 +219,16 @@ export default function KpiWithChartInline({
             <Target className="text-muted size-4" />
             <KPI.Title>学习趋势图</KPI.Title>
           </div>
+{/* 
+bg-[var(--background)] */}
+
           <Segment
             selectedKey={selectedPeriod}
             size="sm"
             onSelectionChange={(value) => {
               setSelectedPeriod(value as "1D" | "15D" | "30D");
             }}
-            className="absolute right-3.5 top-3.5 bg-[var(--background)]"
+            className="absolute right-3.5 top-3.5 "
           >
             <Segment.Item id="1D">7天</Segment.Item>
             <Segment.Item id="15D">15天</Segment.Item>

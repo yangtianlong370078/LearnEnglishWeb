@@ -99,9 +99,6 @@ export const Navbar = () => {
           </div>
         </div>
 
-
-        
-
         <div className="flex sm:hidden items-center gap-2">
           <Link
             aria-label="Github"

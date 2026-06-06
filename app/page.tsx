@@ -102,6 +102,7 @@ export default function Home() {
           </span>
         </div>
 
+
         <AnimatePresence initial={false} mode="wait">
           {view === "month" ? (
             <motion.div
@@ -152,6 +153,8 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
+
+        
       </div>
     </div>
   );
