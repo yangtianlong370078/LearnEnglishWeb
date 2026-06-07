@@ -14,13 +14,10 @@ import {
   Skeleton,
   Spinner,
   useOverlayState,
-  SearchField,
 } from "@heroui/react";
 
 import RadialChartWithLegend from "@/components/radial-chart-with-legend";
 import { saveLearntask } from "@/lib/api/modules/statistics";
-
-
 
 import {
   Calendar,
@@ -35,6 +32,7 @@ import {
 
 import JeDatePicker from "./task-year-calendar";
 import type { MonthCompletion, MonthValue, MonthlyData } from "@/types";
+import { Chocolate_Classical_Sans } from "next/font/google";
 
 type DayStatus = "pending" | "weekend" | "done" | "missed" | "warn" | "empty";
 
@@ -347,10 +345,18 @@ function CreateTaskButton({
 
   return (
     <>
-      <Button variant="primary" onPress={state.open}>
-        {taskCount > 0 ? <Gear /> : <Plus />}
-        任务
-      </Button>
+      
+      <ButtonGroup
+        size="sm"
+        variant="primary"
+        className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base"
+      >
+        <Button onPress={state.open}>
+          {taskCount > 0 ? <Gear /> : <Plus />}
+          任务
+        </Button>
+      </ButtonGroup>
+
       <Modal state={state}>
         <Modal.Backdrop variant="blur" isDismissable={false}>
           <Modal.Container placement="center" size="md">
@@ -483,6 +489,7 @@ export default function TaskCalendar({
   /** 任务保存成功后的回调，通常用于触发父组件刷新数据 */
   onTaskSaved?: () => void;
 } = {}) {
+
   const today = useMemo(() => new Date(), []);
   const [innerCursor, setInnerCursor] = useState(
     () => new Date(today.getFullYear(), today.getMonth(), 1),
@@ -540,12 +547,16 @@ export default function TaskCalendar({
   }, [cells]);
 
   return (
-    <Card className="" variant="secondary">
+    <div className="flex flex-col gap-4">
       <Card.Header className="flex-row items-center justify-between">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             <div className="flex flex-col gap-2">
-              <ButtonGroup variant="primary">
+              <ButtonGroup
+                size="sm"
+                variant="primary"
+                className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base"
+              >
                 <Button onPress={goPrev}>
                   <ChevronLeft />
                 </Button>
@@ -676,6 +687,6 @@ export default function TaskCalendar({
           />
         )}
       </div>
-    </Card>
+    </div>
   );
 }

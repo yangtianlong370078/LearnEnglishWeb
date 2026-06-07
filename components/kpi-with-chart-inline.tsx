@@ -52,13 +52,19 @@ interface KpiWithChartInlineProps {
   monthlyList?: MonthlyData[];
 }
 
-const PERIOD_DAYS: Record<"1D" | "15D" | "30D", number> = { "1D": 7, "15D": 15, "30D": 30 };
+const PERIOD_DAYS: Record<"1D" | "15D" | "30D", number> = {
+  "1D": 7,
+  "15D": 15,
+  "30D": 30,
+};
 
 export default function KpiWithChartInline({
   stats,
   monthlyList,
 }: KpiWithChartInlineProps = {}) {
-  const [selectedPeriod, setSelectedPeriod] = useState<"1D" | "15D" | "30D">("15D");
+  const [selectedPeriod, setSelectedPeriod] = useState<"1D" | "15D" | "30D">(
+    "15D",
+  );
 
   // 从 monthlyList 中提取每日 count，根据所选周期计算环比趋势
   const { lastTotal, prevTotal, sparklineData } = useMemo(() => {
@@ -103,9 +109,7 @@ export default function KpiWithChartInline({
 
   const growthRate = useMemo(() => {
     if (lastTotal === 0) return 0;
-    return parseFloat(
-      (((lastTotal - prevTotal) / lastTotal) * 100).toFixed(1),
-    );
+    return parseFloat((((lastTotal - prevTotal) / lastTotal) * 100).toFixed(1));
   }, [lastTotal, prevTotal]);
 
   // 骨架屏：首次加载尚未获取到真实数据时展示
@@ -140,19 +144,24 @@ export default function KpiWithChartInline({
             </KPI.Header>
 
             <div className="flex flex-col gap-1">
-
-
               <KPI.Value
                 className="text-3xl"
                 maximumFractionDigits={0}
                 value={s.masteredCount + s.unskilledCount}
               />
 
+              <div className="flex items-center ">
+                <span
+                  className="trend-chip__suffix text-xs min-w-fit"
+                  data-slot="trend-chip-suffix"
+                >
+                  日均增长
+                </span>
 
-              <div className="flex items-center gap-1.5">
                 <TrendChip trend={isTodayUp ? "up" : "down"} variant="tertiary">
-                   {Math.abs(s.growthRate).toFixed(1)}%
-                  <TrendChip.Suffix>今天学习{s.todayCount}</TrendChip.Suffix>
+                  {Math.abs(s.growthRate).toFixed(1)}%
+                  {/* <TrendChip.Suffix>今天学习{s.todayCount}</TrendChip.Suffix> */}
+                  {/* <TrendChip.Suffix>日均增长率</TrendChip.Suffix> */}
                 </TrendChip>
               </div>
             </div>
@@ -183,7 +192,7 @@ export default function KpiWithChartInline({
                 <PieChart.Tooltip content={<PieTooltip />} />
               </PieChart>
 
-              <div className="flex flex-1 flex-col gap-3 w-max ">
+              <div className="flex flex-1 flex-col gap-3 w-max max-w-[100px]">
                 {pieData.map((entry, idx) => {
                   return (
                     <div key={entry.name} className="flex items-center gap-1">
@@ -219,7 +228,7 @@ export default function KpiWithChartInline({
             <Target className="text-muted size-4" />
             <KPI.Title>学习趋势图</KPI.Title>
           </div>
-{/* 
+          {/* 
 bg-[var(--background)] */}
 
           <Segment
@@ -242,10 +251,17 @@ bg-[var(--background)] */}
               maximumFractionDigits={0}
               value={lastTotal}
             />
-            <div className="flex items-center gap-1.5">
+            <div className="flex items-center ">
+              <span
+                className="trend-chip__suffix text-xs min-w-fit"
+                data-slot="trend-chip-suffix"
+              >
+                环比过去{PERIOD_DAYS[selectedPeriod]}天
+              </span>
+
               <TrendChip trend={isUp ? "up" : "down"} variant="tertiary">
                 {Math.abs(growthRate).toFixed(1)}%
-                <TrendChip.Suffix>环比过去{PERIOD_DAYS[selectedPeriod]}天</TrendChip.Suffix>
+                {/* <TrendChip.Suffix>环比过去{PERIOD_DAYS[selectedPeriod]}天</TrendChip.Suffix> */}
               </TrendChip>
             </div>
           </div>

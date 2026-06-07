@@ -91,7 +91,7 @@ export default function AreaChartMultiAreaDemo({
               （{totals.rate}%）
             </span>
           </span>
-          <span className="text-muted text-xs">本年任务完成率</span>
+          <span className="text-muted text-xs">年任务完成率</span>
         </div>
         <AreaChart data={chartData} height={200}>
           <defs>

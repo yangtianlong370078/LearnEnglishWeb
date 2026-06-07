@@ -15,6 +15,10 @@ import { statisticsApi } from "@/lib/api";
 import type { MonthlyData } from "@/types/task";
 import type { WordStats } from "@/types/word";
 
+import {
+  Card,
+} from "@heroui/react";
+
 export default function Home() {
   const today = new Date();
   const [view, setView] = useState<"month" | "year">("month");
@@ -101,7 +105,7 @@ export default function Home() {
             {view === "year" ? "按年查看每月任务量与完成情况" : "按月查看每日任务量与完成情况"}
           </span>
         </div>
-
+ <Card className="" variant="secondary">
 
         <AnimatePresence initial={false} mode="wait">
           {view === "month" ? (
@@ -153,8 +157,8 @@ export default function Home() {
             </motion.div>
           )}
         </AnimatePresence>
+</Card>
 
-        
       </div>
     </div>
   );

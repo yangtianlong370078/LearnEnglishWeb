@@ -112,12 +112,12 @@ export default function TaskYearCalendar({
   const canNext = panelYear < maxYear;
 
   const content = (
-    <Card className="" variant="secondary">
+    <div className="flex flex-col gap-4">
       <Card.Header className="flex-row items-center justify-between">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             <div className="flex flex-col gap-2">
-              <ButtonGroup variant="primary">
+              <ButtonGroup variant="primary" size="sm" className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base">
                 <Button onPress={() => canPrev && setPanelYear((y) => y - 1)}>
                   <ChevronLeft />
                 </Button>
@@ -217,7 +217,7 @@ export default function TaskYearCalendar({
 
         <AreaChartMultiAreaDemo monthlyList={monthlyList} year={panelYear} />
       </div>
-    </Card>
+    </div>
   );
 
   if (inline) return content;
