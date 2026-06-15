@@ -605,15 +605,7 @@ export default function TaskCalendar({
             totalDone={totals.done}
           />
         </div>
-
-        {/* <div className="flex items-center gap-2">
-            <Chip color="success" size="sm" variant="soft">
-              已完成 {totals.done}
-            </Chip>
-            <Chip color="warning" size="sm" variant="soft">
-              待完成 {Math.max(0, totals.task - totals.done)}
-            </Chip>
-          </div> */}
+      
       </Card.Header>
 
       <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">

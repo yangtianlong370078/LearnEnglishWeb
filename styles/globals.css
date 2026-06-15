@@ -217,3 +217,23 @@ header {
 .today-bg span{
   color:#0485f7 !important;
 }
+
+
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 9999s ease-in-out 0s !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* SearchField input: force transparent in ALL states including when has value */
+.search-field__input,
+.search-field__input:focus,
+.search-field__input:focus-visible,
+.search-field__input:not(:placeholder-shown),
+.search-field__input[value]:not([value=""]) {
+  background-color: transparent !important;
+  background: transparent !important;
+}
