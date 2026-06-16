@@ -11,6 +11,8 @@ interface WordDetailProps {
   onDataLoaded?: (hasData: boolean) => void;
 }
 
+const ACTIVE_CONTROL_COLOR = "#0485f7";
+
 function HighlightWord({ text, word }: { text: string; word: string }) {
   const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const parts = text.split(new RegExp(`(${escaped})`, "gi"));
@@ -30,33 +32,44 @@ function HighlightWord({ text, word }: { text: string; word: string }) {
 }
 
 function SpeakerIcon({ playing }: { playing: boolean }) {
+  const stroke = playing ? ACTIVE_CONTROL_COLOR : "currentColor";
+  const activeStyle = playing ? { color: ACTIVE_CONTROL_COLOR, stroke: ACTIVE_CONTROL_COLOR } : undefined;
+
   return (
     <svg
       width="18"
       height="18"
       viewBox="0 0 24 24"
       fill="none"
+      stroke={stroke}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={`shrink-0 transition-all duration-200 ${playing ? "stroke-primary" : "stroke-current"}`}
+      className="shrink-0 transition-all duration-200"
+      style={activeStyle}
     >
-      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <polygon
+        points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"
+        stroke={stroke}
+        style={activeStyle}
+      />
       <path
         d="M15.54 8.46a5 5 0 0 1 0 7.07"
         className={playing ? "animate-pulse" : ""}
+        stroke={stroke}
         style={
           playing
-            ? { animationDelay: "0s", animationDuration: "1s" }
+            ? { ...activeStyle, animationDelay: "0s", animationDuration: "1s" }
             : { opacity: 0.25 }
         }
       />
       <path
         d="M19.07 4.93a10 10 0 0 1 0 14.14"
         className={playing ? "animate-pulse" : ""}
+        stroke={stroke}
         style={
           playing
-            ? { animationDelay: "0.3s", animationDuration: "1s" }
+            ? { ...activeStyle, animationDelay: "0.3s", animationDuration: "1s" }
             : { opacity: 0 }
         }
       />
@@ -65,21 +78,26 @@ function SpeakerIcon({ playing }: { playing: boolean }) {
 }
 
 function LoopIcon({ active }: { active: boolean }) {
+  const stroke = active ? ACTIVE_CONTROL_COLOR : "currentColor";
+  const activeStyle = active ? { color: ACTIVE_CONTROL_COLOR, stroke: ACTIVE_CONTROL_COLOR } : undefined;
+
   return (
     <svg
       width="14"
       height="14"
       viewBox="0 0 24 24"
       fill="none"
+      stroke={stroke}
       strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className={`shrink-0 transition-all duration-200 ${active ? "stroke-primary" : "stroke-current"}`}
+      className="shrink-0 transition-all duration-200"
+      style={activeStyle}
     >
-      <polyline points="17 1 21 5 17 9" />
-      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
-      <polyline points="7 23 3 19 7 15" />
-      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+      <polyline points="17 1 21 5 17 9" stroke={stroke} style={activeStyle} />
+      <path d="M3 11V9a4 4 0 0 1 4-4h14" stroke={stroke} style={activeStyle} />
+      <polyline points="7 23 3 19 7 15" stroke={stroke} style={activeStyle} />
+      <path d="M21 13v2a4 4 0 0 1-4 4H3" stroke={stroke} style={activeStyle} />
     </svg>
   );
 }
@@ -150,10 +168,24 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     setPlayingType(null);
   }
 
+  function turnOffLoop(type: "en" | "us") {
+    if (type === "en") {
+      setLoopEn(false);
+      loopEnRef.current = false;
+    } else {
+      setLoopUs(false);
+      loopUsRef.current = false;
+    }
+  }
+
   function handlePlayClick(type: "en" | "us") {
     if (playingType === type) {
       stopAudio();
+      turnOffLoop(type);
       return;
+    }
+    if (playingType) {
+      turnOffLoop(playingType);
     }
     const shouldLoop = type === "en" ? loopEnRef.current : loopUsRef.current;
     startAudio(type, shouldLoop);
@@ -220,12 +252,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
         {/* 音标行 */}
         <div className="flex flex-wrap gap-3">
           {/* 英式发音 */}
-          <div
-            className={`inline-flex items-center gap-0.5 rounded-full border px-3 py-2 text-sm transition-colors ${playingType === "en"
-                ? "border-primary/50 bg-primary/10 text-primary"
-                : "border-default-200 bg-transparent text-default-700 dark:border-default-700 dark:text-default-300"
-              }`}
-          >
+          <div className="inline-flex items-center gap-0.5 rounded-full border border-default-200 bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300">
             <button
               type="button"
               onClick={() => handlePlayClick("en")}
@@ -249,12 +276,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
           </div>
 
           {/* 美式发音 */}
-          <div
-            className={`inline-flex items-center gap-0.5 rounded-full border px-3 py-2 text-sm transition-colors ${playingType === "us"
-                ? "border-primary/50 bg-primary/10 text-primary"
-                : "border-default-200 bg-transparent text-default-700 dark:border-default-700 dark:text-default-300"
-              }`}
-          >
+          <div className="inline-flex items-center gap-0.5 rounded-full border border-default-200 bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300">
             <button
               type="button"
               onClick={() => handlePlayClick("us")}
