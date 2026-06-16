@@ -110,6 +110,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
   const [loopEn, setLoopEn] = useState(false);
   const [loopUs, setLoopUs] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const audioRunIdRef = useRef(0);
   const loopEnRef = useRef(false);
   const loopUsRef = useRef(false);
 
@@ -123,8 +124,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     setLoopUs(false);
     loopEnRef.current = false;
     loopUsRef.current = false;
-    audioRef.current?.pause();
-    audioRef.current = null;
+    stopAudio();
     wordApi
       .getWordDetail(word)
       .then((data) => {
@@ -140,9 +140,23 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
 
   useEffect(() => {
     return () => {
-      audioRef.current?.pause();
+      stopAudio();
+      audioRef.current = null;
     };
   }, []);
+
+  function getAudio() {
+    if (!audioRef.current) {
+      audioRef.current = new Audio();
+      audioRef.current.preload = "auto";
+    }
+    return audioRef.current;
+  }
+
+  function resetAudioHandlers(audio: HTMLAudioElement) {
+    audio.onended = null;
+    audio.onerror = null;
+  }
 
   function startAudio(type: "en" | "us", loop: boolean) {
     const w = (detail?.word ?? word).toLowerCase();
@@ -151,20 +165,48 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
         ? `${OSS_BASE_URL}/learnEnglish/Speech_EN/${w}.mp3`
         : `${OSS_BASE_URL}/learnEnglish/Speech_US/${w}.mp3`;
 
-    audioRef.current?.pause();
-    const audio = new Audio(url);
-    audio.loop = loop;
-    audioRef.current = audio;
-    setPlayingType(type);
-    audio.play().catch(() => setPlayingType(null));
-    if (!loop) {
-      audio.onended = () => setPlayingType(null);
+    const runId = audioRunIdRef.current + 1;
+    audioRunIdRef.current = runId;
+    const audio = getAudio();
+    audio.pause();
+    resetAudioHandlers(audio);
+    if (audio.src !== url) {
+      audio.src = url;
     }
+    try {
+      audio.currentTime = 0;
+    } catch {
+      // Some mobile browsers do not allow seeking until metadata is loaded.
+    }
+    audio.loop = loop;
+    setPlayingType(type);
+
+    const clearState = () => {
+      if (audioRunIdRef.current !== runId) return;
+      setPlayingType(null);
+      turnOffLoop(type);
+    };
+
+    audio.onended = () => {
+      if (audioRunIdRef.current !== runId || audio.loop) return;
+      setPlayingType(null);
+    };
+    audio.onerror = clearState;
+    audio.play().catch(clearState);
   }
 
   function stopAudio() {
-    audioRef.current?.pause();
-    audioRef.current = null;
+    audioRunIdRef.current += 1;
+    const audio = audioRef.current;
+    if (audio) {
+      audio.pause();
+      resetAudioHandlers(audio);
+      try {
+        audio.currentTime = 0;
+      } catch {
+        // Ignore browsers that cannot seek the current resource.
+      }
+    }
     setPlayingType(null);
   }
 
