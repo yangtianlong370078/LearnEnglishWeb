@@ -3,7 +3,7 @@
  * 对应后端 /api/Word 路由
  */
 import { get, post, put, del } from "../request";
-import type { Word, WordQueryParams, WordStats } from "@/types/word";
+import type { LexiconDetail, Word, WordQueryParams, WordStats } from "@/types/word";
 import type { PageData } from "@/types/api";
 
 /** 获取单词 KPI 统计 */
@@ -34,4 +34,9 @@ export function updateWordStatus(id: number, status: Word["status"]) {
 /** 删除单词 */
 export function deleteWord(id: number) {
   return del<void>(`/Word/${id}`);
+}
+
+/** 获取单词词典详情（对应后端 lexiconDeatil 接口） */
+export function getWordDetail(word: string) {
+  return get<LexiconDetail>("/Word/lexiconDeatil", { word });
 }

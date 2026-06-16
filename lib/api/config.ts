@@ -10,6 +10,11 @@ export const API_BASE_URL =
 /** 请求超时时间（ms） */
 export const REQUEST_TIMEOUT = 15_000;
 
+/** OSS 静态资源基础地址 */
+export const OSS_BASE_URL =
+  process.env.NEXT_PUBLIC_OSS_BASE_URL ??
+  "https://marketimages.oss-cn-shanghai.aliyuncs.com";
+
 /** .NET 10 后端业务状态码约定 */
 export const ApiCode = {
   SUCCESS: 200,

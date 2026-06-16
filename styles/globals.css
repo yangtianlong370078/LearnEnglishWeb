@@ -237,3 +237,8 @@ input:-webkit-autofill:active {
   background-color: transparent !important;
   background: transparent !important;
 }
+
+.zs {
+    color: #f03744;
+    font-weight: 600;
+}

@@ -1,6 +1,6 @@
 "use client";
 
-import { SearchField, Button, Modal, Spinner } from "@heroui/react";
+import { SearchField, Button, Modal, Spinner, Card } from "@heroui/react";
 import React from "react";
 import WordDetail from "@/components/common/word-detail";
 import { get, post } from "@/lib/api/request";
@@ -99,9 +99,11 @@ export default function FullWidth() {
                 {searchedWord}
               </Modal.Heading>
             </Modal.Header>
-            <Modal.Body>
-              <WordDetail />
-            </Modal.Body>
+
+            <Card className="m-0 p-0" variant="transparent">
+              <WordDetail word={searchedWord} />
+            </Card>
+
             {!wordExists && !isChecking && (
               <Modal.Footer>
                 <Button

@@ -29,6 +29,25 @@ export interface WordQueryParams {
   pageSize: number;
 }
 
+/** 单词例句 */
+export interface SampleSentence {
+  en: string;
+  cn: string;
+}
+
+/** 词典详情（对应后端 MongoDB lexicondetail） */
+export interface LexiconDetail {
+  word: string;
+  frequence: number;
+  sampleSentences: SampleSentence[];
+  phonetic: string;
+  britishPhonetic: string;
+  americanPhonetic: string;
+  definition: string[];
+  translation: string[];
+  tag: string[];
+}
+
 /** KPI 统计数据（对应后端 StudyStatisticsDto） */
 export interface WordStats {
   /** 已掌握数量 */
