@@ -12,6 +12,7 @@ export default function FullWidth() {
   const [wordExists, setWordExists] = React.useState(false);
   const [isChecking, setIsChecking] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
+  const [wordDetailResult, setWordDetailResult] = React.useState<boolean | null>(null);
 
   const handleSearch = async () => {
     const trimmed = value.trim();
@@ -21,6 +22,7 @@ export default function FullWidth() {
     setIsOpen(true);
     setWordExists(false);
     setIsChecking(true);
+    setWordDetailResult(null);
     try {
       const exists = await get<boolean>("/Word/WordExist", { en: trimmed });
       setWordExists(exists);
@@ -100,11 +102,11 @@ export default function FullWidth() {
               </Modal.Heading>
             </Modal.Header>
 
-            <Card className="m-0 p-0" variant="transparent">
-              <WordDetail word={searchedWord} />
+            <Card className="m-0 px-0" variant="transparent">
+              <WordDetail word={searchedWord} onDataLoaded={setWordDetailResult} />
             </Card>
 
-            {!wordExists && !isChecking && (
+            {wordDetailResult === true && !isChecking && !wordExists && (
               <Modal.Footer>
                 <Button
                   variant="primary"

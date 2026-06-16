@@ -1,13 +1,14 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Button, Chip, ScrollShadow, Skeleton } from "@heroui/react";
+import { Chip, ScrollShadow, Skeleton } from "@heroui/react";
 import { wordApi } from "@/lib/api";
 import { OSS_BASE_URL } from "@/lib/api/config";
 import type { LexiconDetail } from "@/types/word";
 
 interface WordDetailProps {
   word: string;
+  onDataLoaded?: (hasData: boolean) => void;
 }
 
 function HighlightWord({ text, word }: { text: string; word: string }) {
@@ -28,24 +29,96 @@ function HighlightWord({ text, word }: { text: string; word: string }) {
   );
 }
 
-export default function WordDetail({ word }: WordDetailProps) {
+function SpeakerIcon({ playing }: { playing: boolean }) {
+  return (
+    <svg
+      width="18"
+      height="18"
+      viewBox="0 0 24 24"
+      fill="none"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`shrink-0 transition-all duration-200 ${playing ? "stroke-primary" : "stroke-current"}`}
+    >
+      <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5" />
+      <path
+        d="M15.54 8.46a5 5 0 0 1 0 7.07"
+        className={playing ? "animate-pulse" : ""}
+        style={
+          playing
+            ? { animationDelay: "0s", animationDuration: "1s" }
+            : { opacity: 0.25 }
+        }
+      />
+      <path
+        d="M19.07 4.93a10 10 0 0 1 0 14.14"
+        className={playing ? "animate-pulse" : ""}
+        style={
+          playing
+            ? { animationDelay: "0.3s", animationDuration: "1s" }
+            : { opacity: 0 }
+        }
+      />
+    </svg>
+  );
+}
+
+function LoopIcon({ active }: { active: boolean }) {
+  return (
+    <svg
+      width="14"
+      height="14"
+      viewBox="0 0 24 24"
+      fill="none"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      className={`shrink-0 transition-all duration-200 ${active ? "stroke-primary" : "stroke-current"}`}
+    >
+      <polyline points="17 1 21 5 17 9" />
+      <path d="M3 11V9a4 4 0 0 1 4-4h14" />
+      <polyline points="7 23 3 19 7 15" />
+      <path d="M21 13v2a4 4 0 0 1-4 4H3" />
+    </svg>
+  );
+}
+
+export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
   const [detail, setDetail] = useState<LexiconDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [playingType, setPlayingType] = useState<"en" | "us" | null>(null);
+  const [loopEn, setLoopEn] = useState(false);
+  const [loopUs, setLoopUs] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
+  const loopEnRef = useRef(false);
+  const loopUsRef = useRef(false);
 
   useEffect(() => {
     if (!word) return;
     setLoading(true);
     setError(null);
     setDetail(null);
+    setPlayingType(null);
+    setLoopEn(false);
+    setLoopUs(false);
+    loopEnRef.current = false;
+    loopUsRef.current = false;
+    audioRef.current?.pause();
+    audioRef.current = null;
     wordApi
       .getWordDetail(word)
-      .then(setDetail)
-      .catch((e: Error) => setError(e.message ?? "加载失败"))
+      .then((data) => {
+        setDetail(data);
+        onDataLoaded?.(data !== null);
+      })
+      .catch((e: Error) => {
+        setError(e.message ?? "加载失败");
+        onDataLoaded?.(false);
+      })
       .finally(() => setLoading(false));
-  }, [word]);
+  }, [word, onDataLoaded]);
 
   useEffect(() => {
     return () => {
@@ -53,7 +126,7 @@ export default function WordDetail({ word }: WordDetailProps) {
     };
   }, []);
 
-  function playAudio(type: "en" | "us") {
+  function startAudio(type: "en" | "us", loop: boolean) {
     const w = (detail?.word ?? word).toLowerCase();
     const url =
       type === "en"
@@ -61,18 +134,55 @@ export default function WordDetail({ word }: WordDetailProps) {
         : `${OSS_BASE_URL}/learnEnglish/Speech_US/${w}.mp3`;
 
     audioRef.current?.pause();
-
-    if (playingType === type) {
-      audioRef.current = null;
-      setPlayingType(null);
-      return;
-    }
-
     const audio = new Audio(url);
+    audio.loop = loop;
     audioRef.current = audio;
     setPlayingType(type);
     audio.play().catch(() => setPlayingType(null));
-    audio.onended = () => setPlayingType(null);
+    if (!loop) {
+      audio.onended = () => setPlayingType(null);
+    }
+  }
+
+  function stopAudio() {
+    audioRef.current?.pause();
+    audioRef.current = null;
+    setPlayingType(null);
+  }
+
+  function handlePlayClick(type: "en" | "us") {
+    if (playingType === type) {
+      stopAudio();
+      return;
+    }
+    const shouldLoop = type === "en" ? loopEnRef.current : loopUsRef.current;
+    startAudio(type, shouldLoop);
+  }
+
+  function handleLoopToggle(type: "en" | "us") {
+    if (type === "en") {
+      const newLoop = !loopEn;
+      setLoopEn(newLoop);
+      loopEnRef.current = newLoop;
+      if (newLoop) {
+        setLoopUs(false);
+        loopUsRef.current = false;
+        startAudio("en", true);
+      } else {
+        if (playingType === "en") stopAudio();
+      }
+    } else {
+      const newLoop = !loopUs;
+      setLoopUs(newLoop);
+      loopUsRef.current = newLoop;
+      if (newLoop) {
+        setLoopEn(false);
+        loopEnRef.current = false;
+        startAudio("us", true);
+      } else {
+        if (playingType === "us") stopAudio();
+      }
+    }
   }
 
   if (loading) {
@@ -109,52 +219,87 @@ export default function WordDetail({ word }: WordDetailProps) {
       <ScrollShadow className="max-h-[450px]">
         {/* 音标行 */}
         <div className="flex flex-wrap gap-3">
-          <Button
-            variant={playingType === "en" ? "primary" : "tertiary"}
-            size="sm"
-            onPress={() => playAudio("en")}
-            className="gap-1"
+          {/* 英式发音 */}
+          <div
+            className={`inline-flex items-center gap-0.5 rounded-full border px-3 py-2 text-sm transition-colors ${playingType === "en"
+                ? "border-primary/50 bg-primary/10 text-primary"
+                : "border-default-200 bg-transparent text-default-700 dark:border-default-700 dark:text-default-300"
+              }`}
           >
-            <span className="text-sm">英</span>
-            {detail.britishPhonetic && (
-              <span className="text-sm">[ {detail.britishPhonetic} ]</span>
-            )}
-            <span className="text-xs">{playingType === "en" ? "■" : "▶"}</span>
-          </Button>
-          <Button
-            variant={playingType === "us" ? "primary" : "tertiary"}
-            size="sm"
-            onPress={() => playAudio("us")}
-            className="gap-1"
+            <button
+              type="button"
+              onClick={() => handlePlayClick("en")}
+              className="inline-flex cursor-pointer select-none items-center gap-1 outline-none"
+            >
+              <span className="text-sm">英</span>
+              {detail.britishPhonetic && (
+                <span className="text-sm">[ {detail.britishPhonetic} ]</span>
+              )}
+              <SpeakerIcon playing={playingType === "en"} />
+            </button>
+            <span className="h-3 w-px shrink-0 bg-default-200 dark:bg-default-700" />
+            <button
+              type="button"
+              onClick={() => handleLoopToggle("en")}
+              className="cursor-pointer select-none outline-none"
+              title={loopEn ? "关闭循环" : "开启循环"}
+            >
+              <LoopIcon active={loopEn} />
+            </button>
+          </div>
+
+          {/* 美式发音 */}
+          <div
+            className={`inline-flex items-center gap-0.5 rounded-full border px-3 py-2 text-sm transition-colors ${playingType === "us"
+                ? "border-primary/50 bg-primary/10 text-primary"
+                : "border-default-200 bg-transparent text-default-700 dark:border-default-700 dark:text-default-300"
+              }`}
           >
-            <span className="text-sm">美</span>
-            {detail.americanPhonetic && (
-              <span className="text-sm">[ {detail.americanPhonetic} ]</span>
-            )}
-            <span className="text-xs">{playingType === "us" ? "■" : "▶"}</span>
-          </Button>
+            <button
+              type="button"
+              onClick={() => handlePlayClick("us")}
+              className="inline-flex cursor-pointer select-none items-center gap-1 outline-none"
+            >
+              <span className="text-sm">美</span>
+              {detail.americanPhonetic && (
+                <span className="text-sm">[ {detail.americanPhonetic} ]</span>
+              )}
+              <SpeakerIcon playing={playingType === "us"} />
+            </button>
+            <span className="h-3 w-px shrink-0 bg-default-200 dark:bg-default-700" />
+            <button
+              type="button"
+              onClick={() => handleLoopToggle("us")}
+              className="cursor-pointer select-none outline-none"
+              title={loopUs ? "关闭循环" : "开启循环"}
+            >
+              <LoopIcon active={loopUs} />
+            </button>
+          </div>
         </div>
 
         {/* 正文 */}
         <div className=" ">
           {/* 释义 */}
-          <div className="py-3">
+          <div className="flex flex-col gap-2 pt-3">
             {detail.translation?.map((item, idx) => (
-              <p key={idx} className="text-base font-medium leading-6">
+              <div key={idx} className="text-base font-medium leading-6">
                 {item}
-              </p>
+              </div>
             ))}
-            {detail.frequence > 0 && (
-              <Chip size="sm" color="accent" variant="soft" className="my-3">
-                高考 {detail.frequence} 次
-              </Chip>
-            )}
+
           </div>
+
+          {detail.frequence > 0 && (
+            <Chip size="sm" color="accent" variant="soft" className="mt-3 px-4 py-1 text-xs">
+              高考 {detail.frequence} 次
+            </Chip>
+          )}
 
           {/* 例句 */}
           {detail.sampleSentences && detail.sampleSentences.length > 0 && (
             <div>
-              <p className="mb-2 text-sm text-default-500">例句</p>
+              <p className="mb-2 mt-3 text-sm text-default-500">例句</p>
               <div className="space-y-3">
                 {detail.sampleSentences.map((sentence, idx) => (
                   <div key={idx} className="flex items-baseline gap-3">
