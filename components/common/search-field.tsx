@@ -89,12 +89,12 @@ export default function FullWidth() {
         </SearchField.Group>
       </SearchField>
       <Modal.Backdrop
-        className="backdrop-blur-xl backdrop-saturate-150 "
+        className="!bg-transparent"
         isOpen={isOpen}
         onOpenChange={setIsOpen}
       >
         <Modal.Container className="w-full max-w-lg rounded-2xl">
-          <Modal.Dialog>
+          <Modal.Dialog className="backdrop-blur-xl backdrop-saturate-150 bg-white/70 dark:bg-zinc-900/70 shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
             <Modal.CloseTrigger />
             <Modal.Header>
               <Modal.Heading className="text-2xl font-semibold">

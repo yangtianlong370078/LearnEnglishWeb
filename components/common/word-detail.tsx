@@ -33,7 +33,9 @@ function HighlightWord({ text, word }: { text: string; word: string }) {
 
 function SpeakerIcon({ playing }: { playing: boolean }) {
   const stroke = playing ? ACTIVE_CONTROL_COLOR : "currentColor";
-  const activeStyle = playing ? { color: ACTIVE_CONTROL_COLOR, stroke: ACTIVE_CONTROL_COLOR } : undefined;
+  const activeStyle = playing
+    ? { color: ACTIVE_CONTROL_COLOR, stroke: ACTIVE_CONTROL_COLOR }
+    : undefined;
 
   return (
     <svg
@@ -69,7 +71,11 @@ function SpeakerIcon({ playing }: { playing: boolean }) {
         stroke={stroke}
         style={
           playing
-            ? { ...activeStyle, animationDelay: "0.3s", animationDuration: "1s" }
+            ? {
+                ...activeStyle,
+                animationDelay: "0.3s",
+                animationDuration: "1s",
+              }
             : { opacity: 0 }
         }
       />
@@ -79,7 +85,9 @@ function SpeakerIcon({ playing }: { playing: boolean }) {
 
 function LoopIcon({ active }: { active: boolean }) {
   const stroke = active ? ACTIVE_CONTROL_COLOR : "currentColor";
-  const activeStyle = active ? { color: ACTIVE_CONTROL_COLOR, stroke: ACTIVE_CONTROL_COLOR } : undefined;
+  const activeStyle = active
+    ? { color: ACTIVE_CONTROL_COLOR, stroke: ACTIVE_CONTROL_COLOR }
+    : undefined;
 
   return (
     <svg
@@ -294,7 +302,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
         {/* 音标行 */}
         <div className="flex flex-wrap gap-3">
           {/* 英式发音 */}
-          <div className="inline-flex items-center gap-0.5 rounded-full border border-default-200 bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300">
+          <div className="inline-flex items-center gap-0.5 rounded-full wordfy bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300">
             <button
               type="button"
               onClick={() => handlePlayClick("en")}
@@ -318,7 +326,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
           </div>
 
           {/* 美式发音 */}
-          <div className="inline-flex items-center gap-0.5 rounded-full border border-default-200 bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300">
+          <div className="inline-flex items-center gap-0.5 rounded-full wordfy bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300">
             <button
               type="button"
               onClick={() => handlePlayClick("us")}
@@ -351,11 +359,15 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
                 {item}
               </div>
             ))}
-
           </div>
 
           {detail.frequence > 0 && (
-            <Chip size="sm" color="accent" variant="soft" className="mt-3 px-4 py-1 text-xs">
+            <Chip
+              size="sm"
+              color="accent"
+              variant="soft"
+              className="mt-3 px-4 py-1 text-xs"
+            >
               高考 {detail.frequence} 次
             </Chip>
           )}
@@ -363,13 +375,16 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
           {/* 例句 */}
           {detail.sampleSentences && detail.sampleSentences.length > 0 && (
             <div>
-              <p className="mb-2 mt-3 text-sm text-default-500">例句</p>
+              <p className="mb-2 mt-3 text-sm text-muted text-default-500">
+                例句
+              </p>
               <div className="space-y-3">
                 {detail.sampleSentences.map((sentence, idx) => (
-                  <div key={idx} className="flex items-baseline gap-3">
-                    <span className="min-w-5 text-base text-default-400">
-                      {idx + 1}
-                    </span>
+                  <div key={idx} className="flex items-baseline gap-2">
+                      <span className="min-w-5 text-base text-default-400 text-center">
+                        {idx + 1}
+                      </span>
+
                     <div>
                       <p className="mb-1 text-base font-medium leading-snug">
                         <HighlightWord text={sentence.en} word={detail.word} />
