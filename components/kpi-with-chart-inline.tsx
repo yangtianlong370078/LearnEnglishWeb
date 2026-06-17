@@ -222,7 +222,7 @@ export default function KpiWithChartInline({
         </KPI.Content>
       </KPI>
  
-      <KPI className=" backdrop-blur-xl backdrop-saturate-150 ">
+      <KPI  className=" backdrop-blur-xl backdrop-saturate-150 ">
         <KPI.Header className="justify-between">
           <div className="flex items-center gap-2">
             <Target className="text-muted size-4" />
