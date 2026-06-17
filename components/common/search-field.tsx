@@ -102,9 +102,9 @@ export default function FullWidth() {
               </Modal.Heading>
             </Modal.Header>
 
-            <Card className="m-0 px-0" variant="transparent">
+            <div className="m-0 py-4" >
               <WordDetail word={searchedWord} onDataLoaded={setWordDetailResult} />
-            </Card>
+            </div>
 
             {wordDetailResult === true && !isChecking && !wordExists && (
               <Modal.Footer>
