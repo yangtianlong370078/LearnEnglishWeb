@@ -1,22 +1,36 @@
 "use client";
 
-import { Display, Moon, Sun , Bell,Person,Gear,ShieldCheck,Comment,ArrowRightFromSquare } from "@gravity-ui/icons";
-import { Kbd, SearchField,Button, Avatar,Dropdown,Label,Separator} from "@heroui/react";
+import {
+  Display,
+  Moon,
+  Sun,
+  Bell,
+  Person,
+  Gear,
+  ShieldCheck,
+  Comment,
+  ArrowRightFromSquare,
+} from "@gravity-ui/icons";
+import { Button, Avatar, Dropdown, Label, Separator } from "@heroui/react";
 import { useEffect, useState } from "react";
 import { useTheme } from "next-themes";
 import { useRouter, usePathname } from "next/navigation";
 import NextLink from "next/link";
 import { siteConfig } from "@/config/site";
-import {
+import { Logo } from "@/components/icons";
+import { Navbar, Segment } from "@heroui-pro/react";
 
-  Logo,
-} from "@/components/icons";
-import { Navbar, Segment  } from "@heroui-pro/react";
+import { MaterBasic } from "@/components/meter-base";
 
-import  {MaterBasic}  from  "@/components/meter-base";
+import InlineSelectCustomIndicatorDemo from "@/components/common/inline-select-custom-indicator-demo";
 
 const BrandLogo = () => (
-  <svg fill="none" height="22" viewBox="0 0 83 26" xmlns="http://www.w3.org/2000/svg">
+  <svg
+    fill="none"
+    height="22"
+    viewBox="0 0 83 26"
+    xmlns="http://www.w3.org/2000/svg"
+  >
     <path
       d="M0.536865 6.72737V14.2058C0.536865 14.5593 0.718555 14.8878 1.01747 15.0747L6.11609 18.2631C6.79552 18.688 7.67556 18.1977 7.67556 17.3942V11.108C7.67556 10.7463 7.86565 10.4115 8.1757 10.2271L11.2858 8.37825V24.4895C11.2858 25.2902 12.1606 25.781 12.8402 25.3616L18.1026 22.1136C18.4045 21.9273 18.5883 21.5972 18.5883 21.2415V5.77018C18.5883 4.97334 17.7212 4.48199 17.0414 4.89359L11.2858 8.37825V1.51066C11.2858 0.715978 10.4229 0.224316 9.74303 0.631596L1.03414 5.84829C0.725738 6.03305 0.536865 6.36691 0.536865 6.72737Z"
       fill="currentColor"
@@ -46,10 +60,17 @@ export default function NavbarProDocsSite() {
   const { theme, setTheme } = useTheme();
   const [mounted, setMounted] = useState(false);
 
-  useEffect(() => setMounted(true), []);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   return (
-    <Navbar maxWidth="full" position="static" shouldBlockScroll={false} className="bg-transparent">
+    <Navbar
+      maxWidth="full"
+      position="static"
+      shouldBlockScroll={false}
+      className=" backdrop-blur-xl backdrop-saturate-150 bg-transparent"
+    >
       <Navbar.Header className="relative ">
         <Navbar.MenuToggle className="md:hidden" />
 
@@ -59,9 +80,9 @@ export default function NavbarProDocsSite() {
         </Navbar.Brand> */}
 
         <NextLink className="flex items-center gap-1" href="/">
-                    <Logo />
-                    <p className="font-bold text-inherit">{siteConfig.name}</p>
-                  </NextLink>
+          <Logo />
+          <p className="font-bold text-inherit">{siteConfig.name}</p>
+        </NextLink>
 
         <Navbar.Content className="hidden gap-0 md:flex">
           {siteConfig.navItems.map((item) => (
@@ -79,7 +100,10 @@ export default function NavbarProDocsSite() {
             </Navbar.Item>
           ))}
         </Navbar.Content>
-        <div className="absolute inset-0 m-auto w-fit h-fit"> <MaterBasic /></div>
+        <div className="absolute inset-0 m-auto w-fit h-fit">
+          {" "}
+          <MaterBasic />
+        </div>
 
         <Navbar.Spacer />
 
@@ -107,66 +131,73 @@ export default function NavbarProDocsSite() {
             size="sm"
             onSelectionChange={(key) => setTheme(String(key))}
           >
-            <Segment.Item aria-label="Light" className="size-[28px] px-0" id="light">
+            <Segment.Item
+              aria-label="Light"
+              className="size-[28px] px-0"
+              id="light"
+            >
               <Sun className="size-3.5" />
             </Segment.Item>
-            <Segment.Item aria-label="Dark" className="size-[28px] px-0" id="dark">
+            <Segment.Item
+              aria-label="Dark"
+              className="size-[28px] px-0"
+              id="dark"
+            >
               <Moon className="size-3.5" />
             </Segment.Item>
-            <Segment.Item aria-label="System" className="size-[28px] px-0" id="system">
+            <Segment.Item
+              aria-label="System"
+              className="size-[28px] px-0"
+              id="system"
+            >
               <Display className="size-3.5" />
             </Segment.Item>
           </Segment>
 
-           <Navbar.Item>
-              <Bell data-slot="icon" />
-            </Navbar.Item>
-
+          <Navbar.Item>
+            <Bell data-slot="icon" />
+          </Navbar.Item>
         </Navbar.Content>
 
+        <InlineSelectCustomIndicatorDemo />
 
-
-
-          <Dropdown>
-            <Button isIconOnly aria-label="User menu" variant="ghost">
-              <Avatar className="size-7">
-                <Avatar.Image
-                  alt="User avatar"
-                  src="https://img.heroui.chat/image/avatar?w=200&h=200&u=1"
-                />
-                <Avatar.Fallback>AJ</Avatar.Fallback>
-              </Avatar>
-            </Button>
-            <Dropdown.Popover className="min-w-[200px]" placement="bottom end">
-              <Dropdown.Menu>
-                <Dropdown.Item id="account" textValue="Your account">
-                  <Person className="text-muted size-4" />
-                  <Label>Your account</Label>
-                </Dropdown.Item>
-                <Dropdown.Item id="preferences" textValue="Preferences">
-                  <Gear className="text-muted size-4" />
-                  <Label>Preferences</Label>
-                </Dropdown.Item>
-                <Separator />
-                <Dropdown.Item id="security" textValue="Security & privacy">
-                  <ShieldCheck className="text-muted size-4" />
-                  <Label>Security & privacy</Label>
-                </Dropdown.Item>
-                <Dropdown.Item id="feedback" textValue="Send feedback">
-                  <Comment className="text-muted size-4" />
-                  <Label>Send feedback</Label>
-                </Dropdown.Item>
-                <Separator />
-                <Dropdown.Item id="sign-out" textValue="Log out">
-                  <ArrowRightFromSquare className="text-muted size-4" />
-                  <Label>Log out</Label>
-                </Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown.Popover>
-          </Dropdown>
-
-
-
+        <Dropdown>
+          <Button isIconOnly aria-label="User menu" variant="ghost">
+            <Avatar className="size-7">
+              <Avatar.Image
+                alt="User avatar"
+                src="https://img.heroui.chat/image/avatar?w=200&h=200&u=1"
+              />
+              <Avatar.Fallback>AJ</Avatar.Fallback>
+            </Avatar>
+          </Button>
+          <Dropdown.Popover className="min-w-[200px]" placement="bottom end">
+            <Dropdown.Menu>
+              <Dropdown.Item id="account" textValue="Your account">
+                <Person className="text-muted size-4" />
+                <Label>Your account</Label>
+              </Dropdown.Item>
+              <Dropdown.Item id="preferences" textValue="Preferences">
+                <Gear className="text-muted size-4" />
+                <Label>Preferences</Label>
+              </Dropdown.Item>
+              <Separator />
+              <Dropdown.Item id="security" textValue="Security & privacy">
+                <ShieldCheck className="text-muted size-4" />
+                <Label>Security & privacy</Label>
+              </Dropdown.Item>
+              <Dropdown.Item id="feedback" textValue="Send feedback">
+                <Comment className="text-muted size-4" />
+                <Label>Send feedback</Label>
+              </Dropdown.Item>
+              <Separator />
+              <Dropdown.Item id="sign-out" textValue="Log out">
+                <ArrowRightFromSquare className="text-muted size-4" />
+                <Label>Log out</Label>
+              </Dropdown.Item>
+            </Dropdown.Menu>
+          </Dropdown.Popover>
+        </Dropdown>
       </Navbar.Header>
 
       <Navbar.Menu>

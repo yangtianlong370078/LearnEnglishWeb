@@ -3,95 +3,55 @@
 
 @import "@heroui/styles/css";
 @import "@heroui-pro/react/css";
+@import "./background-themes.css";
 
 @custom-variant dark (&:is(.dark *));
 
 @theme {
-	--font-sans: "font", sans-serif;
-	--font-mono: "monospace", monospace;
-}
-
-/* ── 全局基础底色 ── */
-html {
-  /* html 提供兜底底色（当 body::before 还未渲染时不闪白） */
-  background-color: oklch(0.95 0.006 240);
-  min-height: 100%;
-}
-html.dark {
-  background-color: oklch(0.09 0.008 240);
-}
-
-body {
-  /* body 透明，且必须创建堆叠上下文（z-index:0 + position），
-     这样 body::before { z-index:-1 } 才能正确落在内容之后、html背景之前 */
-  background: transparent !important;
-  position: relative;
-  z-index: 0;
-  min-height: 100dvh;
-  overflow-x: hidden;
-}
-
-/* ── Aurora 光晕：body::before，fixed 超出视口铺满，z-index:-1 ──
-   用明确的 width/height（120vw/120vh）避免 inset:-10% 在某些浏览器上被裁剪 */
-body::before {
-  content: "";
-  position: fixed;
-  top: -10vh;
-  left: -10vw;
-  width: 120vw;
-  height: 120vh;
-  pointer-events: none;
-  z-index: -1;
-  transform-origin: center;
-  will-change: transform;
-  /* 亮色：柔和彩光 */
-  background:
-    radial-gradient(ellipse 80% 75% at 12% 18%, oklch(0.80 0.13 280 / 0.4) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 58% at 78% 14%, oklch(0.83 0.12 190 / 0.35) 0%, transparent 58%),
-    radial-gradient(ellipse 65% 62% at 78% 82%, oklch(0.80 0.13 320 / 0.3) 0%, transparent 58%),
-    radial-gradient(ellipse 58% 56% at 18% 84%, oklch(0.86 0.11 55 / 0.3) 0%, transparent 58%),
-    oklch(0.95 0.006 240);
-  animation: aurora 14s ease-in-out infinite alternate;
-}
-
-html.dark body::before {
-  /* 暗色：亮度 0.40-0.45，低饱和 */
-  background:
-    radial-gradient(ellipse 90% 85% at 12% 18%, oklch(0.43 0.07 280 / 0.6) 0%, transparent 62%),
-    radial-gradient(ellipse 80% 68% at 78% 14%, oklch(0.40 0.07 190 / 0.52) 0%, transparent 58%),
-    radial-gradient(ellipse 75% 72% at 78% 82%, oklch(0.45 0.07 320 / 0.5) 0%, transparent 58%),
-    radial-gradient(ellipse 68% 66% at 18% 84%, oklch(0.42 0.06 55  / 0.42) 0%, transparent 58%),
-    oklch(0.12 0.008 240);
-  animation: aurora 14s ease-in-out infinite alternate;
+  --font-sans: "font", sans-serif;
+  --font-mono: "monospace", monospace;
 }
 
 /* 关键帧均使用 scale >= 1.05，配合 inset:-10% 确保任何时刻都铺满视口 */
 @keyframes aurora {
-  0%   { transform: scale(1.05) rotate(0deg);   }
-  40%  { transform: scale(1.10) rotate(1.2deg); }
-  70%  { transform: scale(1.06) rotate(-0.8deg);}
-  100% { transform: scale(1.09) rotate(1.8deg); }
+  0% {
+    transform: scale(1.05) rotate(0deg);
+  }
+  40% {
+    transform: scale(1.1) rotate(1.2deg);
+  }
+  70% {
+    transform: scale(1.06) rotate(-0.8deg);
+  }
+  100% {
+    transform: scale(1.09) rotate(1.8deg);
+  }
 }
 
 /* ── 毛玻璃：覆盖 HeroUI v3 的 --surface* 变量为半透明 ──
    HeroUI v3 Card/Accordion 等用 .surface--default 类，背景来自 var(--surface) */
 :root {
   --surface: oklch(1 0 0 / 0.42) !important;
-  --surface-secondary: oklch(0.98 0.002 286 / 0.40) !important;
+  --surface-secondary: oklch(0.98 0.002 286 / 0.4) !important;
   --surface-tertiary: oklch(0.96 0.002 286 / 0.38) !important;
 }
 .dark {
-  --surface: oklch(0.22 0.006 286 / 0.50) !important;
+  --surface: oklch(0.22 0.006 286 / 0.5) !important;
   --surface-secondary: oklch(0.26 0.004 286 / 0.46) !important;
   --surface-tertiary: oklch(0.28 0.003 248 / 0.42) !important;
 }
 
-.wordfy{
-border: none !important;
-box-shadow:
+.wordfy {
+  border: none !important;
+  box-shadow:
     inset 0 0 0 1px rgb(0 0 0 / 0.07),
     0 1px 10px rgb(0 0 0 / 0.07) !important; 
+} 
 
+.dark .wordfy {
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.1),
+    0 1px 10px rgb(0 0 0 / 0.3) !important; 
 }
 
 /* 给所有 surface 块加毛玻璃模糊 + 玻璃描边 + 顶部高光 */
@@ -103,38 +63,60 @@ box-shadow:
 .surface--secondary,
 .surface--tertiary,
 .card,
+.searchFieldqy,
 .card--default,
 [data-slot="card"],
 .accordion,
 .disclosure-group,
 .alert {
-  /*backdrop-filter: blur(20px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
-   亮色：保持原描边 + 顶部高光 
-  border: 1px solid rgb(255 255 255 / 0.3) !important;
+  --border-bottom-width: 1px;
+  --border-color:rgba(255, 255, 255, 0.5);
+  --border-left-width: 1px;
+  --border-right-width: 1px;
+  --border-style: solid;
+  --border-top-width: 1px;
+ border: none !important;
   box-shadow:
-    0 2px 20px rgb(0 0 80 / 0.075),
-    inset 0 1px 0 rgb(255 255 255 / 0.5) !important;
-	*/
-
- /* border: none !important;
-box-shadow:
-    inset 0 0 0 1px rgb(0 0 0 / 0.07),
-    0 1px 10px rgb(0 0 0 / 0.07) !important;    */
-
-/* border: none !important;
-box-shadow:
-  inset 0 0 0 1px rgba(0, 0, 0, 0.05),
-  inset 0 1px 0 rgba(0, 0, 0, 0.04),
-  0 4px 16px rgba(0, 0, 0, 0.06) !important; */
-
+    rgba(30, 30, 30, 0.1) 0px 4px 10px 0px,
+    rgba(30, 30, 30, 0.05) 0px 4px 4px 0px,
+    rgba(30, 30, 30, 0.05) 0px 1px 0px 0px;
+  opacity: 1;
 }
+
+
+.surface:after,
+.surface--default:after,
+.surface--secondary:after,
+.surface--tertiary:after,
+.card:after,
+.searchFieldqy:after,
+.card--default:after,
+[data-slot="card"]:after,
+.accordion:after,
+.disclosure-group:after,
+.alert:after {
+    content: "";
+    border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
+    border-color: var(--border-color, none);
+    border-style: var(--border-style, none);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    box-sizing: border-box;
+    left: 0;
+    top: 0;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+
+
 .dark .surface,
 .dark .surface--default,
 .dark .surface--secondary,
 .dark .surface--tertiary,
 .dark .card,
-.dark .wordfy,
+.dark .searchFieldqy,
 .dark .card--default,
 .dark [data-slot="card"],
 .dark .accordion,
@@ -142,10 +124,49 @@ box-shadow:
 .dark .alert {
   /* 暗色：极轻描边，只比卡片背景略亮一点 */
   border: none !important;
+
+
+ box-shadow:
+    rgba(30, 30, 30, 0.1) 0px 4px 10px 0px,
+    rgba(30, 30, 30, 0.05) 0px 4px 4px 0px,
+    rgba(30, 30, 30, 0.05) 0px 1px 0px 0px;
+  opacity: 1;
+
+/* 
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 0.07),
-    0 2px 20px rgb(0 0 0 / 0.3) !important;
+    0 2px 20px rgb(0 0 0 / 0.3) !important;  */
 }
+ 
+
+.dark .surface:after,
+.dark .surface--default:after,
+.dark .surface--secondary:after,
+.dark .surface--tertiary:after,
+.dark .card:after,
+.dark .card--default:after,
+.dark .searchFieldqy:after,
+.dark [data-slot="card"]:after,
+.dark .accordion:after,
+.dark .disclosure-group:after,
+.dark .alert:after {
+    content: ""; 
+    /* 暗色：极轻描边，只比卡片背景略亮一点 */
+     border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
+    border-color: rgb(255 255 255 / 0.07);
+    border-style: solid; 
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    box-sizing: border-box;
+    left: 0;
+    top: 0;
+    border-radius: inherit;
+    pointer-events: none;
+}
+
+
+
 
 /* 同样的玻璃描边给 Button / Chip / Input 等通用容器（按需扩展） */
 .button,
@@ -164,7 +185,7 @@ box-shadow:
 .dark .kbd,
 .dark .tag,
 .dark .segment {
-  border-color: rgb(255 255 255 / 0.10) !important;
+  border-color: rgb(255 255 255 / 0.1) !important;
 }
 
 /* 兜底：保留旧的 bg-content 规则（万一某些组件用） */
@@ -189,14 +210,22 @@ box-shadow:
   -webkit-backdrop-filter: blur(14px) saturate(148%) !important;
 }
 
-.dark .bg-content1 { background-color: rgb(15 20 40 / 0.48) !important; }
-.dark .bg-content2 { background-color: rgb(20 28 52 / 0.44) !important; }
-.dark .bg-content3 { background-color: rgb(26 36 62 / 0.40) !important; }
-.dark .bg-content4 { background-color: rgb(32 44 72 / 0.36) !important; }
+.dark .bg-content1 {
+  background-color: rgb(15 20 40 / 0.48) !important;
+}
+.dark .bg-content2 {
+  background-color: rgb(20 28 52 / 0.44) !important;
+}
+.dark .bg-content3 {
+  background-color: rgb(26 36 62 / 0.4) !important;
+}
+.dark .bg-content4 {
+  background-color: rgb(32 44 72 / 0.36) !important;
+}
 
 /* ── Navbar 毛玻璃 ── */
 header {
-  background-color: rgb(255 255 255 / 0.60) !important;
+  background-color: rgb(255 255 255 / 0.6) !important;
   backdrop-filter: blur(24px) saturate(170%) !important;
   -webkit-backdrop-filter: blur(24px) saturate(170%) !important;
   border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;
@@ -227,7 +256,9 @@ header {
 /* ── 兜底：data-slot=base 描边（适用于使用此 slot 的组件） ── */
 [data-slot="base"] {
   border: 1px solid rgb(255 255 255 / 0.3) !important;
-  box-shadow: 0 2px 18px rgb(0 0 80 / 0.05), inset 0 1px 0 rgb(255 255 255 / 0.42) !important;
+  box-shadow:
+    0 2px 18px rgb(0 0 80 / 0.05),
+    inset 0 1px 0 rgb(255 255 255 / 0.42) !important;
 }
 .dark [data-slot="base"] {
   box-shadow:
@@ -235,11 +266,9 @@ header {
     0 2px 20px rgb(0 0 0 / 0.3) !important;
 }
 
-.today-bg span{
-  color:#0485f7 !important;
+.today-bg span {
+  color: #0485f7 !important;
 }
-
-
 
 input:-webkit-autofill,
 input:-webkit-autofill:hover,
@@ -260,6 +289,6 @@ input:-webkit-autofill:active {
 }
 
 .zs {
-    color: #f03744;
-    font-weight: 600;
+  color: #f03744;
+  font-weight: 600;
 }

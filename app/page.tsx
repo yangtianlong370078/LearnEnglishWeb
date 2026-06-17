@@ -105,7 +105,7 @@ export default function Home() {
             {view === "year" ? "按年查看每月任务量与完成情况" : "按月查看每日任务量与完成情况"}
           </span>
         </div>
- <Card className="" variant="secondary">
+ <Card className=" backdrop-blur-xl backdrop-saturate-150" variant="secondary" >
 
         <AnimatePresence initial={false} mode="wait">
           {view === "month" ? (
