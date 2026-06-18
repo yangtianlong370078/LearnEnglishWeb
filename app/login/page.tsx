@@ -21,19 +21,27 @@ export default function LoginPage() {
     const data = new FormData(e.currentTarget);
     const loginIDValue = ((data.get("loginID") as string) ?? "").trim();
     const passwordValue = ((data.get("password") as string) ?? "").trim();
+
     if (!loginIDValue || !passwordValue) {
       setError("请输入账户和密码");
+
       return;
     }
     setError("");
     setLoading(true);
     try {
-      const result = await login({ loginID: loginIDValue, password: passwordValue });
+      const result = await login({
+        loginID: loginIDValue,
+        password: passwordValue,
+      });
+
       storage.setToken(result.token);
       storage.set("user", result.user);
       router.push("/");
     } catch (err) {
-      setError(err instanceof Error ? err.message : "登录失败，请检查账户和密码");
+      setError(
+        err instanceof Error ? err.message : "登录失败，请检查账户和密码",
+      );
     } finally {
       setLoading(false);
     }
@@ -64,7 +72,9 @@ export default function LoginPage() {
               />
             </svg>
           </div>
-          <h1 className="text-2xl font-bold text-foreground tracking-tight">LearnEnglish</h1>
+          <h1 className="text-2xl font-bold text-foreground tracking-tight">
+            LearnEnglish
+          </h1>
           <p className="text-sm text-muted mt-1">登录您的账户继续学习</p>
         </div>
 
@@ -94,7 +104,10 @@ export default function LoginPage() {
 
               {/* 账户输入 */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-foreground" htmlFor="loginID">
+                <label
+                  className="text-sm font-medium text-foreground"
+                  htmlFor="loginID"
+                >
                   账户
                 </label>
                 <div className="relative">
@@ -128,7 +141,10 @@ export default function LoginPage() {
 
               {/* 密码输入 */}
               <div className="flex flex-col gap-1.5">
-                <label className="text-sm font-medium text-foreground" htmlFor="password">
+                <label
+                  className="text-sm font-medium text-foreground"
+                  htmlFor="password"
+                >
                   密码
                 </label>
                 <div className="relative">
@@ -203,7 +219,7 @@ export default function LoginPage() {
               {/* 登录按钮 */}
               <Button
                 className="mt-1 w-full rounded-xl bg-gradient-to-r from-blue-500 to-indigo-600 text-white font-medium shadow-md shadow-blue-500/25 hover:shadow-blue-500/40 transition-all"
-                isLoading={loading}
+                isDisabled={loading}
                 size="lg"
                 type="submit"
               >

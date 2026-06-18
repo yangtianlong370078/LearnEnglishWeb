@@ -1,23 +1,21 @@
 "use client";
 
+import type {
+  MonthCompletion,
+  MonthValue,
+} from "@/components/task-year-calendar";
+import type { MonthlyData } from "@/types/task";
+import type { WordStats } from "@/types/word";
+
 import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
+import { Card } from "@heroui/react";
 
 import KpiWithChartInline from "@/components/kpi-with-chart-inline";
 import TaskCalendar from "@/components/task-calendar";
 import FullWidthSearch from "@/components/common/search-field";
 import TaskYearCalendar from "@/components/task-year-calendar";
-import type {
-  MonthCompletion,
-  MonthValue,
-} from "@/components/task-year-calendar";
 import { statisticsApi } from "@/lib/api";
-import type { MonthlyData } from "@/types/task";
-import type { WordStats } from "@/types/word";
-
-import {
-  Card,
-} from "@heroui/react";
 
 export default function Home() {
   const today = new Date();
@@ -31,13 +29,14 @@ export default function Home() {
   );
   const [monthlyList, setMonthlyList] = useState<MonthlyData[]>([]);
   const [statsLoading, setStatsLoading] = useState(true);
-  const [studyStats, setStudyStats] = useState<WordStats | undefined>(undefined);
+  const [studyStats, setStudyStats] = useState<WordStats | undefined>(
+    undefined,
+  );
 
   // 拉取后端学习统计数据（StatisticsLearnCountTwo）
   // 1) 进入页面立即用 localStorage 缓存渲染（stale）；
   // 2) 同时后台请求最新数据（revalidate），ETag 命中 304 时无 body 传输。
-  const refreshStats = (showLoading = false) => {
-    if (showLoading) setStatsLoading(true);
+  const refreshStats = () => {
     statisticsApi
       .getMonthlyStatisticsWithYearStats()
       .then((res) => {
@@ -55,19 +54,20 @@ export default function Home() {
   };
 
   useEffect(() => {
-    const cached = statisticsApi.getCachedMonthlyStatistics();
-    if (cached) {
-      setMonthlyList(cached.monthly);
-      setYearStats(cached.yearStats);
-      setStatsLoading(false); // 先把骨架屏关掉，再去后台校验
-    } else {
-      setStatsLoading(true);
+    const cachedStats = statisticsApi.getCachedMonthlyStatistics();
+
+    if (cachedStats) {
+      setMonthlyList(cachedStats.monthly);
+      setYearStats(cachedStats.yearStats);
+      setStatsLoading(false);
     }
+
+    const cachedKpi = statisticsApi.getCachedStudyStatistics();
+
+    if (cachedKpi) setStudyStats(cachedKpi);
+
     refreshStats();
 
-    // KPI：先用本地缓存立即渲染，再后台静默拉取最新数据（ETag 未变则无 body 传输）
-    const cachedKpi = statisticsApi.getCachedStudyStatistics();
-    if (cachedKpi) setStudyStats(cachedKpi);
     statisticsApi
       .getStudyStatistics()
       .then(setStudyStats)
@@ -75,7 +75,6 @@ export default function Home() {
         // eslint-disable-next-line no-console
         console.error("加载学习 KPI 失败:", err);
       });
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   // 当前选中月份对应的 MonthlyData
@@ -102,63 +101,66 @@ export default function Home() {
             任务日历
           </span>
           <span className="text-xs whitespace-nowrap text-muted">
-            {view === "year" ? "按年查看每月任务量与完成情况" : "按月查看每日任务量与完成情况"}
+            {view === "year"
+              ? "按年查看每月任务量与完成情况"
+              : "按月查看每日任务量与完成情况"}
           </span>
         </div>
- <Card className=" backdrop-blur-xl backdrop-saturate-150" variant="secondary" >
-
-        <AnimatePresence initial={false} mode="wait">
-          {view === "month" ? (
-            <motion.div
-              key="month"
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.2 } }}
-              initial={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <TaskCalendar
-                isLoading={statsLoading}
-                monthlyData={currentMonthly}
-                value={monthValue}
-                yearStats={yearStats}
-                onChange={setMonthValue}
-                onShowYearView={(stats) => {
-                  setYearStats(stats);
-                  setView("year");
-                }}
-                onTaskSaved={() => {
-                  refreshStats();
-                  statisticsApi
-                    .getStudyStatistics()
-                    .then(setStudyStats)
-                    .catch((err) => {
-                      // eslint-disable-next-line no-console
-                      console.error("刷新学习 KPI 失败:", err);
-                    });
-                }}
-              />
-            </motion.div>
-          ) : (
-            <motion.div
-              key="year"
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0, transition: { duration: 0.2 } }}
-              initial={{ opacity: 0 }}
-              transition={{ duration: 0.3 }}
-            >
-              <TaskYearCalendar
-                inline
-                monthlyList={monthlyList}
-                stats={yearStats}
-                value={monthValue}
-                onChange={setMonthValue}
-                onShowMonthView={() => setView("month")}
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-</Card>
-
+        <Card
+          className=" backdrop-blur-xl backdrop-saturate-150"
+          variant="secondary"
+        >
+          <AnimatePresence initial={false} mode="wait">
+            {view === "month" ? (
+              <motion.div
+                key="month"
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                initial={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <TaskCalendar
+                  isLoading={statsLoading}
+                  monthlyData={currentMonthly}
+                  value={monthValue}
+                  yearStats={yearStats}
+                  onChange={setMonthValue}
+                  onShowYearView={(stats) => {
+                    setYearStats(stats);
+                    setView("year");
+                  }}
+                  onTaskSaved={() => {
+                    refreshStats();
+                    statisticsApi
+                      .getStudyStatistics()
+                      .then(setStudyStats)
+                      .catch((err) => {
+                        // eslint-disable-next-line no-console
+                        console.error("刷新学习 KPI 失败:", err);
+                      });
+                  }}
+                />
+              </motion.div>
+            ) : (
+              <motion.div
+                key="year"
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0, transition: { duration: 0.2 } }}
+                initial={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+              >
+                <TaskYearCalendar
+                  inline
+                  monthlyList={monthlyList}
+                  stats={yearStats}
+                  value={monthValue}
+                  onChange={setMonthValue}
+                  onShowMonthView={() => setView("month")}
+                />
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </Card>
       </div>
     </div>
   );

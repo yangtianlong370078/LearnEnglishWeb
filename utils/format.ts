@@ -13,6 +13,7 @@ export function formatDate(
 ): string {
   if (!date) return "-";
   const d = typeof date === "string" ? new Date(date) : date;
+
   if (isNaN(d.getTime())) return "-";
 
   const pad = (n: number) => String(n).padStart(2, "0");
@@ -43,6 +44,7 @@ export function formatPercent(
 ): string {
   if (value == null) return "-";
   const pct = isDecimal ? value * 100 : value;
+
   return `${pct.toFixed(1)}%`;
 }
 
@@ -53,5 +55,6 @@ export function formatPercent(
 export function formatCount(value: number): string {
   if (value >= 1_000_000) return `${(value / 1_000_000).toFixed(1)}M+`;
   if (value >= 1_000) return `${(value / 1_000).toFixed(1)}k+`;
+
   return String(value);
 }

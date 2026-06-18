@@ -4,8 +4,7 @@
  */
 
 /** 接口基础地址（生产环境从环境变量读取，本地开发通过 next.config.mjs 代理转发） */
-export const API_BASE_URL =
-  process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
+export const API_BASE_URL = process.env.NEXT_PUBLIC_API_BASE_URL ?? "/api";
 
 /** 请求超时时间（ms） */
 export const REQUEST_TIMEOUT = 15_000;

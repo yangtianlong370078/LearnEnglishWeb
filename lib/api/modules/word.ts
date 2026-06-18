@@ -2,9 +2,15 @@
  * 单词模块接口
  * 对应后端 /api/Word 路由
  */
-import { get, post, put, del } from "../request";
-import type { LexiconDetail, Word, WordQueryParams, WordStats } from "@/types/word";
+import type {
+  LexiconDetail,
+  Word,
+  WordQueryParams,
+  WordStats,
+} from "@/types/word";
 import type { PageData } from "@/types/api";
+
+import { get, post, put, del } from "../request";
 
 /** 获取单词 KPI 统计 */
 export function getWordStats() {
@@ -13,7 +19,10 @@ export function getWordStats() {
 
 /** 分页查询单词列表 */
 export function getWordList(params: WordQueryParams) {
-  return get<PageData<Word>>("/Word/list", params as unknown as Record<string, unknown>);
+  return get<PageData<Word>>(
+    "/Word/list",
+    params as unknown as Record<string, unknown>,
+  );
 }
 
 /** 获取单词详情 */
@@ -22,7 +31,9 @@ export function getWordById(id: number) {
 }
 
 /** 新增单词 */
-export function createWord(data: Omit<Word, "id" | "createdAt" | "lastStudiedAt">) {
+export function createWord(
+  data: Omit<Word, "id" | "createdAt" | "lastStudiedAt">,
+) {
   return post<Word>("/Word", data);
 }
 

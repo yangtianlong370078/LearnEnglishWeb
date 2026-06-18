@@ -41,7 +41,13 @@ export default function RootLayout({
           fontSans.variable,
         )}
       >
-        <Providers themeProps={{ attribute: "class", defaultTheme: "system", enableSystem: true }}>
+        <Providers
+          themeProps={{
+            attribute: "class",
+            defaultTheme: "system",
+            enableSystem: true,
+          }}
+        >
           <div className="relative flex flex-col min-h-screen">
             <ConditionalLayout>{children}</ConditionalLayout>
           </div>

@@ -16,7 +16,7 @@ export const siteConfig = {
       label: "练听力",
       href: "/listening",
     },
-    
+
     {
       label: "试题",
       href: "/exam",

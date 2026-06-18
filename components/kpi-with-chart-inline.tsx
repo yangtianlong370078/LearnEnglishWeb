@@ -1,4 +1,8 @@
 "use client";
+import type { ReactNode } from "react";
+import type { WordStats } from "@/types";
+import type { MonthlyData } from "@/types/task";
+
 import { useMemo, useState } from "react";
 import { SquareChartBar, Target } from "@gravity-ui/icons";
 import {
@@ -9,9 +13,6 @@ import {
   Segment,
 } from "@heroui-pro/react";
 import { Skeleton } from "@heroui/react";
-import type { ReactNode } from "react";
-import type { WordStats } from "@/types";
-import type { MonthlyData } from "@/types/task";
 
 const CHART_COLORS = [
   "var(--chart-4)",
@@ -33,7 +34,9 @@ function PieTooltip({
   valueFormatter?: (value: number | string) => ReactNode;
 }) {
   const entry = payload?.[0];
+
   if (!active || !entry) return null;
+
   return (
     <ChartTooltip>
       <ChartTooltip.Item>
@@ -77,9 +80,11 @@ export default function KpiWithChartInline({
     );
 
     const countMap = new Map<string, number>();
+
     monthlyList?.forEach((m) => {
       m.statisticsLearns.forEach((sl) => {
         const key = `${sl.year}-${sl.month}-${sl.day}`;
+
         countMap.set(key, (countMap.get(key) ?? 0) + sl.count);
       });
     });
@@ -90,17 +95,21 @@ export default function KpiWithChartInline({
 
     for (let i = days - 1; i >= 0; i--) {
       const d = new Date(todayStart);
+
       d.setDate(d.getDate() - i);
       const key = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
       const count = countMap.get(key) ?? 0;
+
       last += count;
       points.push({ value: count });
     }
 
     for (let i = days * 2 - 1; i >= days; i--) {
       const d = new Date(todayStart);
+
       d.setDate(d.getDate() - i);
       const key = `${d.getFullYear()}-${d.getMonth() + 1}-${d.getDate()}`;
+
       prev += countMap.get(key) ?? 0;
     }
 
@@ -109,6 +118,7 @@ export default function KpiWithChartInline({
 
   const growthRate = useMemo(() => {
     if (lastTotal === 0) return 0;
+
     return parseFloat((((lastTotal - prevTotal) / lastTotal) * 100).toFixed(1));
   }, [lastTotal, prevTotal]);
 
@@ -170,9 +180,9 @@ export default function KpiWithChartInline({
           <div className="flex items-center justify-end w-full">
             <div className="flex items-center justify-center w-full gap-2 sm:gap-6">
               <PieChart
+                className="flex items-center justify-center w-1/2 "
                 height={104}
                 width={104}
-                className="flex items-center justify-center w-1/2 "
               >
                 <PieChart.Pie
                   cx="50%"
@@ -182,9 +192,9 @@ export default function KpiWithChartInline({
                   nameKey="name"
                   outerRadius={50}
                 >
-                  {pieData.map((_, idx) => (
+                  {pieData.map((entry, idx) => (
                     <PieChart.Cell
-                      key={idx}
+                      key={entry.name}
                       fill={CHART_COLORS[idx % CHART_COLORS.length]}
                     />
                   ))}
@@ -221,8 +231,8 @@ export default function KpiWithChartInline({
           </div>
         </KPI.Content>
       </KPI>
- 
-      <KPI  className=" backdrop-blur-xl backdrop-saturate-150 ">
+
+      <KPI className=" backdrop-blur-xl backdrop-saturate-150 ">
         <KPI.Header className="justify-between">
           <div className="flex items-center gap-2">
             <Target className="text-muted size-4" />
@@ -232,12 +242,12 @@ export default function KpiWithChartInline({
 bg-[var(--background)] */}
 
           <Segment
+            className="absolute right-3.5 top-3.5 "
             selectedKey={selectedPeriod}
             size="sm"
             onSelectionChange={(value) => {
               setSelectedPeriod(value as "1D" | "15D" | "30D");
             }}
-            className="absolute right-3.5 top-3.5 "
           >
             <Segment.Item id="1D">7天</Segment.Item>
             <Segment.Item id="15D">15天</Segment.Item>

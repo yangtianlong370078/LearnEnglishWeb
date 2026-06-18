@@ -1,12 +1,15 @@
 "use client";
 
+import type { MonthlyData } from "@/types/task";
+
 import { useEffect, useState } from "react";
 import { Label, Meter } from "@heroui/react";
+
 import { statisticsApi } from "@/lib/api";
-import type { MonthlyData } from "@/types/task";
 
 function calcTodayTaskCount(monthly: MonthlyData, today: Date): number {
   const taskTotal = monthly.task?.count ?? 0;
+
   if (taskTotal === 0) return 0;
 
   const year = today.getFullYear();
@@ -16,6 +19,7 @@ function calcTodayTaskCount(monthly: MonthlyData, today: Date): number {
   const daysInMonth = new Date(year, month + 1, 0).getDate();
 
   const weekendDays = new Set<number>();
+
   if (weekendMode > 0) {
     for (let d = 1; d <= daysInMonth; d++) {
       const dow = new Date(year, month, d).getDay();
@@ -23,6 +27,7 @@ function calcTodayTaskCount(monthly: MonthlyData, today: Date): number {
         (weekendMode === 1 && dow === 6) ||
         (weekendMode === 2 && dow === 0) ||
         (weekendMode === 3 && (dow === 0 || dow === 6));
+
       if (include) weekendDays.add(d);
     }
   }
@@ -41,27 +46,39 @@ function calcTodayTaskCount(monthly: MonthlyData, today: Date): number {
   return quotient + (remainder >= todayDay ? 1 : 0);
 }
 
+function getTodayProgress() {
+  const cached = statisticsApi.getCachedMonthlyStatistics();
+
+  if (!cached) return { todayTask: 0, doneCount: 0 };
+  const today = new Date();
+  const monthly = cached.monthly.find(
+    (m) => m.year === today.getFullYear() && m.month === today.getMonth() + 1,
+  );
+
+  if (!monthly) return { todayTask: 0, doneCount: 0 };
+  const todayLearn = monthly.statisticsLearns.find(
+    (s) => s.day === today.getDate(),
+  );
+
+  return {
+    todayTask: calcTodayTaskCount(monthly, today),
+    doneCount: todayLearn?.count ?? 0,
+  };
+}
+
 export function MaterBasic() {
-  const [todayTask, setTodayTask] = useState<number>(0);
-  const [doneCount, setDoneCount] = useState<number>(0);
+  const [{ todayTask, doneCount }, setProgress] = useState({
+    todayTask: 0,
+    doneCount: 0,
+  });
 
   useEffect(() => {
     function sync() {
-      const cached = statisticsApi.getCachedMonthlyStatistics();
-      if (!cached) return;
-      const today = new Date();
-      const monthly = cached.monthly.find(
-        (m) => m.year === today.getFullYear() && m.month === today.getMonth() + 1,
-      );
-      if (!monthly) return;
-      setTodayTask(calcTodayTaskCount(monthly, today));
-      const todayLearn = monthly.statisticsLearns.find(
-        (s) => s.day === today.getDate(),
-      );
-      setDoneCount(todayLearn?.count ?? 0);
+      setProgress(getTodayProgress());
     }
     sync();
     window.addEventListener("stats:updated", sync);
+
     return () => window.removeEventListener("stats:updated", sync);
   }, []);
 
@@ -73,7 +90,9 @@ export function MaterBasic() {
 
   return (
     <Meter aria-label="今日任务" className="w-64" value={percent}>
-      <Label>今日任务：{doneCount}/{todayTask}</Label>
+      <Label>
+        今日任务：{doneCount}/{todayTask}
+      </Label>
       <Meter.Output />
       <Meter.Track>
         <Meter.Fill />

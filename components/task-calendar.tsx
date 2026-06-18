@@ -1,6 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import type { MonthCompletion, MonthValue, MonthlyData } from "@/types";
+
+import { useCallback, useMemo, useState } from "react";
 import {
   Button,
   Chip,
@@ -15,10 +17,6 @@ import {
   Spinner,
   useOverlayState,
 } from "@heroui/react";
-
-import RadialChartWithLegend from "@/components/radial-chart-with-legend";
-import { saveLearntask } from "@/lib/api/modules/statistics";
-
 import {
   Calendar,
   ChevronLeft,
@@ -30,9 +28,8 @@ import {
   Plus,
 } from "@gravity-ui/icons";
 
-import JeDatePicker from "./task-year-calendar";
-import type { MonthCompletion, MonthValue, MonthlyData } from "@/types";
-import { Chocolate_Classical_Sans } from "next/font/google";
+import RadialChartWithLegend from "@/components/radial-chart-with-legend";
+import { saveLearntask } from "@/lib/api/modules/statistics";
 
 type DayStatus = "pending" | "weekend" | "done" | "missed" | "warn" | "empty";
 
@@ -70,6 +67,7 @@ function buildGrid(
   const weekendMode = data?.task?.weekend ?? 0;
 
   const weekendDays = new Set<number>();
+
   if (weekendMode > 0) {
     for (let d = 1; d <= daysInMonth; d++) {
       const dow = new Date(year, month, d).getDay();
@@ -77,6 +75,7 @@ function buildGrid(
         (weekendMode === 1 && dow === 6) ||
         (weekendMode === 2 && dow === 0) ||
         (weekendMode === 3 && (dow === 0 || dow === 6));
+
       if (include) weekendDays.add(d);
     }
   }
@@ -86,6 +85,7 @@ function buildGrid(
   let remainder = taskTotal > 0 ? taskTotal % workingDayCount : 0;
 
   const learnMap = new Map<string, number>();
+
   data?.statisticsLearns.forEach((s) => {
     learnMap.set(`${s.year}-${s.month}-${s.day}`, s.count);
   });
@@ -94,6 +94,7 @@ function buildGrid(
 
   for (let i = 0; i < firstWeekIdx; i++) {
     const d = new Date(year, month, -(firstWeekIdx - 1 - i));
+
     cells.push({
       date: d,
       inMonth: false,
@@ -113,6 +114,7 @@ function buildGrid(
     const isWeekend = weekendDays.has(day);
 
     let taskCount = 0;
+
     if (taskTotal > 0) {
       if (isWeekend) {
         taskCount = 0;
@@ -167,6 +169,7 @@ function buildGrid(
   while (cells.length % 7 !== 0 || cells.length < 42) {
     const offset = cells.length - (firstWeekIdx + daysInMonth) + 1;
     const d = new Date(year, month + 1, offset);
+
     cells.push({
       date: d,
       inMonth: false,
@@ -192,15 +195,6 @@ const STATUS_BAR: Record<DayStatus, string> = {
   warn: "bg-[#F5B400] text-white",
   empty: "",
 };
-
-function Legend({ color, label }: { color: string; label: string }) {
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="h-2.5 w-2.5 rounded-sm" style={{ background: color }} />
-      <span>{label}</span>
-    </div>
-  );
-}
 
 function DayCell({ cell, isToday }: { cell: DayInfo; isToday: boolean }) {
   const dimmed = !cell.inMonth;
@@ -246,15 +240,18 @@ function weekendToArray(w: 0 | 1 | 2 | 3): string[] {
   if (w === 1) return ["sat"];
   if (w === 2) return ["sun"];
   if (w === 3) return ["sat", "sun"];
+
   return [];
 }
 
 function arrayToWeekend(arr: string[]): 0 | 1 | 2 | 3 {
   const hasSat = arr.includes("sat");
   const hasSun = arr.includes("sun");
+
   if (hasSat && hasSun) return 3;
   if (hasSat) return 1;
   if (hasSun) return 2;
+
   return 0;
 }
 
@@ -281,17 +278,13 @@ function CreateTaskButton({
     (cursorDate.getFullYear() === today.getFullYear() &&
       cursorDate.getMonth() < today.getMonth());
   const state = useOverlayState();
-  const [wordCount, setWordCount] = useState<number | null>(
+  const [wordCount, setWordCount] = useState<number | null>(() =>
     taskCount > 0 ? taskCount : null,
   );
-  const [weekend, setWeekend] = useState<string[]>(weekendToArray(weekendMode));
+  const [weekend, setWeekend] = useState<string[]>(() =>
+    weekendToArray(weekendMode),
+  );
   const [isSaving, setIsSaving] = useState(false);
-
-  // 切换月份时自动同步表单值
-  useEffect(() => {
-    setWordCount(taskCount > 0 ? taskCount : null);
-    setWeekend(weekendToArray(weekendMode));
-  }, [taskCount, weekendMode, cursorDate]);
 
   const handleSave = async () => {
     setIsSaving(true);
@@ -313,8 +306,8 @@ function CreateTaskButton({
     if (totalTask > 0 && totalDone >= totalTask) {
       return (
         <Chip
-          size="lg"
           className="bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400"
+          size="lg"
         >
           <CircleCheckFill className="mr-1 inline-block size-3.5" />
           已完成
@@ -324,18 +317,19 @@ function CreateTaskButton({
     if (totalTask > 0 && totalDone < totalTask) {
       return (
         <Chip
-          size="lg"
           className="bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400"
+          size="lg"
         >
           <CircleExclamationFill className="mr-1 inline-block size-3.5" />
           未完成
         </Chip>
       );
     }
+
     return (
       <Chip
-        size="lg"
         className="bg-gray-100 text-gray-600 dark:bg-gray-800/50 dark:text-gray-400"
+        size="lg"
       >
         <CircleMinusFill className="mr-1 inline-block size-3.5" />
         无任务
@@ -345,11 +339,10 @@ function CreateTaskButton({
 
   return (
     <>
-      
       <ButtonGroup
+        className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base"
         size="sm"
         variant="primary"
-        className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base"
       >
         <Button onPress={state.open}>
           {taskCount > 0 ? <Gear /> : <Plus />}
@@ -358,7 +351,7 @@ function CreateTaskButton({
       </ButtonGroup>
 
       <Modal state={state}>
-        <Modal.Backdrop variant="blur" isDismissable={false}>
+        <Modal.Backdrop isDismissable={false} variant="blur">
           <Modal.Container placement="center" size="md">
             <Modal.Dialog>
               <Modal.Header>
@@ -381,31 +374,32 @@ function CreateTaskButton({
                   </label>
 
                   <NumberField
-                    variant="secondary"
-                    aria-label="单词数量"
-                    minValue={0}
-                    maxValue={999}
                     fullWidth
-                    value={wordCount ?? NaN}
-                    onChange={(v) => setWordCount(Number.isNaN(v) ? null : v)}
+                    aria-label="单词数量"
+                    maxValue={999}
+                    minValue={0}
                     style={
                       {
                         "--field-border": "var(--border)",
                       } as React.CSSProperties
                     }
+                    value={wordCount ?? NaN}
+                    variant="secondary"
+                    onChange={(v) => setWordCount(Number.isNaN(v) ? null : v)}
                   >
                     <NumberField.Group className="w-full flex">
                       <NumberField.Input
+                        className="w-full"
                         id="task-word-count"
                         placeholder="输入任务单词数量"
-                        className="w-full"
                       />
 
                       {wordCount !== null && (
                         <button
+                          aria-label="清空任务单词数量"
+                          className="inline-flex items-center justify-center px-2 hover:opacity-70"
                           type="button"
                           onClick={() => setWordCount(null)}
-                          className="inline-flex items-center justify-center px-2 hover:opacity-70"
                         >
                           <svg
                             height="16"
@@ -433,7 +427,7 @@ function CreateTaskButton({
                     value={weekend}
                     onChange={setWeekend}
                   >
-                    <Checkbox value="sat" className="m-0" variant="secondary">
+                    <Checkbox className="m-0" value="sat" variant="secondary">
                       <Checkbox.Control className="size-5 rounded-full before:rounded-full">
                         <Checkbox.Indicator />
                       </Checkbox.Control>
@@ -441,7 +435,7 @@ function CreateTaskButton({
                         <Label>周六</Label>
                       </Checkbox.Content>
                     </Checkbox>
-                    <Checkbox value="sun" className="m-0" variant="secondary">
+                    <Checkbox className="m-0" value="sun" variant="secondary">
                       <Checkbox.Control className="size-5 rounded-full before:rounded-full">
                         <Checkbox.Indicator />
                       </Checkbox.Control>
@@ -489,28 +483,35 @@ export default function TaskCalendar({
   /** 任务保存成功后的回调，通常用于触发父组件刷新数据 */
   onTaskSaved?: () => void;
 } = {}) {
-
   const today = useMemo(() => new Date(), []);
   const [innerCursor, setInnerCursor] = useState(
     () => new Date(today.getFullYear(), today.getMonth(), 1),
   );
-  const cursor = value ? new Date(value.year, value.month - 1, 1) : innerCursor;
-  const setCursor = (next: Date | ((prev: Date) => Date)) => {
-    const resolved =
-      typeof next === "function" ? (next as (p: Date) => Date)(cursor) : next;
-    if (value) {
-      onChange?.({
-        year: resolved.getFullYear(),
-        month: resolved.getMonth() + 1,
-      });
-    } else {
-      setInnerCursor(resolved);
-    }
-  };
+  const cursor = useMemo(
+    () => (value ? new Date(value.year, value.month - 1, 1) : innerCursor),
+    [innerCursor, value],
+  );
+  const setCursor = useCallback(
+    (next: Date | ((prev: Date) => Date)) => {
+      const resolved =
+        typeof next === "function" ? (next as (p: Date) => Date)(cursor) : next;
+
+      if (value) {
+        onChange?.({
+          year: resolved.getFullYear(),
+          month: resolved.getMonth() + 1,
+        });
+      } else {
+        setInnerCursor(resolved);
+      }
+    },
+    [cursor, onChange, value],
+  );
 
   // 月度数据：仅使用接口数据，无数据时返回空结构
   const data: MonthlyData = useMemo(() => {
     if (monthlyData) return monthlyData;
+
     return {
       year: cursor.getFullYear(),
       month: cursor.getMonth() + 1,
@@ -538,11 +539,13 @@ export default function TaskCalendar({
   const totals = useMemo(() => {
     let task = 0;
     let done = 0;
+
     cells.forEach((c) => {
       if (!c.inMonth) return;
       task += c.taskCount;
       done += c.doneCount;
     });
+
     return { task, done };
   }, [cells]);
 
@@ -553,9 +556,9 @@ export default function TaskCalendar({
           <div className="flex items-center gap-1">
             <div className="flex flex-col gap-2">
               <ButtonGroup
+                className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base"
                 size="sm"
                 variant="primary"
-                className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base"
               >
                 <Button onPress={goPrev}>
                   <ChevronLeft />
@@ -597,15 +600,15 @@ export default function TaskCalendar({
 
         <div className="flex items-center gap-2">
           <CreateTaskButton
+            key={`${cursor.getFullYear()}-${cursor.getMonth()}-${data.task?.count ?? 0}-${data.task?.weekend ?? 0}`}
             cursorDate={cursor}
             taskCount={data.task?.count}
+            totalDone={totals.done}
+            totalTask={totals.task}
             weekendMode={data.task?.weekend}
             onSaved={onTaskSaved}
-            totalTask={totals.task}
-            totalDone={totals.done}
           />
         </div>
-      
       </Card.Header>
 
       <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
@@ -623,9 +626,12 @@ export default function TaskCalendar({
 
           {isLoading ? (
             <div className="relative">
-              <div className="grid grid-cols-7 gap-2" aria-hidden>
+              <div aria-hidden className="grid grid-cols-7 gap-2">
                 {Array.from({ length: 35 }).map((_, i) => (
-                  <div key={i} className="flex flex-col gap-1">
+                  <div
+                    key={`calendar-skeleton-${i}`}
+                    className="flex flex-col gap-1"
+                  >
                     <Skeleton className="mx-auto h-7 w-7 rounded-full" />
                     <Skeleton className="h-6 w-full rounded-md" />
                   </div>
@@ -639,15 +645,17 @@ export default function TaskCalendar({
             <div className="grid grid-cols-7 gap-2">
               {(() => {
                 const rows: DayInfo[][] = [];
+
                 for (let r = 0; r < cells.length / 7; r++) {
                   rows.push(cells.slice(r * 7, r * 7 + 7));
                 }
+
                 return rows
                   .filter((row) => row.some((c) => c.inMonth))
                   .flat()
-                  .map((cell, i) => (
+                  .map((cell) => (
                     <DayCell
-                      key={i}
+                      key={cell.date.toISOString()}
                       cell={cell}
                       isToday={
                         cell.date.toDateString() === today.toDateString()

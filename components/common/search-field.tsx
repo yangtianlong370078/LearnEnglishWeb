@@ -1,7 +1,8 @@
 "use client";
 
-import { SearchField, Button, Modal, Spinner, Card } from "@heroui/react";
+import { SearchField, Button, Modal, Spinner } from "@heroui/react";
 import React from "react";
+
 import WordDetail from "@/components/common/word-detail";
 import { get, post } from "@/lib/api/request";
 
@@ -12,10 +13,13 @@ export default function FullWidth() {
   const [wordExists, setWordExists] = React.useState(false);
   const [isChecking, setIsChecking] = React.useState(false);
   const [isSaving, setIsSaving] = React.useState(false);
-  const [wordDetailResult, setWordDetailResult] = React.useState<boolean | null>(null);
+  const [wordDetailResult, setWordDetailResult] = React.useState<
+    boolean | null
+  >(null);
 
   const handleSearch = async () => {
     const trimmed = value.trim();
+
     if (!trimmed) return;
 
     setSearchedWord(trimmed);
@@ -25,6 +29,7 @@ export default function FullWidth() {
     setWordDetailResult(null);
     try {
       const exists = await get<boolean>("/Word/WordExist", { en: trimmed });
+
       setWordExists(exists);
     } catch {
       setWordExists(false);
@@ -35,6 +40,7 @@ export default function FullWidth() {
 
   const handleAddToVocab = async () => {
     const trimmed = searchedWord;
+
     if (!trimmed) return;
 
     setIsSaving(true);
@@ -52,8 +58,8 @@ export default function FullWidth() {
     <div className="w-full space-y-4">
       <SearchField
         name="primary-search"
-        variant="primary"
         value={value}
+        variant="primary"
         onChange={setValue}
         onSubmit={handleSearch}
       >
@@ -79,9 +85,9 @@ export default function FullWidth() {
             </svg>
           </SearchField.ClearButton>
           <Button
-            variant="ghost"
-            size="sm"
             className="m-0 p-0 hover:bg-transparent data-[hovered=true]:bg-transparent"
+            size="sm"
+            variant="ghost"
             onPress={handleSearch}
           >
             <SearchField.SearchIcon className="mx-3" />
@@ -102,15 +108,19 @@ export default function FullWidth() {
               </Modal.Heading>
             </Modal.Header>
 
-            <div className="m-0 py-4" >
-              <WordDetail word={searchedWord} onDataLoaded={setWordDetailResult} />
+            <div className="m-0 py-4">
+              <WordDetail
+                key={searchedWord}
+                word={searchedWord}
+                onDataLoaded={setWordDetailResult}
+              />
             </div>
 
             {wordDetailResult === true && !isChecking && !wordExists && (
               <Modal.Footer>
                 <Button
-                  variant="primary"
                   isPending={isSaving}
+                  variant="primary"
                   onPress={handleAddToVocab}
                 >
                   {isSaving ? <Spinner color="current" size="sm" /> : null}

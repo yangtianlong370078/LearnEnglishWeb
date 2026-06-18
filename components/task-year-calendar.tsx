@@ -1,16 +1,14 @@
 "use client";
 
-import { Button, Popover, Card, Chip, ButtonGroup } from "@heroui/react";
+import type { MonthValue, MonthCompletion, MonthlyData } from "@/types";
 
+import { Button, Popover, Card, ButtonGroup } from "@heroui/react";
 import { ReactNode, useMemo, useState } from "react";
-
 import { ChevronLeft, ChevronRight, Calendar } from "@gravity-ui/icons";
 
-import BarChartComparisonDemo from "@/components/bar-chart-comparison-demo";
 import AreaChartMultiAreaDemo from "@/components/area-chart-multi-area-demo";
 
 // 从 types 目录导入并重新导出，保持对外兼容
-import type { MonthValue, MonthCompletion, MonthlyData } from "@/types";
 export type { MonthValue, MonthCompletion };
 
 interface JeDatePickerProps {
@@ -42,11 +40,13 @@ function getPercentColor(p: number | null | undefined): string {
   if (p === 0) return "text-danger";
   //if (p < 50) return "text-warning";
   if (p < 100) return "text-warning";
+
   return "text-success";
 }
 
 function formatPercent(p: number | null | undefined): string {
   if (p === null || p === undefined) return "-";
+
   return `${p}%`;
 }
 
@@ -78,7 +78,9 @@ export default function TaskYearCalendar({
 
   const statsMap = useMemo(() => {
     const m = new Map<string, number | null>();
+
     stats?.forEach((s) => m.set(`${s.year}-${s.month}`, s.percent));
+
     return m;
   }, [stats]);
 
@@ -102,6 +104,7 @@ export default function TaskYearCalendar({
 
   const handleThisMonth = () => {
     const v = { year: today.getFullYear(), month: today.getMonth() + 1 };
+
     setPanelYear(v.year);
     setDraft(v);
     commit(v);
@@ -117,7 +120,11 @@ export default function TaskYearCalendar({
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-1">
             <div className="flex flex-col gap-2">
-              <ButtonGroup variant="primary" size="sm" className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base">
+              <ButtonGroup
+                className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base"
+                size="sm"
+                variant="primary"
+              >
                 <Button onPress={() => canPrev && setPanelYear((y) => y - 1)}>
                   <ChevronLeft />
                 </Button>
@@ -146,7 +153,7 @@ export default function TaskYearCalendar({
               </ButtonGroup>
             </div>
           </div>
-          <div className="w-[88px]" aria-hidden />
+          <div aria-hidden className="w-[88px]" />
         </div>
       </Card.Header>
 
@@ -159,6 +166,7 @@ export default function TaskYearCalendar({
               const isThisMonth =
                 panelYear === today.getFullYear() && m === today.getMonth() + 1;
               const percent = statsMap.get(`${panelYear}-${m}`);
+
               return (
                 <div key={m} className="flex justify-center">
                   <button

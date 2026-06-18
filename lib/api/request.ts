@@ -2,6 +2,8 @@
  * Axios 二次封装
  * 适配 .NET 10 WebApi 统一返回结构、JWT 鉴权、全局异常处理
  */
+import type { ApiResponse } from "@/types/api";
+
 import axios, {
   type AxiosInstance,
   type AxiosRequestConfig,
@@ -9,7 +11,6 @@ import axios, {
   type InternalAxiosRequestConfig,
 } from "axios";
 
-import type { ApiResponse } from "@/types/api";
 import { API_BASE_URL, ApiCode, REQUEST_TIMEOUT } from "./config";
 
 const request: AxiosInstance = axios.create({
@@ -26,10 +27,12 @@ request.interceptors.request.use(
     // 从 localStorage 读取 token（客户端）
     if (typeof window !== "undefined") {
       const token = localStorage.getItem("token");
+
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
       }
     }
+
     return config;
   },
   (error) => Promise.reject(error),
@@ -60,7 +63,7 @@ request.interceptors.response.use(
         // Token 失效，清除本地凭证并跳转登录
         if (typeof window !== "undefined") {
           localStorage.removeItem("token");
-          document.cookie = "auth_token=; expires=Thu, 01 Jan 1970 00:00:00 GMT; path=/";
+          void fetch("/api/logout", { method: "POST" });
           window.location.href = "/login";
         }
         break;
@@ -73,7 +76,10 @@ request.interceptors.response.use(
       case 502:
         // eslint-disable-next-line no-console
         console.error("[api] 502 响应体:", error.response?.data);
-        return Promise.reject(new Error("网关错误，请检查后端服务是否正常运行"));
+
+        return Promise.reject(
+          new Error("网关错误，请检查后端服务是否正常运行"),
+        );
       default:
         break;
     }
@@ -90,6 +96,7 @@ export async function get<T>(
   config?: AxiosRequestConfig,
 ): Promise<T> {
   const res = await request.get<ApiResponse<T>>(url, { params, ...config });
+
   return res.data.data;
 }
 
@@ -99,6 +106,7 @@ export async function post<T>(
   config?: AxiosRequestConfig,
 ): Promise<T> {
   const res = await request.post<ApiResponse<T>>(url, data, config);
+
   return res.data.data;
 }
 
@@ -108,6 +116,7 @@ export async function put<T>(
   config?: AxiosRequestConfig,
 ): Promise<T> {
   const res = await request.put<ApiResponse<T>>(url, data, config);
+
   return res.data.data;
 }
 
@@ -116,6 +125,7 @@ export async function del<T>(
   config?: AxiosRequestConfig,
 ): Promise<T> {
   const res = await request.delete<ApiResponse<T>>(url, config);
+
   return res.data.data;
 }
 

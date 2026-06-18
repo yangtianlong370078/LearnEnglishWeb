@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button, Kbd, Link, TextField, InputGroup } from "@heroui/react";
 import NextLink from "next/link";
 import clsx from "clsx";
+
 import { siteConfig } from "@/config/site";
 import { ThemeSwitch } from "@/components/theme-switch";
 import {
@@ -113,6 +114,7 @@ export const Navbar = () => {
             aria-expanded={isMenuOpen}
             aria-label="Toggle menu"
             className="p-2"
+            type="button"
             onClick={() => setIsMenuOpen(!isMenuOpen)}
           >
             <svg

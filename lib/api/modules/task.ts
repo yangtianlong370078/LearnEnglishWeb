@@ -2,12 +2,13 @@
  * 任务模块接口
  * 对应后端 /api/Task 路由
  */
-import { get, post, put } from "../request";
 import type {
   MonthlyData,
   MonthCompletion,
   SaveMonthlyTaskRequest,
 } from "@/types/task";
+
+import { get, post } from "../request";
 
 /** 获取指定月份的任务与学习统计 */
 export function getMonthlyData(year: number, month: number) {

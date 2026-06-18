@@ -2,8 +2,9 @@
  * 鉴权模块接口
  * 对应后端 /api/Login 路由
  */
-import request from "../request";
 import type { LoginResponse, LoginParams } from "@/types/auth";
+
+import request from "../request";
 
 /**
  * 用户登录
@@ -17,6 +18,7 @@ import type { LoginResponse, LoginParams } from "@/types/auth";
  */
 export async function login(params: LoginParams): Promise<LoginResponse> {
   const form = new URLSearchParams();
+
   form.append("loginID", params.loginID);
   form.append("password", params.password);
 
@@ -24,5 +26,6 @@ export async function login(params: LoginParams): Promise<LoginResponse> {
     baseURL: "/api",
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
   });
+
   return res.data;
 }

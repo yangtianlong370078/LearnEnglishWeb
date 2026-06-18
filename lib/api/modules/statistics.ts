@@ -2,13 +2,14 @@
  * 学习统计模块接口
  * 对应后端 /api/Statistics 路由
  */
-import request from "../request";
 import type {
   MonthCompletion,
   MonthlyData,
   StatisticsLearn,
 } from "@/types/task";
 import type { WordStats } from "@/types/word";
+
+import request from "../request";
 
 /** 后端返回的每日学习记录原始结构 */
 interface StatisticsLearnRaw {
@@ -272,20 +273,20 @@ function writeKpiCache(etag: string | null, data: WordStats): void {
  * todayCount 与 growthRate，确保即使从缓存读取也不会返回过期数值。
  */
 function computeKpiRealtime(data: WordStats): WordStats {
-  
   const today = new Date();
+
   today.setHours(0, 0, 0, 0);
 
   const lastDate = data.lastDate ? new Date(data.lastDate) : null;
+
   if (lastDate) lastDate.setHours(0, 0, 0, 0);
 
   const minDate = data.minDate ? new Date(data.minDate) : null;
+
   if (minDate) minDate.setHours(0, 0, 0, 0);
 
   if (minDate && lastDate) {
-    const days = Math.round(
-      (today.getTime() - minDate.getTime()) / 86_400_000,
-    );
+    const days = Math.round((today.getTime() - minDate.getTime()) / 86_400_000);
     const average = days > 0 ? data.masteredCount / days : 0;
     const todayCount =
       lastDate.getTime() === today.getTime() ? (data.lastCount ?? 0) : 0;
@@ -311,13 +312,13 @@ export async function getStudyStatistics(): Promise<WordStats> {
   const { etag: cachedEtag, data: cachedData } = readKpiCache();
 
   try {
-    const res = await request.get<{ success: boolean; studyStatistics: WordStats }>(
-      "/Statistics/GetStudyStatistics",
-      {
-        headers: cachedEtag ? { "If-None-Match": cachedEtag } : undefined,
-        validateStatus: (s) => s === 304 || (s >= 200 && s < 300),
-      },
-    );
+    const res = await request.get<{
+      success: boolean;
+      studyStatistics: WordStats;
+    }>("/Statistics/GetStudyStatistics", {
+      headers: cachedEtag ? { "If-None-Match": cachedEtag } : undefined,
+      validateStatus: (s) => s === 304 || (s >= 200 && s < 300),
+    });
 
     // 304 Not Modified：服务端数据未变，复用本地缓存
     if (res.status === 304 && cachedData) {

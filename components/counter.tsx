@@ -7,7 +7,10 @@ export const Counter = () => {
   const [count, setCount] = useState(0);
 
   return (
-    <Button className="rounded-full" onPress={() => setCount(count + 1)}>
+    <Button
+      className="rounded-full"
+      onPress={() => setCount((prev) => prev + 1)}
+    >
       Count is {count}
     </Button>
   );

@@ -1,12 +1,11 @@
 "use client";
 
-import type {Key} from "@heroui/react";
+import type { Key } from "@heroui/react";
 
-import {ChevronRight} from "@gravity-ui/icons";
-import {ListBox} from "@heroui/react";
-import {useEffect, useState} from "react";
-
-import {InlineSelect} from "@heroui-pro/react";
+import { ChevronRight } from "@gravity-ui/icons";
+import { ListBox } from "@heroui/react";
+import { useEffect, useState } from "react";
+import { InlineSelect } from "@heroui-pro/react";
 
 const STORAGE_KEY = "background-theme";
 const DEFAULT_THEME_ID = "defalut";
@@ -20,11 +19,10 @@ export default function InlineSelectCustomIndicatorDemo() {
   const [role, setRole] = useState<Key | null>(DEFAULT_THEME_ID);
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem(STORAGE_KEY);
-    const initialTheme = storedTheme ?? DEFAULT_THEME_ID;
+    const storedTheme = localStorage.getItem(STORAGE_KEY) ?? DEFAULT_THEME_ID;
 
-    setRole(initialTheme);
-    applyBackgroundTheme(initialTheme);
+    setRole(storedTheme);
+    applyBackgroundTheme(storedTheme);
   }, []);
 
   const handleThemeChange = (key: Key | null) => {
@@ -35,7 +33,11 @@ export default function InlineSelectCustomIndicatorDemo() {
   };
 
   return (
-    <InlineSelect aria-label="背景主题" selectedKey={role} onSelectionChange={handleThemeChange}>
+    <InlineSelect
+      aria-label="背景主题"
+      selectedKey={role}
+      onSelectionChange={handleThemeChange}
+    >
       <InlineSelect.Trigger>
         <InlineSelect.Value />
         <InlineSelect.Indicator>
@@ -52,7 +54,6 @@ export default function InlineSelectCustomIndicatorDemo() {
             绚丽
             <ListBox.ItemIndicator />
           </ListBox.Item>
-         
         </ListBox>
       </InlineSelect.Popover>
     </InlineSelect>

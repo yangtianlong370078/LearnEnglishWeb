@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
  *
  * 注意：更具体的路由（如 /api/login/route.ts）会优先匹配，本路由作为兜底。
  */
-const BACKEND_URL = process.env.DOTNET_API_URL ?? "https://localhost:6121";
+const BACKEND_URL = process.env.DOTNET_API_URL ?? "https://localhost:54807";
 
 /** 不应透传到后端的请求头 */
 const HOP_BY_HOP = new Set([
@@ -81,7 +81,9 @@ async function proxy(
     });
   } catch (err) {
     // 打印真实错误，方便在 Next.js 服务端终端定位问题
+    // eslint-disable-next-line no-console
     console.error("[proxy] fetch 失败", { target, method: req.method }, err);
+
     return NextResponse.json(
       {
         success: false,

@@ -1,10 +1,12 @@
 "use client";
 
+import type { LexiconDetail } from "@/types/word";
+
 import { useEffect, useRef, useState } from "react";
 import { Chip, ScrollShadow, Skeleton } from "@heroui/react";
+
 import { wordApi } from "@/lib/api";
 import { OSS_BASE_URL } from "@/lib/api/config";
-import type { LexiconDetail } from "@/types/word";
 
 interface WordDetailProps {
   word: string;
@@ -13,18 +15,24 @@ interface WordDetailProps {
 
 const ACTIVE_CONTROL_COLOR = "#0485f7";
 
+function resetAudioHandlers(audio: HTMLAudioElement) {
+  audio.onended = null;
+  audio.onerror = null;
+}
+
 function HighlightWord({ text, word }: { text: string; word: string }) {
   const escaped = word.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
   const parts = text.split(new RegExp(`(${escaped})`, "gi"));
+
   return (
     <>
       {parts.map((part, i) =>
         part.toLowerCase() === word.toLowerCase() ? (
-          <span key={i} className="font-semibold zs text-primary">
+          <span key={`${part}-${i}`} className="font-semibold zs text-primary">
             {part}
           </span>
         ) : (
-          <span key={i}>{part}</span>
+          <span key={`${part}-${i}`}>{part}</span>
         ),
       )}
     </>
@@ -39,16 +47,16 @@ function SpeakerIcon({ playing }: { playing: boolean }) {
 
   return (
     <svg
-      width="18"
-      height="18"
-      viewBox="0 0 24 24"
+      className="shrink-0 transition-all duration-200"
       fill="none"
+      height="18"
       stroke={stroke}
-      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="shrink-0 transition-all duration-200"
+      strokeWidth="2"
       style={activeStyle}
+      viewBox="0 0 24 24"
+      width="18"
     >
       <polygon
         points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"
@@ -56,8 +64,8 @@ function SpeakerIcon({ playing }: { playing: boolean }) {
         style={activeStyle}
       />
       <path
-        d="M15.54 8.46a5 5 0 0 1 0 7.07"
         className={playing ? "animate-pulse" : ""}
+        d="M15.54 8.46a5 5 0 0 1 0 7.07"
         stroke={stroke}
         style={
           playing
@@ -66,8 +74,8 @@ function SpeakerIcon({ playing }: { playing: boolean }) {
         }
       />
       <path
-        d="M19.07 4.93a10 10 0 0 1 0 14.14"
         className={playing ? "animate-pulse" : ""}
+        d="M19.07 4.93a10 10 0 0 1 0 14.14"
         stroke={stroke}
         style={
           playing
@@ -91,16 +99,16 @@ function LoopIcon({ active }: { active: boolean }) {
 
   return (
     <svg
-      width="14"
-      height="14"
-      viewBox="0 0 24 24"
+      className="shrink-0 transition-all duration-200"
       fill="none"
+      height="14"
       stroke={stroke}
-      strokeWidth="2"
       strokeLinecap="round"
       strokeLinejoin="round"
-      className="shrink-0 transition-all duration-200"
+      strokeWidth="2"
       style={activeStyle}
+      viewBox="0 0 24 24"
+      width="14"
     >
       <polyline points="17 1 21 5 17 9" stroke={stroke} style={activeStyle} />
       <path d="M3 11V9a4 4 0 0 1 4-4h14" stroke={stroke} style={activeStyle} />
@@ -111,45 +119,66 @@ function LoopIcon({ active }: { active: boolean }) {
 }
 
 export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
-  const [detail, setDetail] = useState<LexiconDetail | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [loadState, setLoadState] = useState<{
+    detail: LexiconDetail | null;
+    loading: boolean;
+    error: string | null;
+  }>({
+    detail: null,
+    loading: true,
+    error: null,
+  });
   const [playingType, setPlayingType] = useState<"en" | "us" | null>(null);
   const [loopEn, setLoopEn] = useState(false);
   const [loopUs, setLoopUs] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioRunIdRef = useRef(0);
+  const audioDisposedRef = useRef(false);
   const loopEnRef = useRef(false);
   const loopUsRef = useRef(false);
+  const onDataLoadedRef = useRef(onDataLoaded);
+
+  onDataLoadedRef.current = onDataLoaded;
 
   useEffect(() => {
     if (!word) return;
-    setLoading(true);
-    setError(null);
-    setDetail(null);
-    setPlayingType(null);
-    setLoopEn(false);
-    setLoopUs(false);
-    loopEnRef.current = false;
-    loopUsRef.current = false;
-    stopAudio();
+    let ignore = false;
+
     wordApi
       .getWordDetail(word)
       .then((data) => {
-        setDetail(data);
-        onDataLoaded?.(data !== null);
+        if (ignore) return;
+        setLoadState({ detail: data, loading: false, error: null });
+        onDataLoadedRef.current?.(data !== null);
       })
       .catch((e: Error) => {
-        setError(e.message ?? "加载失败");
-        onDataLoaded?.(false);
-      })
-      .finally(() => setLoading(false));
-  }, [word, onDataLoaded]);
+        if (ignore) return;
+        setLoadState({
+          detail: null,
+          loading: false,
+          error: e.message ?? "加载失败",
+        });
+        onDataLoadedRef.current?.(false);
+      });
+
+    return () => {
+      ignore = true;
+    };
+  }, [word]);
 
   useEffect(() => {
+    const audio = new Audio();
+
+    audioDisposedRef.current = false;
+    audio.preload = "auto";
+    audioRef.current = audio;
     return () => {
-      stopAudio();
-      audioRef.current = null;
+      audioDisposedRef.current = true;
+      audio.pause();
+      resetAudioHandlers(audio);
+      if (audioRef.current === audio) {
+        audioRef.current = null;
+      }
     };
   }, []);
 
@@ -158,15 +187,12 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
       audioRef.current = new Audio();
       audioRef.current.preload = "auto";
     }
+
     return audioRef.current;
   }
 
-  function resetAudioHandlers(audio: HTMLAudioElement) {
-    audio.onended = null;
-    audio.onerror = null;
-  }
-
   function startAudio(type: "en" | "us", loop: boolean) {
+    const { detail } = loadState;
     const w = (detail?.word ?? word).toLowerCase();
     const url =
       type === "en"
@@ -174,8 +200,10 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
         : `${OSS_BASE_URL}/learnEnglish/Speech_US/${w}.mp3`;
 
     const runId = audioRunIdRef.current + 1;
+
     audioRunIdRef.current = runId;
     const audio = getAudio();
+
     audio.pause();
     resetAudioHandlers(audio);
     if (audio.src !== url) {
@@ -190,13 +218,13 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     setPlayingType(type);
 
     const clearState = () => {
-      if (audioRunIdRef.current !== runId) return;
+      if (audioDisposedRef.current || audioRunIdRef.current !== runId) return;
       setPlayingType(null);
       turnOffLoop(type);
     };
 
     audio.onended = () => {
-      if (audioRunIdRef.current !== runId || audio.loop) return;
+      if (audioDisposedRef.current || audioRunIdRef.current !== runId || audio.loop) return;
       setPlayingType(null);
     };
     audio.onerror = clearState;
@@ -206,6 +234,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
   function stopAudio() {
     audioRunIdRef.current += 1;
     const audio = audioRef.current;
+
     if (audio) {
       audio.pause();
       resetAudioHandlers(audio);
@@ -232,18 +261,21 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     if (playingType === type) {
       stopAudio();
       turnOffLoop(type);
+
       return;
     }
     if (playingType) {
       turnOffLoop(playingType);
     }
     const shouldLoop = type === "en" ? loopEnRef.current : loopUsRef.current;
+
     startAudio(type, shouldLoop);
   }
 
   function handleLoopToggle(type: "en" | "us") {
     if (type === "en") {
       const newLoop = !loopEn;
+
       setLoopEn(newLoop);
       loopEnRef.current = newLoop;
       if (newLoop) {
@@ -255,6 +287,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
       }
     } else {
       const newLoop = !loopUs;
+
       setLoopUs(newLoop);
       loopUsRef.current = newLoop;
       if (newLoop) {
@@ -267,7 +300,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     }
   }
 
-  if (loading) {
+  if (loadState.loading) {
     return (
       <div className="w-full space-y-4 p-5">
         <Skeleton className="h-8 w-40 rounded-lg" />
@@ -284,9 +317,13 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     );
   }
 
-  if (error) {
-    return <div className="p-8 text-sm text-default-500">{error}</div>;
+  if (loadState.error) {
+    return (
+      <div className="p-8 text-sm text-default-500">{loadState.error}</div>
+    );
   }
+
+  const { detail } = loadState;
 
   if (!detail) {
     return (
@@ -304,9 +341,9 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
           {/* 英式发音 */}
           <div className="inline-flex items-center gap-0.5 rounded-full wordfy bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300">
             <button
+              className="inline-flex cursor-pointer select-none items-center gap-1 outline-none"
               type="button"
               onClick={() => handlePlayClick("en")}
-              className="inline-flex cursor-pointer select-none items-center gap-1 outline-none"
             >
               <span className="text-sm">英</span>
               {detail.britishPhonetic && (
@@ -316,10 +353,10 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
             </button>
             <span className="h-3 w-px shrink-0 bg-default-200 dark:bg-default-700" />
             <button
-              type="button"
-              onClick={() => handleLoopToggle("en")}
               className="cursor-pointer select-none outline-none"
               title={loopEn ? "关闭循环" : "开启循环"}
+              type="button"
+              onClick={() => handleLoopToggle("en")}
             >
               <LoopIcon active={loopEn} />
             </button>
@@ -328,9 +365,9 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
           {/* 美式发音 */}
           <div className="inline-flex items-center gap-0.5 rounded-full wordfy bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300">
             <button
+              className="inline-flex cursor-pointer select-none items-center gap-1 outline-none"
               type="button"
               onClick={() => handlePlayClick("us")}
-              className="inline-flex cursor-pointer select-none items-center gap-1 outline-none"
             >
               <span className="text-sm">美</span>
               {detail.americanPhonetic && (
@@ -340,10 +377,10 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
             </button>
             <span className="h-3 w-px shrink-0 bg-default-200 dark:bg-default-700" />
             <button
-              type="button"
-              onClick={() => handleLoopToggle("us")}
               className="cursor-pointer select-none outline-none"
               title={loopUs ? "关闭循环" : "开启循环"}
+              type="button"
+              onClick={() => handleLoopToggle("us")}
             >
               <LoopIcon active={loopUs} />
             </button>
@@ -354,8 +391,8 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
         <div className=" ">
           {/* 释义 */}
           <div className="flex flex-col gap-2 pt-3">
-            {detail.translation?.map((item, idx) => (
-              <div key={idx} className="text-base font-medium leading-6">
+            {detail.translation?.map((item) => (
+              <div key={item} className="text-base font-medium leading-6">
                 {item}
               </div>
             ))}
@@ -363,10 +400,10 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
 
           {detail.frequence > 0 && (
             <Chip
-              size="sm"
-              color="accent"
-              variant="soft"
               className="mt-3 px-4 py-1 text-xs"
+              color="accent"
+              size="sm"
+              variant="soft"
             >
               高考 {detail.frequence} 次
             </Chip>
@@ -380,10 +417,13 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
               </p>
               <div className="space-y-3">
                 {detail.sampleSentences.map((sentence, idx) => (
-                  <div key={idx} className="flex items-baseline gap-2">
-                      <span className="min-w-5 text-base text-default-400 text-center">
-                        {idx + 1}
-                      </span>
+                  <div
+                    key={`${sentence.en}-${sentence.cn ?? ""}`}
+                    className="flex items-baseline gap-2"
+                  >
+                    <span className="min-w-5 text-base text-default-400 text-center">
+                      {idx + 1}
+                    </span>
 
                     <div>
                       <p className="mb-1 text-base font-medium leading-snug">

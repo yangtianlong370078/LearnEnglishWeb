@@ -1,14 +1,11 @@
 ﻿"use client";
 
 import type { ReactNode } from "react";
-import { useMemo } from "react";
-
-import { Card } from "@heroui/react";
-import { ChartTooltip, RadialChart } from "@heroui-pro/react";
-
 import type { MonthValue, MonthlyData } from "@/types";
 
-
+import { useMemo } from "react";
+import { Card } from "@heroui/react";
+import { ChartTooltip, RadialChart } from "@heroui-pro/react";
 
 const CHART_COLOR_TIME = "var(--chart-2)";
 const CHART_COLOR_TASK = "var(--chart-3)";
@@ -73,10 +70,14 @@ export default function RadialChartWithLegend({
 }: RadialChartWithLegendProps = {}) {
   const today = useMemo(() => new Date(), []);
 
-  const current: MonthValue = monthValue ?? {
-    year: today.getFullYear(),
-    month: today.getMonth() + 1,
-  };
+  const current: MonthValue = useMemo(
+    () =>
+      monthValue ?? {
+        year: today.getFullYear(),
+        month: today.getMonth() + 1,
+      },
+    [monthValue, today],
+  );
 
   const totalCount = useMemo(
     () =>
@@ -111,7 +112,11 @@ export default function RadialChartWithLegend({
         value: taskProgress,
       });
     }
-    list.push({ fill: CHART_COLOR_TIME, name: "时间进度", value: timeProgress });
+    list.push({
+      fill: CHART_COLOR_TIME,
+      name: "时间进度",
+      value: timeProgress,
+    });
 
     return list;
   }, [timeProgress, taskProgress, hasTask]);
@@ -128,8 +133,6 @@ export default function RadialChartWithLegend({
         <Card.Description className="text-muted text-xs">
           {description}
         </Card.Description>
-
-       
       </Card.Header>
       <Card.Content className="grid place-items-center min-h-[320px]">
         <div className="relative shrink-0">
@@ -140,7 +143,12 @@ export default function RadialChartWithLegend({
             outerRadius="100%"
             width={220}
           >
-            <RadialChart.AngleAxis angleAxisId={0} domain={[0, 100]} tick={false} type="number" />
+            <RadialChart.AngleAxis
+              angleAxisId={0}
+              domain={[0, 100]}
+              tick={false}
+              type="number"
+            />
             <RadialChart.Bar
               background
               angleAxisId={0}

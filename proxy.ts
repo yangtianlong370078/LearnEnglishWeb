@@ -5,7 +5,7 @@ const PUBLIC_PATHS = [
   "/login",
   "/_next",
   "/favicon.ico",
-  "/api",        // 接口代理请求不拦截
+  "/api", // 接口代理请求不拦截
 ];
 
 function isPublic(pathname: string): boolean {
@@ -23,6 +23,7 @@ export function proxy(request: NextRequest) {
 
   if (!token) {
     const loginUrl = new URL("/login", request.url);
+
     return NextResponse.redirect(loginUrl);
   }
 

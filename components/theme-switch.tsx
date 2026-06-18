@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
-import { useTheme } from "next-themes";
 import clsx from "clsx";
 
+import { useTheme } from "@/app/providers";
 import { SunFilledIcon, MoonFilledIcon } from "@/components/icons";
 
 export interface ThemeSwitchProps {
@@ -22,7 +22,6 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className }) => {
     setIsMounted(true);
   }, []);
 
-
   if (!isMounted) return <div aria-hidden className="w-6 h-6" />;
 
   return (
@@ -34,6 +33,7 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({ className }) => {
         "w-auto h-auto bg-transparent rounded-lg text-muted",
         className,
       )}
+      type="button"
       onClick={handleToggle}
     >
       {isLight ? <SunFilledIcon size={22} /> : <MoonFilledIcon size={22} />}

@@ -47,13 +47,16 @@ export function useRequest<T>(
   // 使用 ref 避免闭包捕获旧的回调
   const onSuccessRef = useRef(onSuccess);
   const onErrorRef = useRef(onError);
+
   onSuccessRef.current = onSuccess;
   onErrorRef.current = onError;
 
   // 防止组件卸载后 setState
   const mountedRef = useRef(true);
+
   useEffect(() => {
     mountedRef.current = true;
+
     return () => {
       mountedRef.current = false;
     };
@@ -66,18 +69,19 @@ export function useRequest<T>(
 
       try {
         const result = await requestFn(...args);
+
         if (!mountedRef.current) return;
         setState({ data: result, loading: false, error: null });
         onSuccessRef.current?.(result);
       } catch (err) {
         if (!mountedRef.current) return;
-        const msg =
-          err instanceof Error ? err.message : "请求失败，请稍后重试";
+        const msg = err instanceof Error ? err.message : "请求失败，请稍后重试";
+
         setState((prev) => ({ ...prev, loading: false, error: msg }));
         onErrorRef.current?.(msg);
       }
     },
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+
     [requestFn],
   );
 
@@ -86,8 +90,7 @@ export function useRequest<T>(
       run();
     }
     // 仅在 mount 时执行一次
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [immediate, run]);
 
   const reset = useCallback(() => {
     setState({ data: null, loading: false, error: null });
