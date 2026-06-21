@@ -2,9 +2,9 @@
 
 import type { ReactNode } from "react";
 import type { MonthValue, MonthlyData } from "@/types";
-
+import { Check } from "@gravity-ui/icons";
 import { useMemo } from "react";
-import { Card } from "@heroui/react";
+import { Card, Chip } from "@heroui/react";
 import { ChartTooltip, RadialChart } from "@heroui-pro/react";
 
 const CHART_COLOR_TIME = "var(--chart-2)";
@@ -128,8 +128,16 @@ export default function RadialChartWithLegend({
 
   return (
     <Card className="w-full rounded-2xl">
-      <Card.Header>
-        <Card.Title className="text-base">任务明细</Card.Title>
+      <Card.Header className="gap-2">
+        <div className="flex items-center justify-start gap-2">
+          <Card.Title className="text-base">任务明细</Card.Title>
+
+          <Chip color="success" size="md" variant="soft" className="">
+            <Check width={12} />
+            <Chip.Label>进度良好</Chip.Label>
+          </Chip>
+
+        </div>
         <Card.Description className="text-muted text-xs">
           {description}
         </Card.Description>
