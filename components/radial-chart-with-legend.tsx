@@ -2,7 +2,7 @@
 
 import type { ReactNode } from "react";
 import type { MonthValue, MonthlyData } from "@/types";
-import { Check } from "@gravity-ui/icons";
+import { Check, CircleInfo, CircleFill } from "@gravity-ui/icons";
 import { useMemo } from "react";
 import { Card, Chip } from "@heroui/react";
 import { ChartTooltip, RadialChart } from "@heroui-pro/react";
@@ -100,6 +100,23 @@ export default function RadialChartWithLegend({
     ? Math.min(100, Math.floor((totalCount / taskCount) * 100))
     : 0;
 
+  const isCurrentMonth = useMemo(
+    () =>
+      current.year === today.getFullYear() &&
+      current.month === today.getMonth() + 1,
+    [current, today],
+  );
+
+  const chipState = useMemo(() => {
+    if (!hasTask) {
+      return { color: "warning" as const, icon: <CircleFill width={6} />, label: "未设置任务" };
+    }
+    if (taskProgress >= timeProgress) {
+      return { color: "success" as const, icon: <Check width={12} />, label: "进度良好" };
+    }
+    return { color: "danger" as const, icon: <CircleInfo width={12} />, label: "进度已落后" };
+  }, [hasTask, taskProgress, timeProgress]);
+
   const chartData = useMemo(() => {
     // RadialChart 中数组首项位于内环，末项位于外环。
     // 需求：外环=时间进度，内环=任务进度。
@@ -124,18 +141,20 @@ export default function RadialChartWithLegend({
   const remain = hasTask ? Math.max(0, taskCount - totalCount) : 0;
   const description = hasTask
     ? `任务${taskCount}；已学习${totalCount}；还剩${remain}`
-    : `已学习${totalCount}；本月未设置任务`;
+    : `已学习${totalCount}`;
 
   return (
     <Card className="w-full rounded-2xl">
       <Card.Header className="gap-2">
-        <div className="flex items-center justify-start gap-2">
+        <div className="flex items-center justify-start gap-3">
           <Card.Title className="text-base">任务明细</Card.Title>
 
-          <Chip color="success" size="md" variant="soft" className="">
-            <Check width={12} />
-            <Chip.Label>进度良好</Chip.Label>
-          </Chip>
+          {isCurrentMonth && (
+            <Chip color={chipState.color} size="md" variant="soft">
+              {chipState.icon}
+              <Chip.Label>{chipState.label}</Chip.Label>
+            </Chip>
+          )}
 
         </div>
         <Card.Description className="text-muted text-xs">
