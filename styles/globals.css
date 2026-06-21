@@ -55,17 +55,32 @@
 .wordfy {
   border: none !important;
   box-shadow:
-    inset 0 0 0 1px rgb(0 0 0 / 0.1), 
+    inset 0 0 0 1px rgb(0 0 0 / 0.08), 
     0 1px 10px rgb(0 0 0 / 0.07) !important; 
 } 
 
 .dark .wordfy {
+   border: none !important;
   box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 0.15),
+    inset 0 0 0 1px rgb(255 255 255 / 0.13),
     0 1px 10px rgb(0 0 0 / 0.3) !important; 
 }
 
-/* 给所有 surface 块加毛玻璃模糊 + 玻璃描边 + 顶部高光 */ 
+.taytask {
+  border: none !important;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.04) !important; 
+} 
+
+.dark .taytask  {
+   border: none !important;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.03),
+    0 1px 6px rgb(0 0 0 / 0.3) !important; 
+}
+
+
+/* 给所有 surface 块加毛玻璃模糊 + 玻璃描边 + 顶部高光*/ 
 /* HeroUI v3 Card 实际使用 .card / .card--default / [data-slot="card"]，
    以及其他组件的 .accordion / .disclosure-group / .alert。
    为了一次性覆盖，同时针对多个选择器应用毛玻璃 + 描边 */
@@ -132,7 +147,7 @@
 .dark [data-slot="card"],
 .dark .accordion,
 .dark .disclosure-group,
-.dark .alert {
+.dark .alert{
   /* 暗色：极轻描边，只比卡片背景略亮一点 */
   border: none !important;
 
@@ -162,7 +177,7 @@
 .dark .disclosure-group:after,
 .dark .alert:after {
     content: ""; 
-    /* 暗色：极轻描边，只比卡片背景略亮一点 */
+    /* 暗色：极轻描边，只比卡片背景略亮一点*/
      border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
     border-color: rgb(255 255 255 / 0.07);
     border-style: solid; 

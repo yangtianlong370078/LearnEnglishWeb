@@ -224,7 +224,7 @@ function DayCell({ cell, isToday }: { cell: DayInfo; isToday: boolean }) {
       </div>
       {showBar ? (
         <div
-          className={`flex h-6 items-center justify-center rounded-md px-1 text-[11px] font-medium tabular-nums shadow-sm transition-transform hover:scale-[1.03] ${STATUS_BAR[cell.status]}`}
+          className={`flex h-6 items-center justify-center rounded-md px-1 text-[11px] font-medium tabular-nums taytask transition-transform hover:scale-[1.03] ${STATUS_BAR[cell.status]}`}
           title={`学习:${cell.doneCount} / 任务:${cell.taskCount}`}
         >
           {cell.label}

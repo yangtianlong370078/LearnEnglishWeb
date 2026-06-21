@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from "next/server";
 
 /**
- * 登录代理：在 Next.js 服务端转发到 .NET 后端
+ * 登录代理：在 Next.js 服务端转发到 .NET 后端 
  *
  * 为什么不用 next.config.mjs 的 rewrites？
  * Next.js 16 的 rewrites 内部使用 undici，对自签名证书的 NODE_TLS_REJECT_UNAUTHORIZED=0
  * 不再生效，因此通过此 Route Handler 用 Node 原生 fetch 转发。
  */
-const BACKEND_URL = process.env.DOTNET_API_URL ?? "https://localhost:54807";
+const BACKEND_URL = process.env.DOTNET_API_URL ?? "https://localhost:6121";
 const AUTH_COOKIE = "auth_token";
 
 interface LoginProxyResponse {
