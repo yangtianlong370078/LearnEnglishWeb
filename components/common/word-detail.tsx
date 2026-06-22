@@ -215,6 +215,11 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     }
   }
 
+  function resetSentencePlaybackState() {
+    setSpeechState("idle");
+    setActiveSentenceKey(null);
+  }
+
   function startAudio(type: "en" | "us", loop: boolean) {
     const { detail } = loadState;
     const w = (detail?.word ?? word).toLowerCase();
@@ -231,6 +236,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     cleanupPendingSpeech();
     audio.pause();
     resetAudioHandlers(audio);
+    resetSentencePlaybackState();
     if (audio.src !== url) {
       audio.src = url;
     }
@@ -266,8 +272,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
 
     if (!content) {
       setPlayingType(null);
-      setSpeechState("idle");
-      setActiveSentenceKey(null);
+      resetSentencePlaybackState();
       return;
     }
 
@@ -291,8 +296,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
       if (audioDisposedRef.current || audioRunIdRef.current !== runId) return;
       cleanupPendingSpeech();
       setPlayingType(null);
-      setSpeechState("idle");
-      setActiveSentenceKey(null);
+      resetSentencePlaybackState();
     };
 
     try {
@@ -325,8 +329,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
         if (audioDisposedRef.current || audioRunIdRef.current !== runId) return;
         cleanupPendingSpeech();
         setPlayingType(null);
-        setSpeechState("idle");
-        setActiveSentenceKey(null);
+        resetSentencePlaybackState();
       };
       audio.onerror = clearState;
       await audio.play().catch(clearState);
@@ -356,8 +359,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
       }
     }
     setPlayingType(null);
-    setSpeechState("idle");
-    setActiveSentenceKey(null);
+    resetSentencePlaybackState();
   }
 
   function turnOffLoop(type: "en" | "us" | "wd") {
