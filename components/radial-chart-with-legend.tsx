@@ -147,7 +147,7 @@ export default function RadialChartWithLegend({
     <Card className="w-full rounded-2xl">
       <Card.Header className="gap-2">
         <div className="flex items-center justify-start gap-3">
-          <Card.Title className="text-base">任务明细</Card.Title>
+          <Card.Title className="text-base">{current.year}年{current.month}月任务明细</Card.Title>
 
           {isCurrentMonth && (
             <Chip color={chipState.color} size="md" variant="soft">
