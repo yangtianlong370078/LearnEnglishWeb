@@ -80,10 +80,10 @@ function SpeakerIcon({ playing }: { playing: boolean }) {
         style={
           playing
             ? {
-              ...activeStyle,
-              animationDelay: "0.3s",
-              animationDuration: "1s",
-            }
+                ...activeStyle,
+                animationDelay: "0.3s",
+                animationDuration: "1s",
+              }
             : { opacity: 0 }
         }
       />
@@ -128,9 +128,15 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     loading: true,
     error: null,
   });
-  const [playingType, setPlayingType] = useState<"en" | "us" | "wd" | null>(null);
-  const [speechState, setSpeechState] = useState<"idle" | "loading" | "playing">("idle");
-  const [activeSentenceKey, setActiveSentenceKey] = useState<string | null>(null);
+  const [playingType, setPlayingType] = useState<"en" | "us" | "wd" | null>(
+    null,
+  );
+  const [speechState, setSpeechState] = useState<
+    "idle" | "loading" | "playing"
+  >("idle");
+  const [activeSentenceKey, setActiveSentenceKey] = useState<string | null>(
+    null,
+  );
   const [loopEn, setLoopEn] = useState(false);
   const [loopUs, setLoopUs] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -243,7 +249,12 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     };
 
     audio.onended = () => {
-      if (audioDisposedRef.current || audioRunIdRef.current !== runId || audio.loop) return;
+      if (
+        audioDisposedRef.current ||
+        audioRunIdRef.current !== runId ||
+        audio.loop
+      )
+        return;
       setPlayingType(null);
     };
     audio.onerror = clearState;
@@ -285,7 +296,11 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     };
 
     try {
-      const blob = await wordApi.getSpeechAudio(content, undefined, abortController.signal);
+      const blob = await wordApi.getSpeechAudio(
+        content,
+        undefined,
+        abortController.signal,
+      );
 
       if (
         audioDisposedRef.current ||
@@ -557,15 +572,28 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
                           <button
                             className="inline-flex cursor-pointer select-none items-center gap-1 outline-none"
                             type="button"
-                            onClick={() => handlePlayClick("wd", sentence.en, sentenceKey)}
+                            onClick={() =>
+                              handlePlayClick("wd", sentence.en, sentenceKey)
+                            }
                           >
-                            <p className="mb-1 text-base font-medium leading-snug text-left">
-                              <HighlightWord text={sentence.en} word={detail.word} />
+                            <p className="mb-1 text-base font-medium leading-snug text-left leading-[22px]">
+                              <HighlightWord
+                                text={sentence.en}
+                                word={detail.word}
+                              />
+
                               {isLoading && (
-                                <Spinner size="sm" className="inline-block ml-2 top-[3px]" />
+                                <span className="inline-flex align-middle items-center ml-2 h-[20px]">
+                                  <Spinner
+                                    size="sm"
+                                    className="inline-block"
+                                  />
+                                </span>
                               )}
                               {!isLoading && (
-                                <SpeakerIcon playing={isPlaying} />
+                                <span className="inline-flex align-middle h-[20px]">
+                                  <SpeakerIcon playing={isPlaying} />
+                                </span>
                               )}
                             </p>
                           </button>
