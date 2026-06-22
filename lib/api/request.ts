@@ -41,6 +41,13 @@ request.interceptors.request.use(
 // ── 响应拦截器：适配 .NET 10 返回结构、全局异常处理 ──────────────
 request.interceptors.response.use(
   (response: AxiosResponse<ApiResponse>) => {
+    if (
+      response.config.responseType === "blob" ||
+      response.config.responseType === "arraybuffer"
+    ) {
+      return response;
+    }
+
     // 304 Not Modified：无响应体，直接放行交由调用方复用本地缓存
     if (response.status === 304) {
       return response;
@@ -98,6 +105,20 @@ export async function get<T>(
   const res = await request.get<ApiResponse<T>>(url, { params, ...config });
 
   return res.data.data;
+}
+
+export async function getBlob(
+  url: string,
+  params?: Record<string, unknown>,
+  config?: AxiosRequestConfig,
+): Promise<Blob> {
+  const res = await request.get<Blob>(url, {
+    params,
+    responseType: "blob",
+    ...config,
+  });
+
+  return res.data;
 }
 
 export async function post<T>(

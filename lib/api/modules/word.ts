@@ -10,7 +10,7 @@ import type {
 } from "@/types/word";
 import type { PageData } from "@/types/api";
 
-import { get, post, put, del } from "../request";
+import { del, get, getBlob, post, put } from "../request";
 
 /** 获取单词 KPI 统计 */
 export function getWordStats() {
@@ -50,4 +50,13 @@ export function deleteWord(id: number) {
 /** 获取单词词典详情（对应后端 lexiconDeatil 接口） */
 export function getWordDetail(word: string) {
   return get<LexiconDetail>("/Word/lexiconDeatil", { word });
+}
+
+/** Edge TTS 英文朗读 */
+export function getSpeechAudio(text: string, voice?: string, signal?: AbortSignal) {
+  return getBlob(
+    "/Word/speak",
+    { text, ...(voice ? { voice } : {}) },
+    { signal },
+  );
 }

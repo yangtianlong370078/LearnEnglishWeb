@@ -3,7 +3,7 @@
 import type { LexiconDetail } from "@/types/word";
 
 import { useEffect, useRef, useState } from "react";
-import { Chip, ScrollShadow, Skeleton } from "@heroui/react";
+import { Chip, ScrollShadow, Skeleton, Spinner } from "@heroui/react";
 
 import { wordApi } from "@/lib/api";
 import { OSS_BASE_URL } from "@/lib/api/config";
@@ -47,7 +47,7 @@ function SpeakerIcon({ playing }: { playing: boolean }) {
 
   return (
     <svg
-      className="shrink-0 transition-all duration-200"
+      className="shrink-0 transition-all duration-200 inline-block ml-2"
       fill="none"
       height="18"
       stroke={stroke}
@@ -80,10 +80,10 @@ function SpeakerIcon({ playing }: { playing: boolean }) {
         style={
           playing
             ? {
-                ...activeStyle,
-                animationDelay: "0.3s",
-                animationDuration: "1s",
-              }
+              ...activeStyle,
+              animationDelay: "0.3s",
+              animationDuration: "1s",
+            }
             : { opacity: 0 }
         }
       />
@@ -128,12 +128,16 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     loading: true,
     error: null,
   });
-  const [playingType, setPlayingType] = useState<"en" | "us" | null>(null);
+  const [playingType, setPlayingType] = useState<"en" | "us" | "wd" | null>(null);
+  const [speechState, setSpeechState] = useState<"idle" | "loading" | "playing">("idle");
+  const [activeSentenceKey, setActiveSentenceKey] = useState<string | null>(null);
   const [loopEn, setLoopEn] = useState(false);
   const [loopUs, setLoopUs] = useState(false);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const audioRunIdRef = useRef(0);
   const audioDisposedRef = useRef(false);
+  const audioAbortControllerRef = useRef<AbortController | null>(null);
+  const audioObjectUrlRef = useRef<string | null>(null);
   const loopEnRef = useRef(false);
   const loopUsRef = useRef(false);
   const onDataLoadedRef = useRef(onDataLoaded);
@@ -143,6 +147,9 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
   useEffect(() => {
     if (!word) return;
     let ignore = false;
+
+    setSpeechState("idle");
+    setActiveSentenceKey(null);
 
     wordApi
       .getWordDetail(word)
@@ -174,6 +181,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     audioRef.current = audio;
     return () => {
       audioDisposedRef.current = true;
+      cleanupPendingSpeech();
       audio.pause();
       resetAudioHandlers(audio);
       if (audioRef.current === audio) {
@@ -191,6 +199,16 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     return audioRef.current;
   }
 
+  function cleanupPendingSpeech() {
+    audioAbortControllerRef.current?.abort();
+    audioAbortControllerRef.current = null;
+
+    if (audioObjectUrlRef.current) {
+      URL.revokeObjectURL(audioObjectUrlRef.current);
+      audioObjectUrlRef.current = null;
+    }
+  }
+
   function startAudio(type: "en" | "us", loop: boolean) {
     const { detail } = loadState;
     const w = (detail?.word ?? word).toLowerCase();
@@ -204,6 +222,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     audioRunIdRef.current = runId;
     const audio = getAudio();
 
+    cleanupPendingSpeech();
     audio.pause();
     resetAudioHandlers(audio);
     if (audio.src !== url) {
@@ -231,10 +250,87 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     audio.play().catch(clearState);
   }
 
+  async function startSpeakAudio(text: string, sentenceKey: string) {
+    const content = text.trim();
+
+    if (!content) {
+      setPlayingType(null);
+      setSpeechState("idle");
+      setActiveSentenceKey(null);
+      return;
+    }
+
+    const runId = audioRunIdRef.current + 1;
+
+    audioRunIdRef.current = runId;
+    const audio = getAudio();
+
+    cleanupPendingSpeech();
+    audio.pause();
+    resetAudioHandlers(audio);
+    setPlayingType("wd");
+    setSpeechState("loading");
+    setActiveSentenceKey(sentenceKey);
+
+    const abortController = new AbortController();
+
+    audioAbortControllerRef.current = abortController;
+
+    const clearState = () => {
+      if (audioDisposedRef.current || audioRunIdRef.current !== runId) return;
+      cleanupPendingSpeech();
+      setPlayingType(null);
+      setSpeechState("idle");
+      setActiveSentenceKey(null);
+    };
+
+    try {
+      const blob = await wordApi.getSpeechAudio(content, undefined, abortController.signal);
+
+      if (
+        audioDisposedRef.current ||
+        audioRunIdRef.current !== runId ||
+        abortController.signal.aborted
+      ) {
+        return;
+      }
+
+      const objectUrl = URL.createObjectURL(blob);
+
+      audioObjectUrlRef.current = objectUrl;
+      audio.loop = false;
+      audio.src = objectUrl;
+      setSpeechState("playing");
+      try {
+        audio.currentTime = 0;
+      } catch {
+        // Ignore browsers that cannot seek a freshly loaded blob yet.
+      }
+      audio.onended = () => {
+        if (audioDisposedRef.current || audioRunIdRef.current !== runId) return;
+        cleanupPendingSpeech();
+        setPlayingType(null);
+        setSpeechState("idle");
+        setActiveSentenceKey(null);
+      };
+      audio.onerror = clearState;
+      await audio.play().catch(clearState);
+    } catch {
+      if (!abortController.signal.aborted) {
+        clearState();
+      }
+    } finally {
+      if (audioAbortControllerRef.current === abortController) {
+        audioAbortControllerRef.current = null;
+      }
+    }
+  }
+
   function stopAudio() {
     audioRunIdRef.current += 1;
     const audio = audioRef.current;
 
+    cleanupPendingSpeech();
     if (audio) {
       audio.pause();
       resetAudioHandlers(audio);
@@ -245,28 +341,49 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
       }
     }
     setPlayingType(null);
+    setSpeechState("idle");
+    setActiveSentenceKey(null);
   }
 
-  function turnOffLoop(type: "en" | "us") {
+  function turnOffLoop(type: "en" | "us" | "wd") {
     if (type === "en") {
       setLoopEn(false);
       loopEnRef.current = false;
-    } else {
+    } else if (type === "us") {
       setLoopUs(false);
       loopUsRef.current = false;
+    } else {
+      // Handle "wd" loop if needed
     }
   }
 
-  function handlePlayClick(type: "en" | "us") {
+  function handlePlayClick(
+    type: "en" | "us" | "wd",
+    speakText?: string,
+    sentenceKey?: string,
+  ) {
     if (playingType === type) {
-      stopAudio();
-      turnOffLoop(type);
+      if (type !== "wd" || activeSentenceKey === sentenceKey) {
+        stopAudio();
+        turnOffLoop(type);
 
-      return;
+        return;
+      }
+
+      stopAudio();
     }
     if (playingType) {
       turnOffLoop(playingType);
     }
+
+    if (type === "wd") {
+      void startSpeakAudio(
+        speakText ?? loadState.detail?.word ?? word,
+        sentenceKey ?? speakText ?? loadState.detail?.word ?? word,
+      );
+      return;
+    }
+
     const shouldLoop = type === "en" ? loopEnRef.current : loopUsRef.current;
 
     startAudio(type, shouldLoop);
@@ -333,6 +450,10 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
     );
   }
 
+  function getSentenceKey(sentence: { en: string; cn?: string | null }) {
+    return `${sentence.en}-${sentence.cn ?? ""}`;
+  }
+
   return (
     <div className="w-full">
       <ScrollShadow className="max-h-[450px]">
@@ -390,7 +511,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
         {/* 正文 */}
         <div className=" ">
           {/* 释义 */}
-          <div className="flex flex-col gap-2 pt-3">
+          <div className="flex flex-col gap-2 pt-4">
             {detail.translation?.map((item) => (
               <div key={item} className="text-base font-medium leading-6">
                 {item}
@@ -400,7 +521,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
 
           {detail.frequence > 0 && (
             <Chip
-              className="mt-3 px-4 py-1 text-xs"
+              className="mt-4 px-4 py-1 text-xs"
               color="accent"
               size="sm"
               variant="soft"
@@ -412,7 +533,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
           {/* 例句 */}
           {detail.sampleSentences && detail.sampleSentences.length > 0 && (
             <div>
-              <p className="mb-2 mt-3 text-sm text-muted text-default-500">
+              <p className="mb-2 mt-4 text-sm text-muted text-default-500">
                 例句
               </p>
               <div className="space-y-3">
@@ -426,9 +547,30 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
                     </span>
 
                     <div>
-                      <p className="mb-1 text-base font-medium leading-snug">
-                        <HighlightWord text={sentence.en} word={detail.word} />
-                      </p>
+                      {(() => {
+                        const sentenceKey = getSentenceKey(sentence);
+                        const isActive = activeSentenceKey === sentenceKey;
+                        const isLoading = isActive && speechState === "loading";
+                        const isPlaying = isActive && speechState === "playing";
+
+                        return (
+                          <button
+                            className="inline-flex cursor-pointer select-none items-center gap-1 outline-none"
+                            type="button"
+                            onClick={() => handlePlayClick("wd", sentence.en, sentenceKey)}
+                          >
+                            <p className="mb-1 text-base font-medium leading-snug text-left">
+                              <HighlightWord text={sentence.en} word={detail.word} />
+                              {isLoading && (
+                                <Spinner size="sm" className="inline-block ml-2 top-[3px]" />
+                              )}
+                              {!isLoading && (
+                                <SpeakerIcon playing={isPlaying} />
+                              )}
+                            </p>
+                          </button>
+                        );
+                      })()}
                       {sentence.cn && (
                         <p className="text-sm leading-relaxed text-default-500">
                           {sentence.cn}
