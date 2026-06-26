@@ -11,87 +11,84 @@ import type { WordStats } from "@/types/word";
 
 import request from "../request";
 
-/** 后端返回的每日学习记录原始结构 */
-interface StatisticsLearnRaw {
-  /** ISO 日期字符串，如 2026-05-01T00:00:00 */
-  date: string;
-  count: number;
-}
+type CompactDailyItem = [day: number, count: number];
 
-/** 后端返回的月度任务原始结构（精简版：只含前端实际使用的字段） */
-interface LearnTaskRaw {
-  /** 月度任务总单词数；0 表示未配置任务 */
-  count: number;
+/** StatisticsLearnCountTwo 返回的紧凑月度结构 */
+interface MonthlyCompactRaw {
+  /** 月份基准，格式 yyyyMM，如 202407 */
+  ym: number;
+  /** 当月学习总数 */
+  total: number;
+  /** 月度任务总数；0 表示未配置任务 */
+  taskCnt: number;
   /**
    * 排除周末模式
    * 0 = 不排除，1 = 排除周六，2 = 排除周日，3 = 排除双休
    */
-  weekend: number;
-}
-
-/** 月度统计分组原始结构 */
-interface MonthlyCategoryRaw {
-  /** 该月份 1 号 ISO 日期 */
-  date: string;
-  totalcount: number;
-  statisticsLearns: StatisticsLearnRaw[];
-  /** 未配置任务时为 null */
-  task: LearnTaskRaw | null;
+  taskWeekend: number;
+  /** 当月每日学习明细：[当月第几天, 数量] */
+  items: CompactDailyItem[];
 }
 
 /**
  * StatisticsLearnCountTwo 接口完整响应
- * 注意：此接口未走通用 { success, data } 包装，data 直接铺在 categorys 字段。
  */
 interface StatisticsLearnCountTwoResponse {
   success: boolean;
   msg?: string;
-  categorys: MonthlyCategoryRaw[];
+  data: MonthlyCompactRaw[];
 }
 
-function parseDate(iso: string): Date {
-  // 后端无时区信息的 DateTime 字符串，按本地时区解析即可
-  return new Date(iso);
+function parseYm(ym: number): { year: number; month: number } {
+  return {
+    year: Math.floor(ym / 100),
+    month: ym % 100,
+  };
 }
 
-function toStatisticsLearn(item: StatisticsLearnRaw): StatisticsLearn {
-  const d = parseDate(item.date);
+function toStatisticsLearn(
+  year: number,
+  month: number,
+  item: CompactDailyItem,
+): StatisticsLearn {
+  const [day, count] = item;
 
   return {
-    year: d.getFullYear(),
-    month: d.getMonth() + 1,
-    day: d.getDate(),
-    count: item.count,
+    year,
+    month,
+    day,
+    count,
   };
 }
 
 /**
  * 将后端原始月度分组转换为前端 TaskCalendar 使用的 MonthlyData
  */
-export function mapMonthlyData(raw: MonthlyCategoryRaw): MonthlyData {
-  const d = parseDate(raw.date);
+export function mapMonthlyData(raw: MonthlyCompactRaw): MonthlyData {
+  const { year, month } = parseYm(raw.ym);
+  const taskCount = raw.taskCnt ?? 0;
 
   return {
-    year: d.getFullYear(),
-    month: d.getMonth() + 1,
-    statisticsLearns: raw.statisticsLearns.map(toStatisticsLearn),
-    // 仅当后端确实下发了任务（task !== null）时才视为有任务，
-    // 避免历史实现中“空任务 = count:0 的 MonthlyTask”造成误判
-    task: raw.task
+    year,
+    month,
+    statisticsLearns: raw.items.map((item) =>
+      toStatisticsLearn(year, month, item),
+    ),
+    task: taskCount > 0
       ? {
-          count: raw.task.count,
-          weekend: (raw.task.weekend ?? 0) as 0 | 1 | 2 | 3,
+          count: taskCount,
+          weekend: (raw.taskWeekend ?? 0) as 0 | 1 | 2 | 3,
         }
       : null,
   };
 }
 
 /** 计算单个月份的完成百分比 */
-function calcPercent(raw: MonthlyCategoryRaw): number | null {
-  const taskCount = raw.task?.count ?? 0;
+function calcPercent(raw: MonthlyCompactRaw): number | null {
+  const taskCount = raw.taskCnt ?? 0;
 
   if (taskCount <= 0) return null;
-  const percent = Math.round((raw.totalcount / taskCount) * 100);
+  const percent = Math.round((raw.total / taskCount) * 100);
 
   return Math.max(0, Math.min(100, percent));
 }
@@ -101,8 +98,8 @@ function calcPercent(raw: MonthlyCategoryRaw): number | null {
 // 1. 首次请求后把 ETag 与转换后的结果写入 localStorage；
 // 2. 后续请求带上 If-None-Match；服务端命中后返回 304（axios 默认会抛错），
 //    此时复用 localStorage 缓存，避免下载/解析整个响应体。
-const STATS_CACHE_KEY = "stats:monthly:v1";
-const STATS_ETAG_KEY = "stats:monthly:etag:v1";
+const STATS_CACHE_KEY = "stats:monthly:v2";
+const STATS_ETAG_KEY = "stats:monthly:etag:v2";
 
 interface CachedStats {
   monthly: MonthlyData[];
@@ -146,15 +143,15 @@ export function clearMonthlyStatisticsCache(): void {
   localStorage.removeItem(STATS_ETAG_KEY);
 }
 
-function transform(list: MonthlyCategoryRaw[]): CachedStats {
+function transform(list: MonthlyCompactRaw[]): CachedStats {
   return {
     monthly: list.map(mapMonthlyData),
     yearStats: list.map((raw) => {
-      const d = parseDate(raw.date);
+      const { year, month } = parseYm(raw.ym);
 
       return {
-        year: d.getFullYear(),
-        month: d.getMonth() + 1,
+        year,
+        month,
         percent: calcPercent(raw),
       };
     }),
@@ -189,7 +186,7 @@ export async function getMonthlyStatisticsWithYearStats(): Promise<CachedStats> 
       return cachedData;
     }
 
-    const list = res.data?.categorys ?? [];
+    const list = res.data?.data ?? [];
     const transformed = transform(list);
     const newEtag =
       (res.headers?.etag as string | undefined) ??
