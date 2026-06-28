@@ -17,6 +17,7 @@ import FullWidthSearch from "@/components/common/search-field";
 import TaskYearCalendar from "@/components/task-year-calendar";
 import { statisticsApi } from "@/lib/api";
 
+
 export default function Home() {
   const today = new Date();
   const [view, setView] = useState<"month" | "year">("month");
@@ -106,10 +107,18 @@ export default function Home() {
               : "按月查看每日任务量与完成情况"}
           </span>
         </div>
-        <Card
+         <Card
           className=" backdrop-blur-xl backdrop-saturate-150"
-          variant="secondary"
-        >
+          // variant="secondary"
+          variant="transparent"
+        > 
+        {/* <LiquidGlass displacementScale={64}
+  blurAmount={0.1}
+  saturation={130}
+  aberrationIntensity={2}
+  elasticity={0}
+  cornerRadius={35}
+  padding="8px 16px"> */}
           <AnimatePresence initial={false} mode="wait">
             {view === "month" ? (
               <motion.div
@@ -160,7 +169,8 @@ export default function Home() {
               </motion.div>
             )}
           </AnimatePresence>
-        </Card>
+        {/* </LiquidGlass> */}
+        </Card> 
       </div>
     </div>
   );

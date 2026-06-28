@@ -242,7 +242,7 @@ export default function KpiWithChartInline({
 bg-[var(--background)] */}
 
           <Segment
-            className="absolute right-3.5 top-3.5 "
+            className="absolute right-3.5 top-3.5 bg-white/50 dark:bg-black/30 "
             selectedKey={selectedPeriod}
             size="sm"
             onSelectionChange={(value) => {

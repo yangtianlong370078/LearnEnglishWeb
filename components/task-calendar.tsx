@@ -187,9 +187,9 @@ function buildGrid(
 
 const STATUS_BAR: Record<DayStatus, string> = {
   pending:
-    "bg-[lab(93.0314%_0.0993609_-0.364041)] text-[#5e5e5e] dark:bg-white/5 dark:text-white/40",
+    "bg-black/5 text-[#5e5e5e] dark:bg-white/5 dark:text-white/40",
   weekend:
-    "bg-[lab(93.0314%_0.0993609_-0.364041)] text-[#5e5e5e] dark:bg-white/5 dark:text-white/40",
+    "bg-black/5 text-[#5e5e5e] dark:bg-white/5 dark:text-white/40",
   done: "bg-[#1FB89A] text-white",
   missed: "bg-[#FF6B3D] text-white",
   warn: "bg-[#F5B400] text-white",

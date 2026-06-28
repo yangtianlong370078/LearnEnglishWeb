@@ -94,7 +94,7 @@ export function MaterBasic() {
         今日任务：{doneCount}/{todayTask}
       </Label>
       <Meter.Output />
-      <Meter.Track>
+      <Meter.Track className="bg-black/10 dark:bg-white/10">
         <Meter.Fill />
       </Meter.Track>
     </Meter>

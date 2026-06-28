@@ -214,6 +214,18 @@
   border-color: rgb(255 255 255 / 0.1) !important;
 }
 
+
+.radial-chart .recharts-radial-bar-background-sector {
+    fill: rgba(0, 0, 0, 0.1)!important;
+}
+ 
+
+.dark .radial-chart .recharts-radial-bar-background-sector {
+    fill: rgba(255, 255, 255, 0.1)!important;
+}
+
+
+
 /* 兜底：保留旧的 bg-content 规则（万一某些组件用） */
 .bg-content1 {
   background-color: rgb(255 255 255 / 0.45) !important;
