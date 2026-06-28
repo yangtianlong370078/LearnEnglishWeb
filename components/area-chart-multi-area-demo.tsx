@@ -147,7 +147,7 @@ export default function AreaChartMultiAreaDemo({
             strokeWidth={2}
             type="monotone"
           />
-          <AreaChart.Tooltip content={<AreaChart.TooltipContent />} />
+          <AreaChart.Tooltip  labelFormatter={(label) => `${label} 月`} content={<AreaChart.TooltipContent />} />
         </AreaChart>
       </Card.Content>
     </Card>

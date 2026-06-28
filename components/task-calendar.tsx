@@ -186,15 +186,22 @@ function buildGrid(
 }
 
 const STATUS_BAR: Record<DayStatus, string> = {
-  pending:
-    "bg-black/5 text-[#5e5e5e] dark:bg-white/5 dark:text-white/40",
-  weekend:
-    "bg-black/5 text-[#5e5e5e] dark:bg-white/5 dark:text-white/40",
+  pending: "bg-black/5 text-[#5e5e5e] dark:bg-white/5 dark:text-white/40",
+  weekend: "bg-black/5 text-[#5e5e5e] dark:bg-white/5 dark:text-white/40",
   done: "bg-[#1FB89A] text-white",
   missed: "bg-[#FF6B3D] text-white",
   warn: "bg-[#F5B400] text-white",
   empty: "",
 };
+
+// const STATUS_Type: Record<DayStatus, string> = {
+//   pending: "default",
+//   weekend: "default",
+//   done: "success",
+//   missed: "danger",
+//   warn: "warning",
+//   empty: "",
+// };
 
 function DayCell({ cell, isToday }: { cell: DayInfo; isToday: boolean }) {
   const dimmed = !cell.inMonth;
@@ -223,14 +230,23 @@ function DayCell({ cell, isToday }: { cell: DayInfo; isToday: boolean }) {
         </span>
       </div>
       {showBar ? (
-        <div
-          className={`flex h-6 items-center justify-center rounded-md px-1 text-[11px] font-medium tabular-nums taytask transition-transform hover:scale-[1.03] ${STATUS_BAR[cell.status]}`}
+        <div 
+          className={`flex h-6 items-center  justify-center rounded-2xl px-1 text-[12px] font-medium tabular-nums taytask transition-transform hover:scale-[1.03] ${STATUS_BAR[cell.status]}`}
           title={`学习:${cell.doneCount} / 任务:${cell.taskCount}`}
         >
           {cell.label}
         </div>
+
+        // <Chip
+        //   color={STATUS_Type[cell.status]}
+        //   size="md"
+        //   variant="soft"
+        //   className="flex justify-center"
+        // >
+        //   {cell.label}
+        // </Chip>
       ) : (
-        <div className="h-6" />
+        <div className="h-5" />
       )}
     </div>
   );

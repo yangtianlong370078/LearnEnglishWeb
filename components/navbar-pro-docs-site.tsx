@@ -46,7 +46,7 @@ export default function NavbarProDocsSite() {
   return (
     <div className="backdrop-blur-xl backdrop-saturate-150">
       <Navbar
-        className="  bg-transparent"
+        className="bg-transparent"
         maxWidth="full"
         position="static"
         shouldBlockScroll={false}
