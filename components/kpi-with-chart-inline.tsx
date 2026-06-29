@@ -24,6 +24,7 @@ const CHART_COLORS = [
 function PieTooltip({
   active,
   payload,
+  total = 0,
 }: {
   active?: boolean;
   payload?: Array<{
@@ -31,18 +32,20 @@ function PieTooltip({
     payload?: { fill?: string };
     value?: number | string;
   }>;
+  total?: number;
   valueFormatter?: (value: number | string) => ReactNode;
 }) {
   const entry = payload?.[0];
-
   if (!active || !entry) return null;
-
+  const percent = total > 0 ? ((Number(entry.value) || 0) / total) * 100 : 0;
   return (
     <ChartTooltip>
-      <ChartTooltip.Item>
+      <ChartTooltip.Item className="flex items-center  gap-2">
         <ChartTooltip.Indicator color={entry.payload?.fill} />
-        <ChartTooltip.Label>{entry.name}</ChartTooltip.Label>
-        <ChartTooltip.Value>{entry.value}%</ChartTooltip.Value>
+        <ChartTooltip.Label className="min-w-[100px]">{entry.name} ({percent.toFixed(1)}%)</ChartTooltip.Label>
+        <ChartTooltip.Value className="min-w-[40px] text-right">
+          {entry.value} 个
+        </ChartTooltip.Value>
       </ChartTooltip.Item>
     </ChartTooltip>
   );
@@ -55,8 +58,8 @@ interface KpiWithChartInlineProps {
   monthlyList?: MonthlyData[];
 }
 
-const PERIOD_DAYS: Record<"1D" | "15D" | "30D", number> = {
-  "1D": 7,
+const PERIOD_DAYS: Record<"7D" | "15D" | "30D", number> = {
+  "7D": 7,
   "15D": 15,
   "30D": 30,
 };
@@ -65,7 +68,7 @@ export default function KpiWithChartInline({
   stats,
   monthlyList,
 }: KpiWithChartInlineProps = {}) {
-  const [selectedPeriod, setSelectedPeriod] = useState<"1D" | "15D" | "30D">(
+  const [selectedPeriod, setSelectedPeriod] = useState<"7D" | "15D" | "30D">(
     "15D",
   );
 
@@ -137,6 +140,9 @@ export default function KpiWithChartInline({
 
   const isTodayUp = s.growthRate >= 0;
 
+  const pieTotal =
+    s.masteredCount + s.unskilledCount + s.reinforcementCount;
+
   const pieData = [
     { name: "已掌握", value: s.masteredCount },
     { name: "未熟练", value: s.unskilledCount },
@@ -199,7 +205,7 @@ export default function KpiWithChartInline({
                     />
                   ))}
                 </PieChart.Pie>
-                <PieChart.Tooltip content={<PieTooltip />} />
+                <PieChart.Tooltip content={<PieTooltip total={pieTotal} />} />
               </PieChart>
 
               <div className="flex flex-1 flex-col gap-3 w-max max-w-[100px]">
@@ -246,10 +252,10 @@ bg-[var(--background)] */}
             selectedKey={selectedPeriod}
             size="sm"
             onSelectionChange={(value) => {
-              setSelectedPeriod(value as "1D" | "15D" | "30D");
+              setSelectedPeriod(value as "7D" | "15D" | "30D");
             }}
           >
-            <Segment.Item id="1D">7天</Segment.Item>
+            <Segment.Item id="7D">7天</Segment.Item>
             <Segment.Item id="15D">15天</Segment.Item>
             <Segment.Item id="30D">30天</Segment.Item>
           </Segment>
