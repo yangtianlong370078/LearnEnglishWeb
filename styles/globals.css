@@ -316,13 +316,44 @@ input:-webkit-autofill:active {
   -webkit-text-fill-color: inherit !important;
 }
 
-/* SearchField input: force transparent in ALL states including when has value */
-.search-field__input,
-.search-field__input:focus,
-.search-field__input:focus-visible,
-.search-field__input:not(:placeholder-shown),
-.search-field__input[value]:not([value=""]) {
+/* Search word input: keep the input paint layer transparent in every browser/state. */
+.word-search-input,
+.word-search-input:hover,
+.word-search-input:active,
+.word-search-input:focus,
+.word-search-input:focus-visible,
+.word-search-input:not(:placeholder-shown),
+.word-search-input[value]:not([value=""]) {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
   background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  outline-color: transparent !important;
+}
+
+.word-search-input:-webkit-autofill,
+.word-search-input:-webkit-autofill:hover,
+.word-search-input:-webkit-autofill:focus,
+.word-search-input:-webkit-autofill:active {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  outline-color: transparent !important;
+}
+
+.word-search-input::-webkit-search-cancel-button,
+.word-search-input::-webkit-search-decoration,
+.word-search-input::-webkit-search-results-button,
+.word-search-input::-webkit-search-results-decoration {
+  appearance: none !important;
+  -webkit-appearance: none !important;
   background: transparent !important;
 }
 
