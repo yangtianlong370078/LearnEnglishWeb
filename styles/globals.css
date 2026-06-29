@@ -357,6 +357,47 @@ input:-webkit-autofill:active {
   background: transparent !important;
 }
 
+/* 暗黑模式样式 */
+.dark .word-search-input,
+.dark .word-search-input:hover,
+.dark .word-search-input:active,
+.dark .word-search-input:focus,
+.dark .word-search-input:focus-visible,
+.dark .word-search-input:not(:placeholder-shown),
+.dark .word-search-input[value]:not([value=""]) {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  outline-color: transparent !important;
+}
+
+.dark .word-search-input:-webkit-autofill,
+.dark .word-search-input:-webkit-autofill:hover,
+.dark .word-search-input:-webkit-autofill:focus,
+.dark .word-search-input:-webkit-autofill:active {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: 0 0 0 1000px transparent inset !important;
+  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  outline-color: transparent !important;
+}
+
+.dark .word-search-input::-webkit-search-cancel-button,
+.dark .word-search-input::-webkit-search-decoration,
+.dark .word-search-input::-webkit-search-results-button,
+.dark .word-search-input::-webkit-search-results-decoration {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+}
+
 .zs {
   color: #f03744;
   font-weight: 600;
