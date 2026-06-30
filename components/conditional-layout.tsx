@@ -4,6 +4,8 @@ import { usePathname } from "next/navigation";
 
 import NavbarProDocsSite from "./navbar-pro-docs-site";
 
+// import {Navbar} from "./navbar";
+
 /** 不需要顶部导航栏的路径 */
 const NO_NAVBAR_PATHS = ["/login"];
 
@@ -25,7 +27,10 @@ export default function ConditionalLayout({
 
   return (
     <>
-      <NavbarProDocsSite />
+       <NavbarProDocsSite /> 
+
+      {/* <Navbar /> */}
+
       <main className="container mx-auto max-w-7xl px-6 py-6 flex-grow">
         {children}
       </main>

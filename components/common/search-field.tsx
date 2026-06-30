@@ -63,9 +63,9 @@ export default function FullWidth() {
         onChange={setValue}
         onSubmit={handleSearch}
       >
-        <SearchField.Group className="!h-11 !border-0 !bg-[var(--surface)]  backdrop-blur-xl backdrop-saturate-150 !shadow-[inset_0_1px_0_rgb(255_255_255/0.42),0_2px_18px_rgb(0_0_80/0.05),inset_0_0_0_1px_rgb(255_255_255/0.3)] dark:!shadow-[inset_0_0_0_1px_rgb(255_255_255/0.07),0_2px_20px_rgb(0_0_0/0.3)]">
+        <SearchField.Group  className="!h-11 !bg-transparent backdrop-blur-xl backdrop-saturate-100">
           <SearchField.Input
-            className="word-search-input ml-2 !bg-transparent rounded-[10px] m-[5px]"
+            className="word-search-input !bg-transparent rounded-[10px] m-[5px]"
             placeholder="查询单词…"
           />
 

@@ -44,14 +44,14 @@ export default function NavbarProDocsSite() {
   );
 
   return (
-    <div className="backdrop-blur-xl backdrop-saturate-150">
+    <div className="sticky top-0 z-50 !bg-transparent navbar-root backdrop-blur-xl backdrop-saturate-100">
       <Navbar
-        className="bg-transparent"
+        className=" !bg-transparent "
         maxWidth="full"
-        position="static"
+        position="sticky"
         shouldBlockScroll={false}
       >
-        <Navbar.Header className="relative ">
+        <Navbar.Header className="relative !bg-transparent">
           <Navbar.MenuToggle className="md:hidden" />
 
           {/* <Navbar.Brand>
@@ -59,12 +59,12 @@ export default function NavbarProDocsSite() {
           <span className="sr-only">记忆助手</span>
         </Navbar.Brand> */}
 
-          <NextLink className="flex items-center gap-1" href="/">
+          <NextLink className="flex items-center gap-1 " href="/">
             <Logo />
             <p className="font-bold text-inherit">{siteConfig.name}</p>
           </NextLink>
 
-          <Navbar.Content className="hidden gap-0 md:flex">
+          <Navbar.Content className="hidden gap-0 md:flex ">
             {siteConfig.navItems.map((item) => (
               <Navbar.Item
                 key={item.href}
@@ -87,26 +87,13 @@ export default function NavbarProDocsSite() {
 
           <Navbar.Spacer />
 
-          <Navbar.Content className="hidden md:flex">
-            {/* <SearchField
-            aria-label="Search documentation"
-            className="w-[200px]"
-            variant="secondary"
-          >
-            <SearchField.Group className="h-8">
-              <SearchField.SearchIcon />
-              <SearchField.Input className="w-16" placeholder="Search docs…" />
-              <Kbd className="pointer-events-none mr-1.5 text-xs">
-                <Kbd.Abbr keyValue="command" />
-                <Kbd.Content>K</Kbd.Content>
-              </Kbd>
-            </SearchField.Group>
-          </SearchField> */}
+          <Navbar.Content className="hidden md:flex ">
+           
 
             <Segment
               // @ts-expect-error suppressHydrationWarning 由 HeroUI V3 Segment 支持但类型尚未屘露
               suppressHydrationWarning
-              className="gap-0  bg-white/50 dark:bg-black/30 "
+              className="gap-0  !bg-white/50 dark:!bg-black/30 "
               selectedKey={mounted ? (theme ?? "system") : "system"}
               size="sm"
               onSelectionChange={(key) => {

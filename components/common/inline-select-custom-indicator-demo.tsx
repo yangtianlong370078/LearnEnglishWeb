@@ -33,7 +33,9 @@ export default function InlineSelectCustomIndicatorDemo() {
   };
 
   return (
+   
     <InlineSelect
+    className="!bg-transparent" 
       aria-label="背景主题"
       selectedKey={role}
       onSelectionChange={handleThemeChange}

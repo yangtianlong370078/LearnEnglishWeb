@@ -79,6 +79,16 @@
     0 1px 6px rgb(0 0 0 / 0.3) !important; 
 }
 
+.navbar-root{
+   border: none !important;
+  box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
+}
+
+.dark .navbar-root{
+   border: none !important;
+  box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
+}
+
 
 /* 给所有 surface 块加毛玻璃模糊 + 玻璃描边 + 顶部高光*/ 
 /* HeroUI v3 Card 实际使用 .card / .card--default / [data-slot="card"]，
@@ -94,6 +104,7 @@
 [data-slot="card"],
 .accordion,
 .disclosure-group,
+.search-field__group,
 .alert {
   --border-bottom-width: 1px;
   --border-color:rgba(255, 255, 255, 0.5);
@@ -120,6 +131,7 @@
 [data-slot="card"]:after,
 .accordion:after,
 .disclosure-group:after,
+.search-field__group:after,
 .alert:after {
     content: "";
     border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
@@ -147,6 +159,7 @@
 .dark [data-slot="card"],
 .dark .accordion,
 .dark .disclosure-group,
+.dark .search-field__group,
 .dark .alert{
   /* 暗色：极轻描边，只比卡片背景略亮一点 */
   border: none !important;
@@ -172,12 +185,13 @@
 .dark .card:after,
 .dark .card--default:after,
 .dark .searchFieldqy:after,
+.dark .search-field__group:after,
 .dark [data-slot="card"]:after,
 .dark .accordion:after,
 .dark .disclosure-group:after,
 .dark .alert:after {
     content: ""; 
-    /* 暗色：极轻描边，只比卡片背景略亮一点*/
+    /* 暗色：极轻描边， 只比卡片背景略亮一点*/
      border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
     border-color: rgb(255 255 255 / 0.07);
     border-style: solid; 
