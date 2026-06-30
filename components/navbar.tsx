@@ -41,7 +41,7 @@ export const Navbar = () => {
   );
 
   return (
-    <div className=" !bg-transparent navbar-root  backdrop-blur-xl backdrop-saturate-100">
+    <div className="navbar-root">
     <nav className="sticky top-0 z-40 w-full border-b border-separator !bg-transparent">
       <header className="mx-auto flex h-16 max-w-[1280px] items-center justify-between gap-4 px-6">
         <div className="flex items-center gap-4">

@@ -63,7 +63,8 @@ export default function FullWidth() {
         onChange={setValue}
         onSubmit={handleSearch}
       >
-        <SearchField.Group  className="!h-11 !bg-transparent backdrop-blur-xl backdrop-saturate-100">
+        <SearchField.Group className="word-search-glass !h-11">
+          <div aria-hidden="true" className="glass-overlay" />
           <SearchField.Input
             className="word-search-input !bg-transparent rounded-[10px] m-[5px]"
             placeholder="查询单词…"

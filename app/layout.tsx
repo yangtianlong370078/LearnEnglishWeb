@@ -48,7 +48,7 @@ export default function RootLayout({
             enableSystem: true,
           }}
         >
-          <div className="relative flex flex-col min-h-screen">
+          <div className="app-shell relative isolate flex flex-col min-h-screen">
             <ConditionalLayout>{children}</ConditionalLayout>
           </div>
         </Providers>

@@ -44,9 +44,10 @@ export default function NavbarProDocsSite() {
   );
 
   return (
-    <div className="sticky top-0 z-50 !bg-transparent navbar-root backdrop-blur-xl backdrop-saturate-100">
+    <div className="sticky top-0 z-50 navbar-root">
+      <div aria-hidden="true" className="glass-overlay" />
       <Navbar
-        className=" !bg-transparent "
+       className="glass-content !bg-transparent "
         maxWidth="full"
         position="sticky"
         shouldBlockScroll={false}

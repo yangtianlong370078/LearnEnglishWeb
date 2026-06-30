@@ -2,68 +2,65 @@
 
 html,
 html[data-bg-theme="defalut"] {
+  --app-background:
+    radial-gradient(ellipse 80% 75% at 12% 18%, oklch(0.80 0.13 280 / 0.4) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 58% at 78% 14%, oklch(0.83 0.12 190 / 0.35) 0%, transparent 58%),
+    radial-gradient(ellipse 65% 62% at 78% 82%, oklch(0.80 0.13 320 / 0.3) 0%, transparent 58%),
+    radial-gradient(ellipse 58% 56% at 18% 84%, oklch(0.86 0.11 55 / 0.3) 0%, transparent 58%),
+    oklch(0.95 0.006 240);
   background-color: oklch(0.95 0.006 240);
   min-height: 100%;
 }
 
 html.dark,
 html.dark[data-bg-theme="defalut"] {
-  background-color: oklch(0.09 0.008 240);
-}
-
-body {
-  background: transparent !important;
-  position: relative;
-  z-index: 0;
-  min-height: 100dvh;
-  overflow-x: hidden;
-}
-
-html[data-bg-theme="defalut"] body::before,
-html:not([data-bg-theme]) body::before {
-  content: "";
-  position: fixed;
-  top: -10vh;
-  left: -10vw;
-  width: 120vw;
-  height: 120vh;
-  pointer-events: none;
-  z-index: -1;
-  transform-origin: center;
-  will-change: transform;
-  background:
-    radial-gradient(ellipse 80% 75% at 12% 18%, oklch(0.80 0.13 280 / 0.4) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 58% at 78% 14%, oklch(0.83 0.12 190 / 0.35) 0%, transparent 58%),
-    radial-gradient(ellipse 65% 62% at 78% 82%, oklch(0.80 0.13 320 / 0.3) 0%, transparent 58%),
-    radial-gradient(ellipse 58% 56% at 18% 84%, oklch(0.86 0.11 55 / 0.3) 0%, transparent 58%),
-    oklch(0.95 0.006 240);
-}
-
-html.dark[data-bg-theme="defalut"] body::before,
-html.dark:not([data-bg-theme]) body::before {
-  background:
+  --app-background:
     radial-gradient(ellipse 90% 85% at 12% 18%, oklch(0.43 0.07 280 / 0.6) 0%, transparent 62%),
     radial-gradient(ellipse 80% 68% at 78% 14%, oklch(0.40 0.07 190 / 0.52) 0%, transparent 58%),
     radial-gradient(ellipse 75% 72% at 78% 82%, oklch(0.45 0.07 320 / 0.5) 0%, transparent 58%),
     radial-gradient(ellipse 68% 66% at 18% 84%, oklch(0.42 0.06 55 / 0.42) 0%, transparent 58%),
     oklch(0.12 0.008 240);
+  background-color: oklch(0.09 0.008 240);
 }
 
-html[data-bg-theme="magnificent"] body::before {
+body {
+  background: transparent !important;
+  isolation: isolate;
+  min-height: 100dvh;
+  overflow-x: hidden;
+}
+
+.app-shell {
+  position: relative;
+  background: transparent;
+  min-height: 100dvh;
+}
+
+/* 背景独立固定层：把背景（尤其图片）绘制在一个固定、GPU 固化的稳定纹理上。
+   这样 navbar / 搜索框等独立合成层的 backdrop-filter 始终从这张永不随内容
+   重绘而失效的纹理采样，避免图片背景被反复解码/重栅格化导致半透明色块闪烁 */
+.app-shell::before {
   content: "";
   position: fixed;
   inset: 0;
-  width: 100vw;
-  height: 100vh;
-  pointer-events: none;
   z-index: -1;
-  background:
+  pointer-events: none;
+  background: var(--app-background);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+html[data-bg-theme="magnificent"] {
+  --app-background:
     linear-gradient(to bottom, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.12)),
     url("/images/bg01_light.jpeg") center / cover no-repeat;
 }
 
-html.dark[data-bg-theme="magnificent"] body::before {
-  background:
+html.dark[data-bg-theme="magnificent"] {
+  --app-background:
     linear-gradient(to bottom, rgb(5 10 24 / 0.16), rgb(5 10 24 / 0.32)),
     url("/images/bg01_dark.jpeg") center / cover no-repeat;
 }

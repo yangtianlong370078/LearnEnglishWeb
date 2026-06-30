@@ -17,18 +17,22 @@
   0% {
     transform: scale(1.05) rotate(0deg);
   }
+
   40% {
     transform: scale(1.1) rotate(1.2deg);
   }
+
   70% {
     transform: scale(1.06) rotate(-0.8deg);
   }
+
   100% {
     transform: scale(1.09) rotate(1.8deg);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
+
   *,
   *::before,
   *::after {
@@ -46,6 +50,7 @@
   --surface-secondary: oklch(0.98 0.002 286 / 0.4) !important;
   --surface-tertiary: oklch(0.96 0.002 286 / 0.38) !important;
 }
+
 .dark {
   --surface: oklch(0.22 0.006 286 / 0.5) !important;
   --surface-secondary: oklch(0.26 0.004 286 / 0.46) !important;
@@ -55,42 +60,96 @@
 .wordfy {
   border: none !important;
   box-shadow:
-    inset 0 0 0 1px rgb(0 0 0 / 0.08), 
-    0 1px 10px rgb(0 0 0 / 0.07) !important; 
-} 
+    inset 0 0 0 1px rgb(0 0 0 / 0.08),
+    0 1px 10px rgb(0 0 0 / 0.07) !important;
+}
 
 .dark .wordfy {
-   border: none !important;
+  border: none !important;
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 0.13),
-    0 1px 10px rgb(0 0 0 / 0.3) !important; 
+    0 1px 10px rgb(0 0 0 / 0.3) !important;
 }
 
 .taytask {
   border: none !important;
   box-shadow:
-    inset 0 0 0 1px rgb(0 0 0 / 0.04) !important; 
-} 
+    inset 0 0 0 1px rgb(0 0 0 / 0.04) !important;
+}
 
-.dark .taytask  {
-   border: none !important;
+.dark .taytask {
+  border: none !important;
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 0.03),
-    0 1px 6px rgb(0 0 0 / 0.3) !important; 
+    0 1px 6px rgb(0 0 0 / 0.3) !important;
 }
 
-.navbar-root{
-   border: none !important;
+.navbar-root {
+  position: relative;
+  border: none !important;
+  border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;
   box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
+  isolation: isolate;
+  /* 直接在容器上做毛玻璃，避免负层级 overlay 触发合成层闪烁 */
+  background-color: rgb(255 255 255 / 0.55);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  /* 固定为稳定的独立合成层（与页面其它不闪烁的毛玻璃卡片一致：仅 translateZ + isolation，
+     不使用 will-change，避免图层被反复创建/销毁导致 backdrop-filter 采样闪烁） */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
 }
 
-.dark .navbar-root{
-   border: none !important;
+.dark .navbar-root {
+  border: none !important;
+  border-bottom: 1px solid rgb(255 255 255 / 0.06) !important;
   box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
+  background-color: rgb(10 16 34 / 0.58);
+}
+
+/* 毛玻璃容器：搜索框（直接在容器上做模糊 + 半透明着色） */
+.word-search-glass {
+  position: relative;
+  isolation: isolate;
+  background-color: rgb(255 255 255 / 0.55) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  /* 固定为稳定的独立合成层（与页面其它不闪烁的毛玻璃卡片一致：仅 translateZ + isolation，
+     不使用 will-change，避免图层被反复创建/销毁导致 backdrop-filter 采样闪烁） */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.dark .word-search-glass {
+  background-color: rgb(10 16 34 / 0.58) !important;
+}
+
+/*
+ * 旧的负层级模糊层会在鼠标经过其它带模糊组件时触发 Chromium 合成层重算，
+ * 导致半透明色块时隐时现地闪烁。改为容器自身做模糊后，此层不再需要模糊，
+ * 仅保留为惰性元素（不渲染任何视觉效果）。
+ */
+.glass-overlay {
+  display: none;
+}
+
+/* 模糊层之上的内容保持透明背景 */
+.glass-content {
+  position: relative;
+  z-index: 0;
+  background-color: transparent !important;
+}
+
+.backdrop-blur-xl,
+.backdrop-blur-lg,
+.backdrop-blur-md,
+.backdrop-blur-sm {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
 }
 
 
-/* 给所有 surface 块加毛玻璃模糊 + 玻璃描边 + 顶部高光*/ 
+/* 给所有 surface 块加毛玻璃模糊 + 玻璃描边 + 顶部高光*/
 /* HeroUI v3 Card 实际使用 .card / .card--default / [data-slot="card"]，
    以及其他组件的 .accordion / .disclosure-group / .alert。
    为了一次性覆盖，同时针对多个选择器应用毛玻璃 + 描边 */
@@ -107,17 +166,20 @@
 .search-field__group,
 .alert {
   --border-bottom-width: 1px;
-  --border-color:rgba(255, 255, 255, 0.5);
+  --border-color: rgba(255, 255, 255, 0.5);
   --border-left-width: 1px;
   --border-right-width: 1px;
   --border-style: solid;
   --border-top-width: 1px;
- border: none !important;
+  border: none !important;
   box-shadow:
     rgba(30, 30, 30, 0.1) 0px 4px 10px 0px,
     rgba(30, 30, 30, 0.05) 0px 4px 4px 0px,
     rgba(30, 30, 30, 0.05) 0px 1px 0px 0px;
+  isolation: isolate;
   opacity: 1;
+  position: relative;
+  transform: translateZ(0);
 }
 
 
@@ -133,18 +195,18 @@
 .disclosure-group:after,
 .search-field__group:after,
 .alert:after {
-    content: "";
-    border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
-    border-color: var(--border-color, none);
-    border-style: var(--border-style, none);
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    box-sizing: border-box;
-    left: 0;
-    top: 0;
-    border-radius: inherit;
-    pointer-events: none;
+  content: "";
+  border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
+  border-color: var(--border-color, none);
+  border-style: var(--border-style, none);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  box-sizing: border-box;
+  left: 0;
+  top: 0;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 
@@ -160,23 +222,23 @@
 .dark .accordion,
 .dark .disclosure-group,
 .dark .search-field__group,
-.dark .alert{
+.dark .alert {
   /* 暗色：极轻描边，只比卡片背景略亮一点 */
   border: none !important;
 
 
- box-shadow:
+  box-shadow:
     rgba(30, 30, 30, 0.1) 0px 4px 10px 0px,
     rgba(30, 30, 30, 0.05) 0px 4px 4px 0px,
     rgba(30, 30, 30, 0.05) 0px 1px 0px 0px;
   opacity: 1;
 
-/* 
+  /*
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 0.07),
     0 2px 20px rgb(0 0 0 / 0.3) !important;  */
 }
- 
+
 
 .dark .surface:after,
 .dark .surface--default:after,
@@ -190,19 +252,19 @@
 .dark .accordion:after,
 .dark .disclosure-group:after,
 .dark .alert:after {
-    content: ""; 
-    /* 暗色：极轻描边， 只比卡片背景略亮一点*/
-     border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
-    border-color: rgb(255 255 255 / 0.07);
-    border-style: solid; 
-    width: 100%;
-    height: 100%;
-    position: absolute;
-    box-sizing: border-box;
-    left: 0;
-    top: 0;
-    border-radius: inherit;
-    pointer-events: none;
+  content: "";
+  /* 暗色：极轻描边， 只比卡片背景略亮一点*/
+  border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
+  border-color: rgb(255 255 255 / 0.07);
+  border-style: solid;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  box-sizing: border-box;
+  left: 0;
+  top: 0;
+  border-radius: inherit;
+  pointer-events: none;
 }
 
 
@@ -218,6 +280,7 @@
 .segment {
   border-color: rgb(255 255 255 / 0.28) !important;
 }
+
 .dark .button,
 .dark .chip,
 .dark .input,
@@ -230,12 +293,12 @@
 
 
 .radial-chart .recharts-radial-bar-background-sector {
-    fill: rgba(0, 0, 0, 0.1)!important;
+  fill: rgba(0, 0, 0, 0.1) !important;
 }
- 
+
 
 .dark .radial-chart .recharts-radial-bar-background-sector {
-    fill: rgba(255, 255, 255, 0.1)!important;
+  fill: rgba(255, 255, 255, 0.1) !important;
 }
 
 
@@ -246,16 +309,19 @@
   backdrop-filter: blur(20px) saturate(160%) !important;
   -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
 }
+
 .bg-content2 {
   background-color: rgb(255 255 255 / 0.38) !important;
   backdrop-filter: blur(18px) saturate(155%) !important;
   -webkit-backdrop-filter: blur(18px) saturate(155%) !important;
 }
+
 .bg-content3 {
   background-color: rgb(255 255 255 / 0.32) !important;
   backdrop-filter: blur(16px) saturate(150%) !important;
   -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
 }
+
 .bg-content4 {
   background-color: rgb(255 255 255 / 0.26) !important;
   backdrop-filter: blur(14px) saturate(148%) !important;
@@ -265,34 +331,24 @@
 .dark .bg-content1 {
   background-color: rgb(15 20 40 / 0.48) !important;
 }
+
 .dark .bg-content2 {
   background-color: rgb(20 28 52 / 0.44) !important;
 }
+
 .dark .bg-content3 {
   background-color: rgb(26 36 62 / 0.4) !important;
 }
+
 .dark .bg-content4 {
   background-color: rgb(32 44 72 / 0.36) !important;
-}
-
-/* ── Navbar 毛玻璃 ── */
-header {
-  background-color: rgb(255 255 255 / 0.6) !important;
-  backdrop-filter: blur(24px) saturate(170%) !important;
-  -webkit-backdrop-filter: blur(24px) saturate(170%) !important;
-  border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;
-  box-shadow: 0 1px 12px rgb(0 0 0 / 0.05) !important;
-}
-.dark header {
-  background-color: rgb(10 16 34 / 0.58) !important;
-  border-bottom: 1px solid rgb(255 255 255 / 0.06) !important;
-  box-shadow: 0 1px 12px rgb(0 0 0 / 0.28) !important;
 }
 
 /* ── Modal 边框 ── */
 .modal__dialog {
   border: 4px solid rgb(180 180 190 / 0.55) !important;
 }
+
 .dark .modal__dialog {
   border: 4px solid rgb(80 80 100 / 0.55) !important;
 }
@@ -312,6 +368,7 @@ header {
     0 2px 18px rgb(0 0 80 / 0.05),
     inset 0 1px 0 rgb(255 255 255 / 0.42) !important;
 }
+
 .dark [data-slot="base"] {
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 0.5),
@@ -411,6 +468,18 @@ input:-webkit-autofill:active {
   -webkit-appearance: none !important;
   background: transparent !important;
 }
+/*
+.zdy-backdrop-blur-xl {
+  background-color: rgb(255 255 255 / 0.42) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+}
+
+.dark .zdy-backdrop-blur-xl {
+  background-color: rgb(10 16 34 / 0.5) !important;
+} */
+
+
 
 .zs {
   color: #f03744;
