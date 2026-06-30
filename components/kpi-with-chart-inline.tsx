@@ -152,7 +152,7 @@ export default function KpiWithChartInline({
 
   return (
     <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
-        <KPI className=" backdrop-blur-xl backdrop-saturate-150">
+        <KPI className=" backdrop-blur-xl !bg-transparent backdrop-saturate-150">
           <KPI.Content className="grid-cols-[1fr_1fr] items-end">
             <div className="flex flex-col justify-between h-full gap-2 ">
               <KPI.Header className="w-max">
@@ -242,7 +242,7 @@ export default function KpiWithChartInline({
           </KPI.Content>
         </KPI>
 
-        <KPI className=" backdrop-blur-xl backdrop-saturate-150 ">
+        <KPI className=" backdrop-blur-xl !bg-transparent backdrop-saturate-150 ">
           <KPI.Header className="justify-between">
             <div className="flex items-center gap-2">
               <Target className="text-muted size-4" />
