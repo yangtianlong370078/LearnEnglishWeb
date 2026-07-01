@@ -108,7 +108,7 @@ export default function Home() {
           </span>
         </div>
          <Card
-          className=" backdrop-blur-xl backdrop-saturate-150"
+          className=" backdrop-blur-xl "
           // variant="secondary"
           variant="transparent"
         > 
