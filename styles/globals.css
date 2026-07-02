@@ -408,15 +408,23 @@ input:-webkit-autofill:active {
 .word-search-input:-webkit-autofill,
 .word-search-input:-webkit-autofill:hover,
 .word-search-input:-webkit-autofill:focus,
-.word-search-input:-webkit-autofill:active {
+.word-search-input:-webkit-autofill:active,
+.word-search-input:autofill,
+.word-search-input:autofill:hover,
+.word-search-input:autofill:focus,
+.word-search-input:autofill:active {
   appearance: none !important;
   -webkit-appearance: none !important;
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
-  box-shadow: 0 0 0 1000px transparent inset !important;
-  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
   outline-color: transparent !important;
+  /* 关键：用一个永不结束的过渡延迟，阻止浏览器把 autofill 背景色真正绘制出来。
+     这是让 autofill 背景保持透明的唯一可靠方法（透明 inset 阴影无效）。 */
+  transition: background-color 9999s ease-in-out 0s !important;
+  -webkit-text-fill-color: inherit !important;
 }
 
 .word-search-input::-webkit-search-cancel-button,
@@ -449,15 +457,21 @@ input:-webkit-autofill:active {
 .dark .word-search-input:-webkit-autofill,
 .dark .word-search-input:-webkit-autofill:hover,
 .dark .word-search-input:-webkit-autofill:focus,
-.dark .word-search-input:-webkit-autofill:active {
+.dark .word-search-input:-webkit-autofill:active,
+.dark .word-search-input:autofill,
+.dark .word-search-input:autofill:hover,
+.dark .word-search-input:autofill:focus,
+.dark .word-search-input:autofill:active {
   appearance: none !important;
   -webkit-appearance: none !important;
   background: transparent !important;
   background-color: transparent !important;
   background-image: none !important;
-  box-shadow: 0 0 0 1000px transparent inset !important;
-  -webkit-box-shadow: 0 0 0 1000px transparent inset !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
   outline-color: transparent !important;
+  transition: background-color 9999s ease-in-out 0s !important;
+  -webkit-text-fill-color: inherit !important;
 }
 
 .dark .word-search-input::-webkit-search-cancel-button,
