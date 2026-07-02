@@ -67,7 +67,7 @@ export default function FullWidth() {
           <div aria-hidden="true" className="glass-overlay" />
           <SearchField.Input
             autoComplete="off"
-            className="word-search-input !bg-transparent rounded-[100px] m-[5px]"
+            className="word-search-input !bg-transparent rounded-[100px] m-[5px] text-[14px]"
             placeholder="查询单词…"
           />
 

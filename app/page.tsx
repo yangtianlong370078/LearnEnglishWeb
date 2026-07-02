@@ -108,7 +108,7 @@ export default function Home() {
           </span>
         </div>
          <Card
-          className=" backdrop-blur-xl "
+          className=" word-search-glass !bg-transparent  "
           // variant="secondary"
           variant="transparent"
         > 
