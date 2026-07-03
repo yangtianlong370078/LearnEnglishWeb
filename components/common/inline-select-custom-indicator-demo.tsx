@@ -37,15 +37,19 @@ export default function InlineSelectCustomIndicatorDemo() {
     <InlineSelect
     className="!bg-transparent" 
       aria-label="背景主题"
-      selectedKey={role}
-      onSelectionChange={handleThemeChange}
+      value={role}
+      onChange={handleThemeChange}
     >
+
+
       <InlineSelect.Trigger>
         <InlineSelect.Value />
         <InlineSelect.Indicator>
           <ChevronRight />
         </InlineSelect.Indicator>
       </InlineSelect.Trigger>
+
+
       <InlineSelect.Popover className="w-[124px]">
         <ListBox>
           <ListBox.Item id="defalut" textValue="光影">

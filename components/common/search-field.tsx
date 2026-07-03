@@ -67,7 +67,7 @@ export default function FullWidth() {
           <div aria-hidden="true" className="glass-overlay" />
           <SearchField.Input
             autoComplete="off"
-            className="word-search-input !bg-transparent rounded-[100px] m-[5px] text-[14px]"
+            className="word-search-input !bg-transparent rounded-[100px] m-[5px] px-3 text-[14px]"
             placeholder="查询单词…"
           />
 
@@ -87,7 +87,7 @@ export default function FullWidth() {
             </svg>
           </SearchField.ClearButton>
           <Button
-            className="m-0 p-0 hover:bg-transparent data-[hovered=true]:bg-transparent"
+            className="m-0 px-1 hover:bg-transparent data-[hovered=true]:bg-transparent"
             size="sm"
             variant="ghost"
             onPress={handleSearch}
