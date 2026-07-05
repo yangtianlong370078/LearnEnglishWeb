@@ -47,12 +47,16 @@ export default function NavbarProDocsSite() {
     <div className="sticky top-0 z-50 navbar-root">
       <div aria-hidden="true" className="glass-overlay" />
       <Navbar
-       className="glass-content !bg-transparent "
+        className="glass-content !bg-transparent "
         maxWidth="full"
         position="sticky"
         shouldBlockScroll={false}
       >
+        <div aria-hidden="true" className="glass-overlay" />
+
         <Navbar.Header className="relative !bg-transparent">
+          <div aria-hidden="true" className="glass-overlay" />
+
           <Navbar.MenuToggle className="md:hidden" />
 
           {/* <Navbar.Brand>
@@ -89,8 +93,6 @@ export default function NavbarProDocsSite() {
           <Navbar.Spacer />
 
           <Navbar.Content className="hidden md:flex ">
-           
-
             <Segment
               // @ts-expect-error suppressHydrationWarning 由 HeroUI V3 Segment 支持但类型尚未屘露
               suppressHydrationWarning
@@ -144,6 +146,7 @@ export default function NavbarProDocsSite() {
               </Avatar>
             </Button>
             <Dropdown.Popover className="min-w-[200px]" placement="bottom end">
+               <div aria-hidden="true" className="glass-overlay" />
               <Dropdown.Menu>
                 <Dropdown.Item id="account" textValue="Your account">
                   <Person className="text-muted size-4" />
@@ -170,9 +173,6 @@ export default function NavbarProDocsSite() {
               </Dropdown.Menu>
             </Dropdown.Popover>
           </Dropdown>
-
-
-          
         </Navbar.Header>
 
         <Navbar.Menu>

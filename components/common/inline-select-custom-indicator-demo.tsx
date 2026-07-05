@@ -51,6 +51,7 @@ export default function InlineSelectCustomIndicatorDemo() {
 
 
       <InlineSelect.Popover className="w-[124px]">
+         <div aria-hidden="true" className="glass-overlay" />
         <ListBox>
           <ListBox.Item id="defalut" textValue="光影">
             光影
