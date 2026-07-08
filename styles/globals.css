@@ -85,7 +85,9 @@
 }
 
 .navbar-root {
-  position: relative;
+  position: sticky;
+  top: 0;
+  z-index: 50;
   border: none !important;
   border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;
   box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
@@ -255,7 +257,7 @@
   content: "";
   /* 暗色：极轻描边， 只比卡片背景略亮一点*/
   border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
-  border-color: rgb(255 255 255 / 0.07);
+  border-color: rgb(255 255 255 / 0.1);
   border-style: solid;
   width: 100%;
   height: 100%;
@@ -266,6 +268,7 @@
   border-radius: inherit;
   pointer-events: none;
 }
+
 
 
 
@@ -493,7 +496,13 @@ input:-webkit-autofill:active {
   background-color: rgb(10 16 34 / 0.5) !important;
 } */
 
+.accordion__item::after {
+  background: rgb(0 0 0 / 0.08) !important;
+}
 
+.dark .accordion__item::after {
+  background: rgb(255 255 255 / 0.08) !important;
+}
 
 .zs {
   color: #f03744;

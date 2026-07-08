@@ -6,7 +6,7 @@ import { Button, Popover, Card, ButtonGroup } from "@heroui/react";
 import { ReactNode, useMemo, useState } from "react";
 import { ChevronLeft, ChevronRight, Calendar } from "@gravity-ui/icons";
 
-import AreaChartMultiAreaDemo from "@/components/area-chart-multi-area-demo";
+import AreaChartMultiAreaDemo from "@/components/home/area-chart-multi-area-demo";
 
 // 从 types 目录导入并重新导出，保持对外兼容
 export type { MonthValue, MonthCompletion };

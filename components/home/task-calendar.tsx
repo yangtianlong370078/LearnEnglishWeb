@@ -28,7 +28,7 @@ import {
   Plus,
 } from "@gravity-ui/icons";
 
-import RadialChartWithLegend from "@/components/radial-chart-with-legend";
+import RadialChartWithLegend from "@/components/home/radial-chart-with-legend";
 import { saveLearntask } from "@/lib/api/modules/statistics";
 
 type DayStatus = "pending" | "weekend" | "done" | "missed" | "warn" | "empty";

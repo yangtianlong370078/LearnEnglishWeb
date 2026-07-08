@@ -1,5 +1,7 @@
 import { title } from "@/components/primitives";
 
+
+import PieChartWithBreakdownDemo from "@/components/learnwords/pie-chart-with-breakdown-demo";
 export default function ListeningPage() {
   return (
     <div>

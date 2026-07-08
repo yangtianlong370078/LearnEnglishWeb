@@ -151,12 +151,10 @@ export default function KpiWithChartInline({
   ];
 
   return (
-    <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
-       <div aria-hidden="true" className="glass-overlay" />
-
-        <KPI className=" word-search-glass !bg-transparent ">
-          <div aria-hidden="true" className="glass-overlay" />
-          <KPI.Content className="grid-cols-[1fr_1fr] items-end">
+    <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+        <KPI className="word-search-glass  !bg-transparent " >
+           <div aria-hidden="true" className="glass-overlay"  />
+          <KPI.Content className="grid-cols-[1fr_1fr] items-end"  >
             <div className="flex flex-col justify-between h-full gap-2 ">
               <KPI.Header className="w-max">
                 <SquareChartBar className="text-muted size-4" />

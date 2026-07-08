@@ -8,7 +8,7 @@ import { useEffect, useState } from "react";
 import { InlineSelect } from "@heroui-pro/react";
 
 const STORAGE_KEY = "background-theme";
-const DEFAULT_THEME_ID = "defalut";
+const DEFAULT_THEME_ID = "magnificent";
 
 function applyBackgroundTheme(themeId: string) {
   document.documentElement.setAttribute("data-bg-theme", themeId);
@@ -41,17 +41,16 @@ export default function InlineSelectCustomIndicatorDemo() {
       onChange={handleThemeChange}
     >
 
-
+<div aria-hidden="true" className="glass-overlay" />
       <InlineSelect.Trigger>
         <InlineSelect.Value />
         <InlineSelect.Indicator>
           <ChevronRight />
         </InlineSelect.Indicator>
       </InlineSelect.Trigger>
-
+<div aria-hidden="true" className="glass-overlay" />
 
       <InlineSelect.Popover className="w-[124px]">
-         <div aria-hidden="true" className="glass-overlay" />
         <ListBox>
           <ListBox.Item id="defalut" textValue="光影">
             光影

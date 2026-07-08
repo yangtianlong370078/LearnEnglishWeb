@@ -3,7 +3,7 @@
 import type {
   MonthCompletion,
   MonthValue,
-} from "@/components/task-year-calendar";
+} from "@/components/home/task-year-calendar";
 import type { MonthlyData } from "@/types/task";
 import type { WordStats } from "@/types/word";
 
@@ -11,12 +11,12 @@ import { useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "motion/react";
 import { Card } from "@heroui/react";
 
-import KpiWithChartInline from "@/components/kpi-with-chart-inline";
-import TaskCalendar from "@/components/task-calendar";
+import TaskCalendar from "@/components/home/task-calendar";
 import FullWidthSearch from "@/components/common/search-field";
-import TaskYearCalendar from "@/components/task-year-calendar";
+import TaskYearCalendar from "@/components/home/task-year-calendar";
 import { statisticsApi } from "@/lib/api";
 
+import KpiWithChartInline from "@/components/home/kpi-with-chart-inline";
 
 export default function Home() {
   const today = new Date();
@@ -93,6 +93,7 @@ export default function Home() {
       <FullWidthSearch />
 
       {/* KPI 区域 */}
+
       <KpiWithChartInline monthlyList={monthlyList} stats={studyStats} />
 
       {/* 数据统计看板：月/年视图平滑切换 */}
@@ -107,12 +108,12 @@ export default function Home() {
               : "按月查看每日任务量与完成情况"}
           </span>
         </div>
-         <Card
+        <Card
           className=" word-search-glass !bg-transparent  "
           // variant="secondary"
           variant="transparent"
-        > 
-        {/* <LiquidGlass displacementScale={64}
+        >
+          {/* <LiquidGlass displacementScale={64}
   blurAmount={0.1}
   saturation={130}
   aberrationIntensity={2}
@@ -169,8 +170,8 @@ export default function Home() {
               </motion.div>
             )}
           </AnimatePresence>
-        {/* </LiquidGlass> */}
-        </Card> 
+          {/* </LiquidGlass> */}
+        </Card>
       </div>
     </div>
   );
