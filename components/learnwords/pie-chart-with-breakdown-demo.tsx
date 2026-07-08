@@ -78,8 +78,12 @@ export default function PieChartWithBreakdownDemo({
     { name: "不认识", value: notLearned },
   ];
   const total = rawData.reduce((sum, d) => sum + d.value, 0);
-  // 图表只渲染 value > 0 的项，避免 0 值切片造成的渲染异常
-  const planData = rawData.filter((d) => d.value > 0);
+  const isEmpty = total === 0;
+  // 图表只渲染 value > 0 的项，避免 0 值切片造成的渲染异常；
+  // 全 0 时渲染一个占位切片以显示空状态圆环
+  const planData = isEmpty
+    ? [{ name: "暂无数据", value: 1 }]
+    : rawData.filter((d) => d.value > 0);
   const hasMultipleSlices = planData.length > 1;
   // 只有当所有非零项的占比都 >= 5% 时才启用大圆角，避免小切片被圆角吃掉
   const allSlicesAboveThreshold =
@@ -152,11 +156,15 @@ export default function PieChartWithBreakdownDemo({
               {planData.map((_, idx) => (
                 <PieChart.Cell
                   key={idx}
-                  fill={CHART_COLORS[idx % CHART_COLORS.length]}
+                  fill={
+                    isEmpty
+                      ? "color-mix(in srgb, var(--foreground) 12%, transparent)"
+                      : CHART_COLORS[idx % CHART_COLORS.length]
+                  }
                 />
               ))}
             </PieChart.Pie>
-            <PieChart.Tooltip content={<PieTooltip />} />
+            {!isEmpty && <PieChart.Tooltip content={<PieTooltip />} />}
           </PieChart>
           <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
             <span className="text-foreground text-xl font-bold">
