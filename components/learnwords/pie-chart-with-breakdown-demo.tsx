@@ -27,6 +27,8 @@ const CHART_COLORS = [
   "var(--chart-4)",
 ];
 
+export type PieChartMenuMode = "none" | "full" | "remove";
+
 export interface PieChartWithBreakdownDemoProps {
   /** 课程名称（显示在标题） */
   courseName?: string;
@@ -36,6 +38,13 @@ export interface PieChartWithBreakdownDemoProps {
   notDoneCount?: number;
   /** 不认识 */
   notLearned?: number;
+  /**
+   * 菜单显示模式：
+   * - "none": 不显示 Dropdown
+   * - "full": 显示 编辑 + 删除
+   * - "remove": 仅显示 移除
+   */
+  menuMode?: PieChartMenuMode;
 }
 
 interface PieTooltipProps {
@@ -71,6 +80,7 @@ export default function PieChartWithBreakdownDemo({
   doneCount = 0,
   notDoneCount = 0,
   notLearned = 0,
+  menuMode = "full",
 }: PieChartWithBreakdownDemoProps = {}) {
   const rawData = [
     { name: "已掌握", value: doneCount },
@@ -97,10 +107,10 @@ export default function PieChartWithBreakdownDemo({
     <>
       <Card.Header className="gap-0 ">
         <div className="flex items-center justify-between  ">
-          <div className="card__title text-base">{courseName}</div>
+          <div className="card__title text-base font-semibold">{courseName}</div>
 
-          
-            <Dropdown >
+          {menuMode !== "none" && (
+            <Dropdown>
               <Button isIconOnly aria-label="菜单" className="bg-black/10 dark:bg-white/10" variant="secondary">
                 <EllipsisVertical className="outline-none" />
               </Button>
@@ -110,31 +120,33 @@ export default function PieChartWithBreakdownDemo({
                 >
                   <Dropdown.Section>
                     <Header>操作</Header>
-                   
-                    <Dropdown.Item id="edit-file" textValue="编辑">
-                      <div className="flex items-start justify-center pt-px">
-                        <Pencil className="size-4 shrink-0 text-muted" />
-                      </div>
-                      <div className="flex flex-col">
-                        <Label>编辑</Label>
-                      </div>
-                      
-                    </Dropdown.Item>
-                     <Dropdown.Item
+
+                    {menuMode === "full" && (
+                      <Dropdown.Item id="edit-file" textValue="编辑">
+                        <div className="flex items-start justify-center pt-px">
+                          <Pencil className="size-4 shrink-0 text-muted" />
+                        </div>
+                        <div className="flex flex-col">
+                          <Label>编辑</Label>
+                        </div>
+                      </Dropdown.Item>
+                    )}
+                    <Dropdown.Item
                       id="delete-file"
-                      textValue="删除"
+                      textValue={menuMode === "remove" ? "移除" : "删除"}
                     >
                       <div className="flex items-start justify-center pt-px">
                         <TrashBin className="size-4 shrink-0 text-muted" />
                       </div>
                       <div className="flex flex-col">
-                        <Label>删除</Label>
+                        <Label>{menuMode === "remove" ? "移除" : "删除"}</Label>
                       </div>
                     </Dropdown.Item>
                   </Dropdown.Section>
                 </Dropdown.Menu>
               </Dropdown.Popover>
             </Dropdown>
+          )}
         </div>
       </Card.Header>
       <Card.Content className="flex flex-row items-center justify-between gap-6">

@@ -1,12 +1,74 @@
 "use client";
 
 import type { CategoryInfo, MyCategoryContent } from "@/types/course";
+import { Books, GraduationCap, Plus, Gear } from "@gravity-ui/icons";
 
 import { useEffect, useState } from "react";
-import { Accordion, Card } from "@heroui/react";
+import {
+  Accordion,
+  Card,
+  Chip,
+  Skeleton,
+  Spinner,
+  ButtonGroup,
+  Button,
+  Modal,
+  InputGroup,
+} from "@heroui/react";
 
 import PieChartWithBreakdownDemo from "@/components/learnwords/pie-chart-with-breakdown-demo";
 import { courseApi } from "@/lib/api";
+
+function CourseChartSkeleton() {
+  return (
+    <Card className="word-search-glass !bg-transparent rounded-2xl">
+      <Card.Header>
+        <Skeleton className="h-6 w-32 rounded-lg" />
+      </Card.Header>
+      <Card.Content className="flex flex-row items-center justify-between gap-6">
+        <Skeleton className="size-[110px] shrink-0 rounded-full" />
+        <div className="flex min-w-[150px] max-w-[250px] flex-1 flex-col gap-3">
+          {Array.from({ length: 3 }).map((_, index) => (
+            <div key={index} className="flex items-center gap-3">
+              <Skeleton className="size-3 shrink-0 rounded-full" />
+              <Skeleton className="h-5 flex-1 rounded-lg" />
+              <Skeleton className="h-5 w-14 rounded-lg" />
+            </div>
+          ))}
+        </div>
+      </Card.Content>
+    </Card>
+  );
+}
+
+function CategoryAccordionSkeleton() {
+  return (
+    <div className="flex min-h-28 w-full items-center justify-center">
+      <Spinner aria-label="课程加载中" />
+    </div>
+  );
+}
+
+function LearnWordsSkeleton() {
+  return (
+    <>
+      <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+        <CourseChartSkeleton />
+        <CourseChartSkeleton />
+      </div>
+
+      <div className="flex flex-col gap-1.5 px-4 pt-2">
+        <Skeleton className="h-6 w-24 rounded-lg" />
+      </div>
+      <CategoryAccordionSkeleton />
+
+      <div className="flex flex-col gap-1.5 px-4 pt-2">
+        <Skeleton className="h-6 w-24 rounded-lg" />
+      </div>
+      <CategoryAccordionSkeleton />
+    </>
+  );
+}
 
 export default function LearnWordsPage() {
   const [data, setData] = useState<MyCategoryContent | null>(null);
@@ -25,7 +87,10 @@ export default function LearnWordsPage() {
       .finally(() => setLoading(false));
   }, []);
 
-  const renderCategoryAccordion = (categories: CategoryInfo[]) => (
+  const renderCategoryAccordion = (
+    categories: CategoryInfo[],
+    menuMode: "full" | "remove",
+  ) => (
     <Accordion
       allowsMultipleExpanded
       className="w-full overflow-hidden rounded-[25px]  word-search-glass !bg-transparent"
@@ -34,7 +99,21 @@ export default function LearnWordsPage() {
         <Accordion.Item key={cat.id}>
           <Accordion.Heading>
             <Accordion.Trigger>
-              {cat.name}
+              <div>
+                <span className="inline-flex rounded-xl  min-h-9 items-center gap-2 rounded-medium bg-white/50 px-3 text-small dark:bg-black/30">
+                  {menuMode == "full" ? (
+                    <GraduationCap className="size-3.5" />
+                  ) : (
+                    <Books className="size-3.5" />
+                  )}
+
+                  {cat.name}
+                  <Chip color="accent" size="sm" variant="soft">
+                    {cat.courseInfos.length}
+                  </Chip>
+                </span>
+              </div>
+
               <Accordion.Indicator />
             </Accordion.Trigger>
           </Accordion.Heading>
@@ -42,15 +121,13 @@ export default function LearnWordsPage() {
             <Accordion.Body>
               <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
                 {cat.courseInfos.map((course) => (
-                  <Card
-                    key={course.courseId}
-                    className=" rounded-2xl"
-                  >
+                  <Card key={course.courseId} className=" rounded-2xl">
                     <PieChartWithBreakdownDemo
                       courseName={course.courseName}
                       doneCount={course.doneCount}
                       notDoneCount={course.notDoneCount}
                       notLearned={course.notLearned}
+                      menuMode={menuMode}
                     />
                   </Card>
                 ))}
@@ -64,50 +141,144 @@ export default function LearnWordsPage() {
 
   return (
     <div className="flex flex-col w-full gap-4">
-      <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
-        <Card className="word-search-glass !bg-transparent rounded-2xl">
-          <PieChartWithBreakdownDemo
-            courseName={data?.newWord.courseName}
-            doneCount={data?.newWord.doneCount}
-            notDoneCount={data?.newWord.notDoneCount}
-            notLearned={data?.newWord.notLearned}
-          />
-        </Card>
-        <Card className="word-search-glass !bg-transparent rounded-2xl">
-          <PieChartWithBreakdownDemo
-            courseName={data?.strengthenWord.courseName}
-            doneCount={data?.strengthenWord.doneCount}
-            notDoneCount={data?.strengthenWord.notDoneCount}
-            notLearned={data?.strengthenWord.notLearned}
-          />
-        </Card>
-      </div>
-
       {loading ? (
-        <div className="text-muted px-4 text-sm">加载中...</div>
+        <LearnWordsSkeleton />
       ) : error ? (
         <div className="text-danger px-4 text-sm">{error}</div>
       ) : (
         <>
-          <div className="flex flex-col gap-1.5 px-4 pt-2">
-            <span className="text-foreground text-base font-semibold">
-              我的课程
-            </span>
+          <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+            <Card className="word-search-glass !bg-transparent rounded-2xl">
+              <PieChartWithBreakdownDemo
+                courseName={data?.newWord.courseName}
+                doneCount={data?.newWord.doneCount}
+                notDoneCount={data?.newWord.notDoneCount}
+                notLearned={data?.newWord.notLearned}
+                menuMode="none"
+              />
+            </Card>
+            <Card className="word-search-glass !bg-transparent rounded-2xl">
+              <PieChartWithBreakdownDemo
+                courseName={data?.strengthenWord.courseName}
+                doneCount={data?.strengthenWord.doneCount}
+                notDoneCount={data?.strengthenWord.notDoneCount}
+                notLearned={data?.strengthenWord.notLearned}
+                menuMode="none"
+              />
+            </Card>
           </div>
 
-          {data && data.myCategoryInfos.length > 0
-            ? renderCategoryAccordion(data.myCategoryInfos)
-            : null}
+          <div className="relative isolate">
+            <div className="flex gap-1.5 px-4 pt-2 pb-3">
+              {/* <span className="text-foreground text-base font-semibold">
+                我的课程
+              </span> */}
 
-          <div className="flex flex-col gap-1.5 px-4 pt-2">
-            <span className="text-foreground text-base font-semibold">
-              精选课程
-            </span>
+              <ButtonGroup
+                className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base"
+                size="sm"
+                variant="primary"
+              >
+                <Button>
+                  <Plus />
+                  创建课程
+                </Button>
+              </ButtonGroup>
+
+              <Modal>
+                <Modal.Backdrop isDismissable={false} variant="blur">
+                  <Modal.Container placement="center" size="md">
+                    <Modal.Dialog>
+                      <Modal.Header>
+                        <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+                          <Gear className="size-5" />
+                        </Modal.Icon>
+                        <Modal.Heading>添加课程</Modal.Heading>
+                        <p className="mt-1.5 text-sm leading-5 text-muted">
+                          添加课程后，在课程中录入单词便可开始学习
+                        </p>
+                      </Modal.Header>
+                      <Modal.Body className="flex flex-col gap-5 py-2">
+                        <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
+                          <label
+                            className="text-sm text-foreground"
+                            htmlFor="task-word-count"
+                          >
+                            单词数量
+                          </label>
+
+                          <InputGroup>
+                            <InputGroup.Prefix>
+                              <GraduationCap className="size-4 text-muted" />
+                            </InputGroup.Prefix>
+                            <InputGroup.Input
+                              className="w-full max-w-[280px]"
+                              placeholder="输入课程名称"
+                            />
+ 
+                            <button
+                              aria-label="清空内容"
+                              className="inline-flex items-center justify-center px-2 hover:opacity-70"
+                              type="button"
+                              onClick={() => {}}
+                            >
+                              <svg
+                                height="16"
+                                viewBox="0 0 16 16"
+                                width="16"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  clipRule="evenodd"
+                                  d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
+                                  fill="currentColor"
+                                  fillRule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          </InputGroup>
+                        </div>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button slot="close" variant="secondary">
+                          取消
+                        </Button>
+                        <Button isDisabled={true} onPress={() => {}}>
+                          { "保存中..." }
+                        </Button>
+                      </Modal.Footer>
+                    </Modal.Dialog>
+                  </Modal.Container>  
+                </Modal.Backdrop>
+              </Modal>
+            </div>
+
+            {data && data.myCategoryInfos.length > 0
+              ? renderCategoryAccordion(data.myCategoryInfos, "full")
+              : null}
           </div>
+          <div className="relative isolate">
+            <div className="flex  gap-1.5 px-4 pt-2 pb-3">
+              {/* <span className="text-foreground text-base font-semibold">
+                精选课程
+              </span> */}
 
-          {data && data.categoryInfos.length > 0
-            ? renderCategoryAccordion(data.categoryInfos)
-            : null}
+              <ButtonGroup
+                className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base"
+                size="sm"
+                variant="primary"
+              >
+                <Button>
+                  <Plus />
+                  精选课程
+                </Button>
+              </ButtonGroup>
+            </div>
+
+            {data && data.categoryInfos.length > 0
+              ? renderCategoryAccordion(data.categoryInfos, "remove")
+              : null}
+          </div>
         </>
       )}
     </div>
