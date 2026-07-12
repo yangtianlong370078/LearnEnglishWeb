@@ -13,7 +13,7 @@ import {
   ButtonGroup,
   Button,
   Modal,
-  InputGroup,card
+  InputGroup,Separator
 } from "@heroui/react";
 
 import PieChartWithBreakdownDemo from "@/components/learnwords/pie-chart-with-breakdown-demo";
@@ -95,12 +95,12 @@ export default function LearnWordsPage() {
       allowsMultipleExpanded
       className="w-full overflow-hidden rounded-[25px]  word-search-glass !bg-transparent"
     >
-      <div className="flex items-center gap-1.5 px-6 py-3">
+      <div className="flex items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15">
         <span className="text-foreground text-base font-semibold">
           精选课程
         </span>
 
-        <Button isIconOnly variant="primary">
+        <Button className="" isIconOnly variant="primary">
           <Plus />
         </Button>
 
@@ -173,7 +173,17 @@ export default function LearnWordsPage() {
 
       </div>
 
-      {categories.map((cat) => (
+        <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]"/>
+
+      {categories.every((cat) => cat.courseInfos.length === 0) ? (
+        <div className="px-6 py-5 text-center text-sm text-muted">
+          暂无课程，请先添加课程
+        </div>
+      ) : null}
+
+      {categories
+        .filter((cat) => cat.courseInfos.length > 0)
+        .map((cat) => (
         <Accordion.Item key={cat.id}>
           <Accordion.Heading>
             <Accordion.Trigger>
