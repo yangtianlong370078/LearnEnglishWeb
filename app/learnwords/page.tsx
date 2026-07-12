@@ -13,7 +13,7 @@ import {
   ButtonGroup,
   Button,
   Modal,
-  InputGroup,
+  InputGroup,card
 } from "@heroui/react";
 
 import PieChartWithBreakdownDemo from "@/components/learnwords/pie-chart-with-breakdown-demo";
@@ -95,6 +95,84 @@ export default function LearnWordsPage() {
       allowsMultipleExpanded
       className="w-full overflow-hidden rounded-[25px]  word-search-glass !bg-transparent"
     >
+      <div className="flex items-center gap-1.5 px-6 py-3">
+        <span className="text-foreground text-base font-semibold">
+          精选课程
+        </span>
+
+        <Button isIconOnly variant="primary">
+          <Plus />
+        </Button>
+
+        <Modal>
+                <Modal.Backdrop isDismissable={false} variant="blur">
+                  <Modal.Container placement="center" size="md">
+                    <Modal.Dialog>
+                      <Modal.Header>
+                        <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+                          <Gear className="size-5" />
+                        </Modal.Icon>
+                        <Modal.Heading>添加课程</Modal.Heading>
+                        <p className="mt-1.5 text-sm leading-5 text-muted">
+                          添加课程后，在课程中录入单词便可开始学习
+                        </p>
+                      </Modal.Header>
+                      <Modal.Body className="flex flex-col gap-5 py-2">
+                        <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
+                          <label
+                            className="text-sm text-foreground"
+                            htmlFor="task-word-count"
+                          >
+                            单词数量
+                          </label>
+
+                          <InputGroup>
+                            <InputGroup.Prefix>
+                              <GraduationCap className="size-4 text-muted" />
+                            </InputGroup.Prefix>
+                            <InputGroup.Input
+                              className="w-full max-w-[280px]"
+                              placeholder="输入课程名称"
+                            />
+
+                            <button
+                              aria-label="清空内容"
+                              className="inline-flex items-center justify-center px-2 hover:opacity-70"
+                              type="button"
+                              onClick={() => {}}
+                            >
+                              <svg
+                                height="16"
+                                viewBox="0 0 16 16"
+                                width="16"
+                                xmlns="http://www.w3.org/2000/svg"
+                              >
+                                <path
+                                  clipRule="evenodd"
+                                  d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
+                                  fill="currentColor"
+                                  fillRule="evenodd"
+                                />
+                              </svg>
+                            </button>
+                          </InputGroup>
+                        </div>
+                      </Modal.Body>
+                      <Modal.Footer>
+                        <Button slot="close" variant="secondary">
+                          取消
+                        </Button>
+                        <Button isDisabled={true} onPress={() => {}}>
+                          {"保存中..."}
+                        </Button>
+                      </Modal.Footer>
+                    </Modal.Dialog>
+                  </Modal.Container>
+                </Modal.Backdrop>
+              </Modal>
+
+      </div>
+
       {categories.map((cat) => (
         <Accordion.Item key={cat.id}>
           <Accordion.Heading>
@@ -148,7 +226,8 @@ export default function LearnWordsPage() {
       ) : (
         <>
           <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
-            <Card className="word-search-glass !bg-transparent rounded-2xl">
+            <Card className="word-search-glass !bg-transparent rounded-2xl ">
+              <div className="absolute inset-0 bg-[url('/images/scb.png')] bg-[width:100%] bg-center bg-no-repeat bg-cover z-[-1] mt-[20px] absolute top-1/2 -translate-y-1/2 h-[130px] w-[130px] ml-[10px]"></div>
               <PieChartWithBreakdownDemo
                 courseName={data?.newWord.courseName}
                 doneCount={data?.newWord.doneCount}
@@ -157,7 +236,8 @@ export default function LearnWordsPage() {
                 menuMode="none"
               />
             </Card>
-            <Card className="word-search-glass !bg-transparent rounded-2xl">
+            <Card className="word-search-glass !bg-transparent rounded-2xl ">
+              <div className="absolute inset-0 bg-[url('/images/qhq.png')] bg-[width:100%] bg-center bg-no-repeat bg-cover z-[-1] mt-[20px] absolute top-1/2 -translate-y-1/2 h-[130px] w-[130px] ml-[10px]"></div>
               <PieChartWithBreakdownDemo
                 courseName={data?.strengthenWord.courseName}
                 doneCount={data?.strengthenWord.doneCount}
@@ -169,112 +249,13 @@ export default function LearnWordsPage() {
           </div>
 
           <div className="relative isolate">
-            <div className="flex gap-1.5 px-4 pt-2 pb-3">
-              {/* <span className="text-foreground text-base font-semibold">
-                我的课程
-              </span> */}
-
-              <ButtonGroup
-                className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base"
-                size="sm"
-                variant="primary"
-              >
-                <Button>
-                  <Plus />
-                  创建课程
-                </Button>
-              </ButtonGroup>
-
-              <Modal>
-                <Modal.Backdrop isDismissable={false} variant="blur">
-                  <Modal.Container placement="center" size="md">
-                    <Modal.Dialog>
-                      <Modal.Header>
-                        <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
-                          <Gear className="size-5" />
-                        </Modal.Icon>
-                        <Modal.Heading>添加课程</Modal.Heading>
-                        <p className="mt-1.5 text-sm leading-5 text-muted">
-                          添加课程后，在课程中录入单词便可开始学习
-                        </p>
-                      </Modal.Header>
-                      <Modal.Body className="flex flex-col gap-5 py-2">
-                        <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
-                          <label
-                            className="text-sm text-foreground"
-                            htmlFor="task-word-count"
-                          >
-                            单词数量
-                          </label>
-
-                          <InputGroup>
-                            <InputGroup.Prefix>
-                              <GraduationCap className="size-4 text-muted" />
-                            </InputGroup.Prefix>
-                            <InputGroup.Input
-                              className="w-full max-w-[280px]"
-                              placeholder="输入课程名称"
-                            />
- 
-                            <button
-                              aria-label="清空内容"
-                              className="inline-flex items-center justify-center px-2 hover:opacity-70"
-                              type="button"
-                              onClick={() => {}}
-                            >
-                              <svg
-                                height="16"
-                                viewBox="0 0 16 16"
-                                width="16"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  clipRule="evenodd"
-                                  d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
-                                  fill="currentColor"
-                                  fillRule="evenodd"
-                                />
-                              </svg>
-                            </button>
-                          </InputGroup>
-                        </div>
-                      </Modal.Body>
-                      <Modal.Footer>
-                        <Button slot="close" variant="secondary">
-                          取消
-                        </Button>
-                        <Button isDisabled={true} onPress={() => {}}>
-                          { "保存中..." }
-                        </Button>
-                      </Modal.Footer>
-                    </Modal.Dialog>
-                  </Modal.Container>  
-                </Modal.Backdrop>
-              </Modal>
-            </div>
+           
 
             {data && data.myCategoryInfos.length > 0
               ? renderCategoryAccordion(data.myCategoryInfos, "full")
               : null}
           </div>
           <div className="relative isolate">
-            <div className="flex  gap-1.5 px-4 pt-2 pb-3">
-              {/* <span className="text-foreground text-base font-semibold">
-                精选课程
-              </span> */}
-
-              <ButtonGroup
-                className="[&>button]:md:h-10 [&>button]:md:px-4 [&>button]:md:text-base"
-                size="sm"
-                variant="primary"
-              >
-                <Button>
-                  <Plus />
-                  精选课程
-                </Button>
-              </ButtonGroup>
-            </div>
-
             {data && data.categoryInfos.length > 0
               ? renderCategoryAccordion(data.categoryInfos, "remove")
               : null}

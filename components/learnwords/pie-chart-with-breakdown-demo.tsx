@@ -107,11 +107,18 @@ export default function PieChartWithBreakdownDemo({
     <>
       <Card.Header className="gap-0 ">
         <div className="flex items-center justify-between  ">
-          <div className="card__title text-base font-semibold">{courseName}</div>
+          <div className="card__title text-base font-semibold">
+            {courseName}
+          </div>
 
           {menuMode !== "none" && (
             <Dropdown>
-              <Button isIconOnly aria-label="菜单" className="bg-black/10 dark:bg-white/10" variant="secondary">
+              <Button
+                isIconOnly
+                aria-label="菜单"
+                className="bg-black/10 dark:bg-white/10"
+                variant="secondary"
+              >
                 <EllipsisVertical className="outline-none" />
               </Button>
               <Dropdown.Popover className="!min-w-[150px] !max-w-[150px] md:!min-w-[150px]">
@@ -148,46 +155,54 @@ export default function PieChartWithBreakdownDemo({
             </Dropdown>
           )}
         </div>
-      </Card.Header>
-      <Card.Content className="flex flex-row items-center justify-between gap-6">
-        <div className="relative shrink-0">
-          <PieChart height={110} width={110}>
-            <PieChart.Pie
-              cornerRadius={cornerRadius}
-              cx="50%"
-              cy="50%"
-              data={planData}
-              dataKey="value"
-              innerRadius="74%"
-              minAngle={hasMultipleSlices ? 4 : 0}
-              nameKey="name"
-              outerRadius="100%"
-              paddingAngle={paddingAngle}
-              strokeWidth={0}
+      </Card.Header> 
+      <Card.Content className={`flex flex-row items-center ${menuMode !== "none" ? "justify-between" : "justify-end"} gap-1`}>
+        <div className="flex flex-1 flex-col gap-3 max-w-[180px] min-w-[120px] ">
+          <div className="relative shrink-0 w-[110px] h-[110px]">
+            <PieChart
+              height={110}
+              width={110}
+              className=""
             >
-              {planData.map((_, idx) => (
-                <PieChart.Cell
-                  key={idx}
-                  fill={
-                    isEmpty
-                      ? "color-mix(in srgb, var(--foreground) 12%, transparent)"
-                      : CHART_COLORS[idx % CHART_COLORS.length]
-                  }
-                />
-              ))}
-            </PieChart.Pie>
-            {!isEmpty && <PieChart.Tooltip content={<PieTooltip />} />}
-          </PieChart>
-          <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-            <span className="text-foreground text-xl font-bold">
-              {total.toLocaleString()}
-            </span>
-            <span className="text-muted text-[10px]">总数</span>
+              <PieChart.Pie
+                cornerRadius={cornerRadius}
+                cx="50%"
+                cy="50%"
+                data={planData}
+                dataKey="value"
+                innerRadius="74%"
+                minAngle={hasMultipleSlices ? 4 : 0}
+                nameKey="name"
+                outerRadius="100%"
+                paddingAngle={paddingAngle}
+                strokeWidth={0}
+              >
+                {planData.map((_, idx) => (
+                  <PieChart.Cell
+                    key={idx}
+                    fill={
+                      isEmpty
+                        ? "color-mix(in srgb, var(--foreground) 12%, transparent)"
+                        : CHART_COLORS[idx % CHART_COLORS.length]
+                    }
+                  />
+                ))}
+              </PieChart.Pie>
+              {!isEmpty && <PieChart.Tooltip content={<PieTooltip />} />}
+            </PieChart>
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-foreground text-xl font-bold">
+                {total.toLocaleString()}
+              </span>
+              <span className="text-muted text-[10px]">总数</span>
+            </div>
           </div>
         </div>
-        <div className="flex flex-1 flex-col gap-3 max-w-[250px] min-w-[150px] ">
+
+        <div className="flex flex-1 flex-col gap-3 max-w-[200px] min-w-[150px] ">
           {rawData.map((entry, idx) => {
-            const pct = total > 0 ? ((entry.value / total) * 100).toFixed(1) : "0.0";
+            const pct =
+              total > 0 ? ((entry.value / total) * 100).toFixed(1) : "0.0";
 
             return (
               <div key={entry.name} className="flex items-center gap-3 w-full">
@@ -199,7 +214,7 @@ export default function PieChartWithBreakdownDemo({
                 />
                 <div className="flex flex-1 items-center justify-between">
                   <span className="text-foreground text-sm">{entry.name}</span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-1">
                     <span className="text-foreground text-sm font-semibold">
                       {entry.value}
                     </span>
