@@ -78,10 +78,24 @@ export default function LearnWordsPage() {
   const [error, setError] = useState<string | null>(null);
   const isDesktop = useMediaQuery("(min-width: 640px)");
 
+  // 添加/编辑课程弹框状态
+  const [courseModalOpen, setCourseModalOpen] = useState(false);
+  // 当前操作的课程 id：0 表示新增，>0 表示编辑
+  const [editCourseId, setEditCourseId] = useState(0);
+  const [courseName, setCourseName] = useState("");
+  const [saving, setSaving] = useState(false);
+
+  // 删除课程确认弹框状态
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+  const [deleteCourseId, setDeleteCourseId] = useState(0);
+  const [deleteCourseName, setDeleteCourseName] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
+  const loadData = () =>
+    courseApi.getMyCategoryContent(1).then((res) => setData(res));
+
   useEffect(() => {
-    courseApi
-      .getMyCategoryContent(1)
-      .then((res) => setData(res))
+    loadData()
       .catch((err) => {
         // eslint-disable-next-line no-console
         console.error("加载课程分类失败:", err);
@@ -89,6 +103,61 @@ export default function LearnWordsPage() {
       })
       .finally(() => setLoading(false));
   }, []);
+
+  // 打开「添加课程」弹框
+  const openAddCourseModal = () => {
+    setEditCourseId(0);
+    setCourseName("");
+    setCourseModalOpen(true);
+  };
+
+  // 打开「编辑课程」弹框
+  const openEditCourseModal = (id: number, name: string) => {
+    setEditCourseId(id);
+    setCourseName(name);
+    setCourseModalOpen(true);
+  };
+
+  // 保存课程：新增 setcourseId 传 0，编辑传当前课程 id，type 固定为 1
+  const handleSaveCourse = async () => {
+    const name = courseName.trim();
+
+    if (!name) return;
+
+    setSaving(true);
+    try {
+      await courseApi.saveCourse(editCourseId, name, 1);
+      setCourseModalOpen(false);
+      await loadData();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("保存课程失败:", err);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  // 打开「删除课程」确认弹框
+  const openDeleteCourseModal = (id: number, name: string) => {
+    setDeleteCourseId(id);
+    setDeleteCourseName(name);
+    setDeleteModalOpen(true);
+  };
+
+  // 确认删除课程：setcourseId 传当前选择的课程 id，成功后刷新页面
+  const handleDeleteCourse = async () => {
+    setDeleting(true);
+    try {
+      await courseApi.deleteCourse(deleteCourseId);
+      setDeleteModalOpen(false);
+      await loadData();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("删除课程失败:", err);
+    } finally {
+      setDeleting(false);
+    }
+  };
 
   const renderCategoryAccordion = (
     categories: CategoryInfo[],
@@ -103,76 +172,27 @@ export default function LearnWordsPage() {
           {menuMode == "full" ? "我的课程" : "精选课程"}
         </span>
 
-        <Button isIconOnly size={isDesktop ? "md" : "sm"} variant="primary">
-          <Plus />
-        </Button>
+        {menuMode === "full" && (
+          <Button
+            isIconOnly
+            size={isDesktop ? "md" : "sm"}
+            variant="primary"
+            onPress={openAddCourseModal}
+          >
+            <Plus />
+          </Button>
+        )}
 
-        <Modal>
-          <Modal.Backdrop isDismissable={false} variant="blur">
-            <Modal.Container placement="center" size="md">
-              <Modal.Dialog>
-                <Modal.Header>
-                  <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
-                    <Gear className="size-5" />
-                  </Modal.Icon>
-                  <Modal.Heading>添加课程</Modal.Heading>
-                  <p className="mt-1.5 text-sm leading-5 text-muted">
-                    添加课程后，在课程中录入单词便可开始学习
-                  </p>
-                </Modal.Header>
-                <Modal.Body className="flex flex-col gap-5 py-2">
-                  <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
-                    <label
-                      className="text-sm text-foreground"
-                      htmlFor="task-word-count"
-                    >
-                      单词数量
-                    </label>
-
-                    <InputGroup>
-                      <InputGroup.Prefix>
-                        <GraduationCap className="size-4 text-muted" />
-                      </InputGroup.Prefix>
-                      <InputGroup.Input
-                        className="w-full max-w-[280px]"
-                        placeholder="输入课程名称"
-                      />
-
-                      <button
-                        aria-label="清空内容"
-                        className="inline-flex items-center justify-center px-2 hover:opacity-70"
-                        type="button"
-                        onClick={() => {}}
-                      >
-                        <svg
-                          height="16"
-                          viewBox="0 0 16 16"
-                          width="16"
-                          xmlns="http://www.w3.org/2000/svg"
-                        >
-                          <path
-                            clipRule="evenodd"
-                            d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
-                            fill="currentColor"
-                            fillRule="evenodd"
-                          />
-                        </svg>
-                      </button>
-                    </InputGroup>
-                  </div>
-                </Modal.Body>
-                <Modal.Footer>
-                  <Button slot="close" variant="secondary">
-                    取消
-                  </Button>
-                  <Button isDisabled={true} onPress={() => {}}>
-                    {"保存中..."}
-                  </Button>
-                </Modal.Footer>
-              </Modal.Dialog>
-            </Modal.Container>
-          </Modal.Backdrop>
-        </Modal>
+        {menuMode === "remove" && (
+          <Button
+            isIconOnly
+            size={isDesktop ? "md" : "sm"}
+            variant="primary"
+           
+          >
+            <Plus />
+          </Button>
+        )}
       </div>
 
       <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
@@ -213,11 +233,14 @@ export default function LearnWordsPage() {
                   {cat.courseInfos.map((course) => (
                     <Card key={course.courseId} className=" rounded-2xl">
                       <PieChartWithBreakdownDemo
+                        courseId={course.courseId}
                         courseName={course.courseName}
                         doneCount={course.doneCount}
                         notDoneCount={course.notDoneCount}
                         notLearned={course.notLearned}
                         menuMode={menuMode}
+                        onEdit={openEditCourseModal}
+                        onDelete={openDeleteCourseModal}
                       />
                     </Card>
                   ))}
@@ -272,6 +295,118 @@ export default function LearnWordsPage() {
           </div>
         </>
       )}
+
+      {/* 添加/编辑课程弹框（受控） */}
+      <Modal.Backdrop
+        isDismissable={false}
+        isOpen={courseModalOpen}
+        variant="blur"
+        onOpenChange={setCourseModalOpen}
+      >
+        <Modal.Container placement="center" size="md">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+                <Gear className="size-5" />
+              </Modal.Icon>
+              <Modal.Heading>
+                {editCourseId === 0 ? "添加课程" : "编辑课程"}
+              </Modal.Heading>
+              <p className="mt-1.5 text-sm leading-5 text-muted">
+                {editCourseId === 0
+                  ? "添加课程后，在课程中录入单词便可开始学习"
+                  : "修改课程名称后保存即可生效"}
+              </p>
+            </Modal.Header>
+            <Modal.Body className="flex flex-col gap-5 py-2">
+              <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
+                <label
+                  className="text-sm text-foreground"
+                  htmlFor="course-name-input"
+                >
+                  课程名称
+                </label>
+
+                <InputGroup>
+                  <InputGroup.Prefix>
+                    <GraduationCap className="size-4 text-muted" />
+                  </InputGroup.Prefix>
+                  <InputGroup.Input
+                    className="w-full max-w-[280px]"
+                    id="course-name-input"
+                    placeholder="输入课程名称"
+                    value={courseName}
+                    onChange={(e) => setCourseName(e.target.value)}
+                  />
+
+                  <button
+                    aria-label="清空内容"
+                    className="inline-flex items-center justify-center px-2 hover:opacity-70"
+                    type="button"
+                    onClick={() => setCourseName("")}
+                  >
+                    <svg
+                      height="16"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        clipRule="evenodd"
+                        d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
+                        fill="currentColor"
+                        fillRule="evenodd"
+                      />
+                    </svg>
+                  </button>
+                </InputGroup>
+              </div>
+            </Modal.Body>
+            <Modal.Footer>
+              <Button slot="close" variant="secondary">
+                取消
+              </Button>
+              <Button
+                isDisabled={saving || courseName.trim().length === 0}
+                onPress={handleSaveCourse}
+              >
+                {saving ? "保存中..." : "保存"}
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
+
+      {/* 删除课程确认弹框（受控） */}
+      <Modal.Backdrop
+        isDismissable={false}
+        isOpen={deleteModalOpen}
+        variant="blur"
+        onOpenChange={setDeleteModalOpen}
+      >
+        <Modal.Container placement="center" size="md">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Heading>移除课程</Modal.Heading>
+              <p className="mt-1.5 text-sm leading-5 text-muted">
+                将课程【{deleteCourseName}】在学习列表中移除
+              </p>
+            </Modal.Header>
+            <Modal.Footer>
+              <Button slot="close" variant="secondary">
+                取消
+              </Button>
+              <Button
+                isDisabled={deleting}
+                variant="danger"
+                onPress={handleDeleteCourse}
+              >
+                {deleting ? "移除中..." : "确定"}
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
     </div>
   );
 }

@@ -4,9 +4,35 @@
  */
 import type { MyCategoryContent } from "@/types/course";
 
-import { get } from "../request";
+import { get, post } from "../request";
 
 /** 获取我的分类内容（课程分类 + 我的分类 + 生词本 + 强化学习） */
 export function getMyCategoryContent(type = 1) {
   return get<MyCategoryContent>("/Course/MyCategoryContent", { type });
+}
+
+/**
+ * 保存/编辑课程
+ * @param setcourseId 新增传 0；编辑传当前课程 id
+ * @param insercoursename 课程名称
+ * @param type 课程类型，默认 1
+ */
+export function saveCourse(
+  setcourseId: number,
+  insercoursename: string,
+  type = 1,
+) {
+  return post<void>("/Course/SaveCourse", null, {
+    params: { setcourseId, insercoursename, type },
+  });
+}
+
+/**
+ * 删除课程
+ * @param setcourseId 当前选择的课程 id
+ */
+export function deleteCourse(setcourseId: number) {
+  return post<void>("/Course/deleteCourse", null, {
+    params: { setcourseId },
+  });
 }

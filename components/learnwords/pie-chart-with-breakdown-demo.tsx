@@ -32,6 +32,8 @@ const CHART_COLORS = [
 export type PieChartMenuMode = "none" | "full" | "remove";
 
 export interface PieChartWithBreakdownDemoProps {
+  /** 课程 id（编辑时回传） */
+  courseId?: number;
   /** 课程名称（显示在标题） */
   courseName?: string;
   /** 已掌握 */
@@ -47,6 +49,10 @@ export interface PieChartWithBreakdownDemoProps {
    * - "remove": 仅显示 移除
    */
   menuMode?: PieChartMenuMode;
+  /** 点击编辑时回调，回传当前课程 id 与名称 */
+  onEdit?: (courseId: number, courseName: string) => void;
+  /** 点击删除/移除时回调，回传当前课程 id 与名称 */
+  onDelete?: (courseId: number, courseName: string) => void;
 }
 
 interface PieTooltipProps {
@@ -78,11 +84,14 @@ function PieTooltip({ active, payload, valueFormatter }: PieTooltipProps) {
 }
 
 export default function PieChartWithBreakdownDemo({
+  courseId = 0,
   courseName = "课程名称",
   doneCount = 0,
   notDoneCount = 0,
   notLearned = 0,
   menuMode = "full",
+  onEdit,
+  onDelete,
 }: PieChartWithBreakdownDemoProps = {}) {
   const rawData = [
     { name: "已掌握", value: doneCount },
@@ -127,7 +136,13 @@ export default function PieChartWithBreakdownDemo({
               </Button>
               <Dropdown.Popover className="!min-w-[150px] !max-w-[150px] md:!min-w-[150px]">
                 <Dropdown.Menu
-                  onAction={(key) => console.log(`Selected: ${key}`)}
+                  onAction={(key) => {
+                    if (key === "edit-file") {
+                      onEdit?.(courseId, courseName);
+                    } else if (key === "delete-file") {
+                      onDelete?.(courseId, courseName);
+                    }
+                  }}
                 >
                   <Dropdown.Section>
                     <Header>操作</Header>
