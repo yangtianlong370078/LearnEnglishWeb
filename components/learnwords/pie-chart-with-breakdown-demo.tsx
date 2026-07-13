@@ -20,6 +20,8 @@ import {
 
 import { ChartTooltip, PieChart } from "@heroui-pro/react";
 
+import { useMediaQuery } from "@/hooks/useMediaQuery";
+
 const CHART_COLORS = [
   "var(--chart-1)",
   "var(--chart-2)",
@@ -102,6 +104,7 @@ export default function PieChartWithBreakdownDemo({
   // 圆角模式下用小的负 paddingAngle，让相邻切片轻微重叠以隐藏两侧独立的圆角接缝
   // 避免出现"珍珠项链"效果；无圆角时保持 0，切片端到端连接
   const paddingAngle = allSlicesAboveThreshold ? -14 : -1;
+  const isDesktop = useMediaQuery("(min-width: 640px)");
 
   return (
     <>
@@ -114,6 +117,7 @@ export default function PieChartWithBreakdownDemo({
           {menuMode !== "none" && (
             <Dropdown>
               <Button
+                size={isDesktop ? "md" : "sm"}
                 isIconOnly
                 aria-label="菜单"
                 className="bg-black/10 dark:bg-white/10"
@@ -155,15 +159,13 @@ export default function PieChartWithBreakdownDemo({
             </Dropdown>
           )}
         </div>
-      </Card.Header> 
-      <Card.Content className={`flex flex-row items-center ${menuMode !== "none" ? "justify-between" : "justify-end"} gap-1`}>
+      </Card.Header>
+      <Card.Content
+        className={`flex flex-row items-center ${menuMode !== "none" ? "justify-between" : "justify-end"} gap-1`}
+      >
         <div className="flex flex-1 flex-col gap-3 max-w-[180px] min-w-[120px] ">
           <div className="relative shrink-0 w-[110px] h-[110px]">
-            <PieChart
-              height={110}
-              width={110}
-              className=""
-            >
+            <PieChart height={110} width={110} className="">
               <PieChart.Pie
                 cornerRadius={cornerRadius}
                 cx="50%"

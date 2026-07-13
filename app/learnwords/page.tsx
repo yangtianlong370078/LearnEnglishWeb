@@ -13,11 +13,13 @@ import {
   ButtonGroup,
   Button,
   Modal,
-  InputGroup,Separator
+  InputGroup,
+  Separator,
 } from "@heroui/react";
 
 import PieChartWithBreakdownDemo from "@/components/learnwords/pie-chart-with-breakdown-demo";
 import { courseApi } from "@/lib/api";
+import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 function CourseChartSkeleton() {
   return (
@@ -74,6 +76,7 @@ export default function LearnWordsPage() {
   const [data, setData] = useState<MyCategoryContent | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const isDesktop = useMediaQuery("(min-width: 640px)");
 
   useEffect(() => {
     courseApi
@@ -97,83 +100,82 @@ export default function LearnWordsPage() {
     >
       <div className="flex items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15">
         <span className="text-foreground text-base font-semibold">
-          精选课程
+          {menuMode == "full" ? "我的课程" : "精选课程"}
         </span>
 
-        <Button className="" isIconOnly variant="primary">
+        <Button isIconOnly size={isDesktop ? "md" : "sm"} variant="primary">
           <Plus />
         </Button>
 
         <Modal>
-                <Modal.Backdrop isDismissable={false} variant="blur">
-                  <Modal.Container placement="center" size="md">
-                    <Modal.Dialog>
-                      <Modal.Header>
-                        <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
-                          <Gear className="size-5" />
-                        </Modal.Icon>
-                        <Modal.Heading>添加课程</Modal.Heading>
-                        <p className="mt-1.5 text-sm leading-5 text-muted">
-                          添加课程后，在课程中录入单词便可开始学习
-                        </p>
-                      </Modal.Header>
-                      <Modal.Body className="flex flex-col gap-5 py-2">
-                        <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
-                          <label
-                            className="text-sm text-foreground"
-                            htmlFor="task-word-count"
-                          >
-                            单词数量
-                          </label>
+          <Modal.Backdrop isDismissable={false} variant="blur">
+            <Modal.Container placement="center" size="md">
+              <Modal.Dialog>
+                <Modal.Header>
+                  <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+                    <Gear className="size-5" />
+                  </Modal.Icon>
+                  <Modal.Heading>添加课程</Modal.Heading>
+                  <p className="mt-1.5 text-sm leading-5 text-muted">
+                    添加课程后，在课程中录入单词便可开始学习
+                  </p>
+                </Modal.Header>
+                <Modal.Body className="flex flex-col gap-5 py-2">
+                  <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
+                    <label
+                      className="text-sm text-foreground"
+                      htmlFor="task-word-count"
+                    >
+                      单词数量
+                    </label>
 
-                          <InputGroup>
-                            <InputGroup.Prefix>
-                              <GraduationCap className="size-4 text-muted" />
-                            </InputGroup.Prefix>
-                            <InputGroup.Input
-                              className="w-full max-w-[280px]"
-                              placeholder="输入课程名称"
-                            />
+                    <InputGroup>
+                      <InputGroup.Prefix>
+                        <GraduationCap className="size-4 text-muted" />
+                      </InputGroup.Prefix>
+                      <InputGroup.Input
+                        className="w-full max-w-[280px]"
+                        placeholder="输入课程名称"
+                      />
 
-                            <button
-                              aria-label="清空内容"
-                              className="inline-flex items-center justify-center px-2 hover:opacity-70"
-                              type="button"
-                              onClick={() => {}}
-                            >
-                              <svg
-                                height="16"
-                                viewBox="0 0 16 16"
-                                width="16"
-                                xmlns="http://www.w3.org/2000/svg"
-                              >
-                                <path
-                                  clipRule="evenodd"
-                                  d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
-                                  fill="currentColor"
-                                  fillRule="evenodd"
-                                />
-                              </svg>
-                            </button>
-                          </InputGroup>
-                        </div>
-                      </Modal.Body>
-                      <Modal.Footer>
-                        <Button slot="close" variant="secondary">
-                          取消
-                        </Button>
-                        <Button isDisabled={true} onPress={() => {}}>
-                          {"保存中..."}
-                        </Button>
-                      </Modal.Footer>
-                    </Modal.Dialog>
-                  </Modal.Container>
-                </Modal.Backdrop>
-              </Modal>
-
+                      <button
+                        aria-label="清空内容"
+                        className="inline-flex items-center justify-center px-2 hover:opacity-70"
+                        type="button"
+                        onClick={() => {}}
+                      >
+                        <svg
+                          height="16"
+                          viewBox="0 0 16 16"
+                          width="16"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <path
+                            clipRule="evenodd"
+                            d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
+                            fill="currentColor"
+                            fillRule="evenodd"
+                          />
+                        </svg>
+                      </button>
+                    </InputGroup>
+                  </div>
+                </Modal.Body>
+                <Modal.Footer>
+                  <Button slot="close" variant="secondary">
+                    取消
+                  </Button>
+                  <Button isDisabled={true} onPress={() => {}}>
+                    {"保存中..."}
+                  </Button>
+                </Modal.Footer>
+              </Modal.Dialog>
+            </Modal.Container>
+          </Modal.Backdrop>
+        </Modal>
       </div>
 
-        <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]"/>
+      <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
 
       {categories.every((cat) => cat.courseInfos.length === 0) ? (
         <div className="px-6 py-5 text-center text-sm text-muted">
@@ -184,46 +186,46 @@ export default function LearnWordsPage() {
       {categories
         .filter((cat) => cat.courseInfos.length > 0)
         .map((cat) => (
-        <Accordion.Item key={cat.id}>
-          <Accordion.Heading>
-            <Accordion.Trigger>
-              <div>
-                <span className="inline-flex rounded-xl  min-h-9 items-center gap-2 rounded-medium bg-white/50 px-3 text-small dark:bg-black/30">
-                  {menuMode == "full" ? (
-                    <GraduationCap className="size-3.5" />
-                  ) : (
-                    <Books className="size-3.5" />
-                  )}
+          <Accordion.Item key={cat.id}>
+            <Accordion.Heading>
+              <Accordion.Trigger>
+                <div>
+                  <span className="inline-flex rounded-xl  min-h-9 items-center gap-2 rounded-medium bg-white/50 px-3 text-small dark:bg-black/30">
+                    {menuMode == "full" ? (
+                      <GraduationCap className="size-3.5" />
+                    ) : (
+                      <Books className="size-3.5" />
+                    )}
 
-                  {cat.name}
-                  <Chip color="accent" size="sm" variant="soft">
-                    {cat.courseInfos.length}
-                  </Chip>
-                </span>
-              </div>
+                    {cat.name}
+                    <Chip color="accent" size="sm" variant="soft">
+                      {cat.courseInfos.length}
+                    </Chip>
+                  </span>
+                </div>
 
-              <Accordion.Indicator />
-            </Accordion.Trigger>
-          </Accordion.Heading>
-          <Accordion.Panel>
-            <Accordion.Body>
-              <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
-                {cat.courseInfos.map((course) => (
-                  <Card key={course.courseId} className=" rounded-2xl">
-                    <PieChartWithBreakdownDemo
-                      courseName={course.courseName}
-                      doneCount={course.doneCount}
-                      notDoneCount={course.notDoneCount}
-                      notLearned={course.notLearned}
-                      menuMode={menuMode}
-                    />
-                  </Card>
-                ))}
-              </div>
-            </Accordion.Body>
-          </Accordion.Panel>
-        </Accordion.Item>
-      ))}
+                <Accordion.Indicator />
+              </Accordion.Trigger>
+            </Accordion.Heading>
+            <Accordion.Panel>
+              <Accordion.Body>
+                <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+                  {cat.courseInfos.map((course) => (
+                    <Card key={course.courseId} className=" rounded-2xl">
+                      <PieChartWithBreakdownDemo
+                        courseName={course.courseName}
+                        doneCount={course.doneCount}
+                        notDoneCount={course.notDoneCount}
+                        notLearned={course.notLearned}
+                        menuMode={menuMode}
+                      />
+                    </Card>
+                  ))}
+                </div>
+              </Accordion.Body>
+            </Accordion.Panel>
+          </Accordion.Item>
+        ))}
     </Accordion>
   );
 
@@ -259,8 +261,6 @@ export default function LearnWordsPage() {
           </div>
 
           <div className="relative isolate">
-           
-
             {data && data.myCategoryInfos.length > 0
               ? renderCategoryAccordion(data.myCategoryInfos, "full")
               : null}
