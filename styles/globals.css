@@ -12,6 +12,26 @@
   --font-mono: "monospace", monospace;
 }
 
+/* ── 全局去除 Recharts 图表切片/元素点击聚焦时的粗边框、高亮描边 ── */
+.recharts-wrapper,
+.recharts-wrapper:focus,
+.recharts-wrapper:focus-visible,
+.recharts-surface,
+.recharts-surface:focus,
+.recharts-surface:focus-visible,
+.recharts-wrapper svg,
+.recharts-wrapper svg:focus,
+.recharts-wrapper svg:focus-visible,
+.recharts-wrapper svg *:focus,
+.recharts-wrapper svg *:focus-visible,
+.recharts-surface *:focus,
+.recharts-surface *:focus-visible,
+.recharts-sector,
+.recharts-sector:focus,
+.recharts-sector:focus-visible {
+  outline: none !important;
+}
+
 /* 关键帧均使用 scale >= 1.05，配合 inset:-10% 确保任何时刻都铺满视口 */
 @keyframes aurora {
   0% {

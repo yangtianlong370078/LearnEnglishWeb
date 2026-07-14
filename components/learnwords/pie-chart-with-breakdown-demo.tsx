@@ -178,7 +178,7 @@ export default function PieChartWithBreakdownDemo({
       <Card.Content className="flex flex-col items-center gap-4">
         <div className="flex flex-1 flex-col gap-3 m-3 ">
           <div className="relative shrink-0 w-[190px] h-[190px]">
-            <PieChart height={190} width={190} className="">
+            <PieChart height={190} width={190}>
               <PieChart.Pie
                 cornerRadius={cornerRadius}
                 cx="50%"
