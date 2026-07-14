@@ -1,8 +1,7 @@
 "use client";
 
 import type { CategoryInfo, MyCategoryContent } from "@/types/course";
-import type { Key } from "@heroui/react";
-import { Books, GraduationCap, Plus, Gear, BookOpen, Flame, ClockArrowRotateLeft } from "@gravity-ui/icons";
+import { Books, GraduationCap, Plus, Gear } from "@gravity-ui/icons";
 
 import { useEffect, useState } from "react";
 import {
@@ -25,22 +24,17 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 function CourseChartSkeleton() {
   return (
     <Card className="word-search-glass !bg-transparent rounded-2xl">
-      <Card.Header className="gap-0">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-6 w-32 rounded-lg" />
-        </div>
+      <Card.Header>
+        <Skeleton className="h-6 w-32 rounded-lg" />
       </Card.Header>
-      <Card.Content className="flex flex-col items-center gap-4">
-        <div className="flex flex-1 flex-col gap-3 m-3">
-          <Skeleton className="size-[190px] shrink-0 rounded-full" />
-        </div>
-        <div className="flex flex-col gap-2">
+      <Card.Content className="flex flex-row items-center justify-between gap-6">
+        <Skeleton className="size-[110px] shrink-0 rounded-full" />
+        <div className="flex min-w-[150px] max-w-[250px] flex-1 flex-col gap-3">
           {Array.from({ length: 3 }).map((_, index) => (
             <div key={index} className="flex items-center gap-3">
               <Skeleton className="size-3 shrink-0 rounded-full" />
-              <Skeleton className="h-5 w-16 rounded-lg" />
-              <Skeleton className="h-5 w-8 rounded-lg" />
-              <Skeleton className="h-4 w-10 rounded-lg" />
+              <Skeleton className="h-5 flex-1 rounded-lg" />
+              <Skeleton className="h-5 w-14 rounded-lg" />
             </div>
           ))}
         </div>
@@ -60,8 +54,7 @@ function CategoryAccordionSkeleton() {
 function LearnWordsSkeleton() {
   return (
     <>
-      <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
-        <CourseChartSkeleton />
+      <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
         <CourseChartSkeleton />
         <CourseChartSkeleton />
       </div>
@@ -97,12 +90,6 @@ export default function LearnWordsPage() {
   const [deleteCourseId, setDeleteCourseId] = useState(0);
   const [deleteCourseName, setDeleteCourseName] = useState("");
   const [deleting, setDeleting] = useState(false);
-
-  // 两个 Accordion（我的课程 / 精选课程）各自的展开项
-  const [expandedMap, setExpandedMap] = useState<Record<"full" | "remove", Set<Key>>>({
-    full: new Set<Key>(),
-    remove: new Set<Key>(),
-  });
 
   const loadData = () =>
     courseApi.getMyCategoryContent(1).then((res) => setData(res));
@@ -179,17 +166,8 @@ export default function LearnWordsPage() {
     <Accordion
       allowsMultipleExpanded
       className="w-full overflow-hidden rounded-[25px]  word-search-glass !bg-transparent"
-      expandedKeys={expandedMap[menuMode]}
-      onExpandedChange={(keys) =>
-        setExpandedMap((prev) => ({ ...prev, [menuMode]: keys as Set<Key> }))
-      }
     >
-      <div
-        className="flex cursor-pointer items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15"
-        onClick={() =>
-          setExpandedMap((prev) => ({ ...prev, [menuMode]: new Set<Key>() }))
-        }
-      >
+      <div className="flex items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15">
         <span className="text-foreground text-base font-semibold">
           {menuMode == "full" ? "我的课程" : "精选课程"}
         </span>
@@ -199,7 +177,6 @@ export default function LearnWordsPage() {
             isIconOnly
             size={isDesktop ? "md" : "sm"}
             variant="primary"
-            onClick={(e) => e.stopPropagation()}
             onPress={openAddCourseModal}
           >
             <Plus />
@@ -229,7 +206,7 @@ export default function LearnWordsPage() {
       {categories
         .filter((cat) => cat.courseInfos.length > 0)
         .map((cat) => (
-          <Accordion.Item key={cat.id} id={cat.id}>
+          <Accordion.Item key={cat.id}>
             <Accordion.Heading>
               <Accordion.Trigger>
                 <div>
@@ -252,12 +229,9 @@ export default function LearnWordsPage() {
             </Accordion.Heading>
             <Accordion.Panel>
               <Accordion.Body>
-                <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3 pt-[2px]">
+                <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
                   {cat.courseInfos.map((course) => (
-                    <Card
-                      key={course.courseId}
-                      className="group relative overflow-hidden rounded-2xl transition-transform duration-300 hover:-translate-y-0.5"
-                    >
+                    <Card key={course.courseId} className=" rounded-2xl">
                       <PieChartWithBreakdownDemo
                         courseId={course.courseId}
                         courseName={course.courseName}
@@ -286,13 +260,9 @@ export default function LearnWordsPage() {
         <div className="text-danger px-4 text-sm">{error}</div>
       ) : (
         <>
-          <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
-            <Card className="word-search-glass group relative overflow-hidden !bg-transparent rounded-2xl transition-transform duration-300 hover:-translate-y-0.5">
-              {/* 生词本 · 蓝青主题装饰 */}
-              <div className="pointer-events-none absolute -top-12 -right-12 z-[-1] size-44 rounded-full bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.22),rgba(56,189,248,0.08)_45%,transparent_72%)] blur-xl transition-opacity duration-300 group-hover:opacity-90" />
-              <div className="pointer-events-none absolute top-4 right-4 z-[-1] flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-sky-400/15 to-cyan-300/5 shadow-inner ring-1 ring-white/20 backdrop-blur-sm">
-                <BookOpen className="size-8 text-sky-500/70 drop-shadow-sm dark:text-sky-300/70" />
-              </div>
+          <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
+            <Card className="word-search-glass !bg-transparent rounded-2xl ">
+              <div className="absolute inset-0 bg-[url('/images/scb.png')] bg-[width:100%] bg-center bg-no-repeat bg-cover z-[-1] mt-[20px] absolute top-1/2 -translate-y-1/2 h-[130px] w-[130px] ml-[10px]"></div>
               <PieChartWithBreakdownDemo
                 courseName={data?.newWord.courseName}
                 doneCount={data?.newWord.doneCount}
@@ -301,12 +271,8 @@ export default function LearnWordsPage() {
                 menuMode="none"
               />
             </Card>
-            <Card className="word-search-glass group relative overflow-hidden !bg-transparent rounded-2xl transition-transform duration-300 hover:-translate-y-0.5">
-              {/* 强化区 · 橙红主题装饰 */}
-              <div className="pointer-events-none absolute -top-12 -right-12 z-[-1] size-44 rounded-full bg-[radial-gradient(circle_at_center,rgba(251,146,60,0.22),rgba(244,63,94,0.08)_45%,transparent_72%)] blur-xl transition-opacity duration-300 group-hover:opacity-90" />
-              <div className="pointer-events-none absolute top-4 right-4 z-[-1] flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-400/15 to-rose-400/5 shadow-inner ring-1 ring-white/20 backdrop-blur-sm">
-                <Flame className="size-8 text-orange-500/75 drop-shadow-sm dark:text-orange-300/70" />
-              </div>
+            <Card className="word-search-glass !bg-transparent rounded-2xl ">
+              <div className="absolute inset-0 bg-[url('/images/qhq.png')] bg-[width:100%] bg-center bg-no-repeat bg-cover z-[-1] mt-[20px] absolute top-1/2 -translate-y-1/2 h-[130px] w-[130px] ml-[10px]"></div>
               <PieChartWithBreakdownDemo
                 courseName={data?.strengthenWord.courseName}
                 doneCount={data?.strengthenWord.doneCount}
@@ -314,26 +280,6 @@ export default function LearnWordsPage() {
                 notLearned={data?.strengthenWord.notLearned}
                 menuMode="none"
               />
-            </Card>
-            <Card className="word-search-glass group relative overflow-hidden !bg-transparent rounded-2xl transition-transform duration-300 hover:-translate-y-0.5">
-              {/* 最后学习课程 · 紫靛主题装饰 */}
-              <div className="pointer-events-none absolute -top-12 -right-12 z-[-1] size-44 rounded-full bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.22),rgba(99,102,241,0.08)_45%,transparent_72%)] blur-xl transition-opacity duration-300 group-hover:opacity-90" />
-              <div className="pointer-events-none absolute top-4 right-4 z-[-1] flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-violet-400/15 to-indigo-400/5 shadow-inner ring-1 ring-white/20 backdrop-blur-sm">
-                <ClockArrowRotateLeft className="size-8 text-violet-500/75 drop-shadow-sm dark:text-violet-300/70" />
-              </div>
-              {data?.lastCourse.courseId ? (
-                <PieChartWithBreakdownDemo
-                  courseName={data?.lastCourse.courseName}
-                  doneCount={data?.lastCourse.doneCount}
-                  notDoneCount={data?.lastCourse.notDoneCount}
-                  notLearned={data?.lastCourse.notLearned}
-                  menuMode="none"
-                />
-              ) : (
-                <div className="flex  h-full w-full items-center justify-center text-sm text-muted">
-                  暂无学习记录
-                </div>
-              )}
             </Card>
           </div>
 
@@ -381,15 +327,7 @@ export default function LearnWordsPage() {
                   课程名称
                 </label>
 
-                <InputGroup 
-                
-                style={
-                      {
-                        "--field-border": "var(--border)",
-                      } as React.CSSProperties
-                    }
-                    variant="secondary"
-                >
+                <InputGroup>
                   <InputGroup.Prefix>
                     <GraduationCap className="size-4 text-muted" />
                   </InputGroup.Prefix>
@@ -401,28 +339,26 @@ export default function LearnWordsPage() {
                     onChange={(e) => setCourseName(e.target.value)}
                   />
 
-                  {courseName.length > 0 && (
-                    <button
-                      aria-label="清空内容"
-                      className="inline-flex items-center justify-center px-2 hover:opacity-70"
-                      type="button"
-                      onClick={() => setCourseName("")}
+                  <button
+                    aria-label="清空内容"
+                    className="inline-flex items-center justify-center px-2 hover:opacity-70"
+                    type="button"
+                    onClick={() => setCourseName("")}
+                  >
+                    <svg
+                      height="16"
+                      viewBox="0 0 16 16"
+                      width="16"
+                      xmlns="http://www.w3.org/2000/svg"
                     >
-                      <svg
-                        height="16"
-                        viewBox="0 0 16 16"
-                        width="16"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          clipRule="evenodd"
-                          d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
-                          fill="currentColor"
-                          fillRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  )}
+                      <path
+                        clipRule="evenodd"
+                        d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
+                        fill="currentColor"
+                        fillRule="evenodd"
+                      />
+                    </svg>
+                  </button>
                 </InputGroup>
               </div>
             </Modal.Body>

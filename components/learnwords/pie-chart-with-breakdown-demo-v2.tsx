@@ -175,23 +175,24 @@ export default function PieChartWithBreakdownDemo({
           )}
         </div>
       </Card.Header>
-      <Card.Content className="flex flex-col items-center gap-4">
-        <div className="flex flex-1 flex-col gap-3 m-3 ">
-          <div className="relative shrink-0 w-[190px] h-[190px]">
-            <PieChart height={190} width={190} className="">
+      <Card.Content
+        className={`flex flex-row items-center ${menuMode !== "none" ? "justify-between" : "justify-end"} gap-1`}
+      >
+        <div className="flex flex-1 flex-col gap-3 max-w-[180px] min-w-[120px] ">
+          <div className="relative shrink-0 w-[110px] h-[110px]">
+            <PieChart height={110} width={110} className="">
               <PieChart.Pie
                 cornerRadius={cornerRadius}
                 cx="50%"
                 cy="50%"
                 data={planData}
                 dataKey="value"
-                innerRadius="80%"
+                innerRadius="74%"
                 minAngle={hasMultipleSlices ? 4 : 0}
                 nameKey="name"
                 outerRadius="100%"
                 paddingAngle={paddingAngle}
                 strokeWidth={0}
-                
               >
                 {planData.map((_, idx) => (
                   <PieChart.Cell
@@ -207,35 +208,36 @@ export default function PieChartWithBreakdownDemo({
               {!isEmpty && <PieChart.Tooltip content={<PieTooltip />} />}
             </PieChart>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
-              <span className="text-foreground text-3xl font-bold">
+              <span className="text-foreground text-xl font-bold">
                 {total.toLocaleString()}
               </span>
-              <span className="text-muted text-sm">总数</span>
+              <span className="text-muted text-[10px]">总数</span>
             </div>
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 ">
+        <div className="flex flex-1 flex-col gap-3 max-w-[200px] min-w-[150px] ">
           {rawData.map((entry, idx) => {
             const pct =
               total > 0 ? ((entry.value / total) * 100).toFixed(1) : "0.0";
 
             return (
-              <div key={entry.name} className="flex items-center gap-3">
+              <div key={entry.name} className="flex items-center gap-3 w-full">
                 <span
                   className="size-3 shrink-0 rounded-full"
                   style={{
                     backgroundColor: CHART_COLORS[idx % CHART_COLORS.length],
                   }}
                 />
-                <span className="text-foreground w-16 text-sm">
-                  {entry.name}
-                </span>
-
-                <span className="text-foreground text-sm font-semibold">
-                  {entry.value}
-                </span>
-                <span className="text-muted text-xs">({pct}%)</span>
+                <div className="flex flex-1 items-center justify-between">
+                  <span className="text-foreground text-sm">{entry.name}</span>
+                  <div className="flex items-center gap-1">
+                    <span className="text-foreground text-sm font-semibold">
+                      {entry.value}
+                    </span>
+                    <span className="text-muted text-xs">({pct}%)</span>
+                  </div>
+                </div>
               </div>
             );
           })}

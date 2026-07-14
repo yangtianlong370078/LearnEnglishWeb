@@ -27,4 +27,5 @@ export interface MyCategoryContent {
   myCategoryInfos: CategoryInfo[];
   newWord: CourseInfo;
   strengthenWord: CourseInfo;
+  lastCourse: CourseInfo;
 }

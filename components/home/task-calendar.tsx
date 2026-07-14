@@ -300,6 +300,7 @@ function CreateTaskButton({
   const [weekend, setWeekend] = useState<string[]>(() =>
     weekendToArray(weekendMode),
   );
+  const [hasInput, setHasInput] = useState(() => taskCount > 0);
   const [isSaving, setIsSaving] = useState(false);
 
   const handleSave = async () => {
@@ -408,14 +409,20 @@ function CreateTaskButton({
                         className="w-full"
                         id="task-word-count"
                         placeholder="输入任务单词数量"
+                        onInput={(e) =>
+                          setHasInput(e.currentTarget.value.length > 0)
+                        }
                       />
 
-                      {wordCount !== null && (
+                      {hasInput && (
                         <button
                           aria-label="清空任务单词数量"
                           className="inline-flex items-center justify-center px-2 hover:opacity-70"
                           type="button"
-                          onClick={() => setWordCount(null)}
+                          onClick={() => {
+                            setWordCount(null);
+                            setHasInput(false);
+                          }}
                         >
                           <svg
                             height="16"
