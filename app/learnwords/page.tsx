@@ -127,11 +127,12 @@ export default function LearnWordsPage() {
   const [selectedCourse, setSelectedCourse] =
     useState<AvailableCourseInfo | null>(null);
   const [addConfirmOpen, setAddConfirmOpen] = useState(false);
-  const [addingCourse, setAddingCourse] = useState(false);
   const [addCourseError, setAddCourseError] = useState<string | null>(null);
 
   // 两个 Accordion（我的课程 / 精选课程）各自的展开项
-  const [expandedMap, setExpandedMap] = useState<Record<"full" | "remove", Set<Key>>>({
+  const [expandedMap, setExpandedMap] = useState<
+    Record<"full" | "remove", Set<Key>>
+  >({
     full: new Set<Key>(),
     remove: new Set<Key>(),
   });
@@ -148,7 +149,11 @@ export default function LearnWordsPage() {
 
       setAvailableCategories(categories);
       setAvailableExpandedKeys(
-        new Set(categories.filter((item) => item.courseInfos.length > 0).map((item) => item.id)),
+        new Set(
+          categories
+            .filter((item) => item.courseInfos.length > 0)
+            .map((item) => item.id),
+        ),
       );
     } catch (err) {
       // eslint-disable-next-line no-console
@@ -238,20 +243,44 @@ export default function LearnWordsPage() {
   const handleAddCourse = async () => {
     if (!selectedCourse) return;
 
-    setAddingCourse(true);
+    const course = selectedCourse;
+
+    // 乐观更新：默认添加成功，立即从精选课程列表移除该课程并关闭弹框
+    setAvailableCategories((prev) =>
+      prev.map((category) => ({
+        ...category,
+        courseInfos: category.courseInfos.filter(
+          (item) => item.courseId !== course.courseId,
+        ),
+      })),
+    );
+    setAddConfirmOpen(false);
+    setSelectedCourse(null);
     setAddCourseError(null);
 
     try {
-      await courseApi.insertMyCourse(selectedCourse.courseId);
-      setAddConfirmOpen(false);
-      setSelectedCourse(null);
-      await Promise.all([loadData(), loadAvailableCourses()]);
+      await courseApi.insertMyCourse(course.courseId);
+
+      // 写入成功后静默刷新列表（不显示加载态）
+      const [content, categories] = await Promise.all([
+        courseApi.getMyCategoryContent(1),
+        courseApi.getCategoryList(1),
+      ]);
+
+      setData(content);
+      setAvailableCategories(categories);
+      setAvailableExpandedKeys(
+        new Set(
+          categories
+            .filter((item) => item.courseInfos.length > 0)
+            .map((item) => item.id),
+        ),
+      );
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("添加课程失败:", err);
-      setAddCourseError(err instanceof Error ? err.message : "添加失败");
-    } finally {
-      setAddingCourse(false);
+      // 失败回滚：重新加载精选课程列表
+      void loadAvailableCourses();
     }
   };
 
@@ -267,9 +296,7 @@ export default function LearnWordsPage() {
         setExpandedMap((prev) => ({ ...prev, [menuMode]: keys as Set<Key> }))
       }
     >
-      <div
-        className="flex items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15"
-      >
+      <div className="flex items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15">
         <button
           className="text-foreground text-base font-semibold"
           type="button"
@@ -443,22 +470,22 @@ export default function LearnWordsPage() {
               : null}
           </div>
           <div className="relative isolate">
-            {data && data.categoryInfos.length > 0
-              ? renderCategoryAccordion(data.categoryInfos, "remove")
-              : null}
+            {data ? renderCategoryAccordion(data.categoryInfos, "remove") : null}
+              
           </div>
         </>
       )}
 
       {/* 精选课程选择弹框 */}
       <Modal.Backdrop
+        className="!bg-transparent backdrop-blur-xl "
         isOpen={availableCourseModalOpen}
         variant="blur"
         onOpenChange={setAvailableCourseModalOpen}
       >
         <Modal.Container placement="center" size="lg">
-          <Modal.Dialog>
-            <Modal.Header>
+          <Modal.Dialog className=" backdrop-saturate-150 p-2 bg-white/70 dark:bg-zinc-900/70 shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+            <Modal.Header className="p-3">
               <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
                 <Books className="size-5" />
               </Modal.Icon>
@@ -467,7 +494,7 @@ export default function LearnWordsPage() {
                 按分类查看课程，并将需要学习的课程加入列表
               </p>
             </Modal.Header>
-            <Modal.Body>
+            <Modal.Body className="p-3">
               {availableCoursesLoading ? (
                 <div className="flex min-h-40 items-center justify-center">
                   <Spinner aria-label="课程加载中" />
@@ -486,14 +513,15 @@ export default function LearnWordsPage() {
                   暂无可添加的课程
                 </div>
               ) : (
-                <ScrollShadow className="max-h-[60vh] overflow-y-auto pr-1">
-                  <Accordion
-                    allowsMultipleExpanded
-                    expandedKeys={availableExpandedKeys}
-                    onExpandedChange={(keys) =>
-                      setAvailableExpandedKeys(keys as Set<Key>)
-                    }
-                  >
+                <Accordion
+                  className="w-full overflow-hidden rounded-2xl  !bg-transparent"
+                  allowsMultipleExpanded
+                  expandedKeys={availableExpandedKeys}
+                  onExpandedChange={(keys) =>
+                    setAvailableExpandedKeys(keys as Set<Key>)
+                  }
+                >
+                  <ScrollShadow className="max-h-[40vh]  overflow-y-auto pr-1">
                     {availableCategories
                       .filter((category) => category.courseInfos.length > 0)
                       .map((category) => (
@@ -502,7 +530,9 @@ export default function LearnWordsPage() {
                             <Accordion.Trigger>
                               <div className="flex items-center gap-2">
                                 <GraduationCap className="size-4 text-muted" />
-                                <span className="font-medium">{category.name}</span>
+                                <span className="font-medium">
+                                  {category.name}
+                                </span>
                                 <Chip color="accent" size="sm" variant="soft">
                                   {category.courseInfos.length}
                                 </Chip>
@@ -519,7 +549,7 @@ export default function LearnWordsPage() {
                                     className="flex min-h-14 items-center justify-between gap-4 px-1 py-2"
                                   >
                                     <div className="min-w-0">
-                                      <p className="truncate text-sm font-medium text-foreground">
+                                      <p className="truncate text-sm font-medium text-foreground font-semibold">
                                         {course.courseName}
                                       </p>
                                       <p className="mt-1 text-xs tabular-nums text-muted">
@@ -529,7 +559,10 @@ export default function LearnWordsPage() {
                                     <Button
                                       size="sm"
                                       variant="outline"
-                                      onPress={() => openAddCourseConfirm(course)}
+                                      className="inline-flex items-center gap-0.5 rounded-full wordfy bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300"
+                                      onPress={() =>
+                                        openAddCourseConfirm(course)
+                                      }
                                     >
                                       <Plus className="size-4" />
                                       添加
@@ -541,11 +574,11 @@ export default function LearnWordsPage() {
                           </Accordion.Panel>
                         </Accordion.Item>
                       ))}
-                  </Accordion>
-                </ScrollShadow>
+                  </ScrollShadow>
+                </Accordion>
               )}
             </Modal.Body>
-            <Modal.Footer>
+            <Modal.Footer className="p-0 m-2">
               <Button slot="close" variant="secondary">
                 关闭
               </Button>
@@ -584,9 +617,7 @@ export default function LearnWordsPage() {
               <Button slot="close" variant="secondary">
                 取消
               </Button>
-              <Button isDisabled={addingCourse} onPress={handleAddCourse}>
-                {addingCourse ? "添加中..." : "确定"}
-              </Button>
+              <Button onPress={handleAddCourse}>确定</Button>
             </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>
@@ -623,14 +654,13 @@ export default function LearnWordsPage() {
                   课程名称
                 </label>
 
-                <InputGroup 
-                
-                style={
-                      {
-                        "--field-border": "var(--border)",
-                      } as React.CSSProperties
-                    }
-                    variant="secondary"
+                <InputGroup
+                  style={
+                    {
+                      "--field-border": "var(--border)",
+                    } as React.CSSProperties
+                  }
+                  variant="secondary"
                 >
                   <InputGroup.Prefix>
                     <GraduationCap className="size-4 text-muted" />
