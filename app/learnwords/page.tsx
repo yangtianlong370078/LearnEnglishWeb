@@ -284,6 +284,13 @@ export default function LearnWordsPage() {
     }
   };
 
+  const collapseCategoryAccordion = (menuMode: "full" | "remove") => {
+    setExpandedMap((prev) => ({
+      ...prev,
+      [menuMode]: new Set<Key>(),
+    }));
+  };
+
   const renderCategoryAccordion = (
     categories: CategoryInfo[],
     menuMode: "full" | "remove",
@@ -296,16 +303,14 @@ export default function LearnWordsPage() {
         setExpandedMap((prev) => ({ ...prev, [menuMode]: keys as Set<Key> }))
       }
     >
-      <div className="flex items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15">
+      <div
+        className="flex items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15"
+        onClick={() => collapseCategoryAccordion(menuMode)}
+      >
         <button
           className="text-foreground text-base font-semibold"
           type="button"
-          onClick={() =>
-            setExpandedMap((prev) => ({
-              ...prev,
-              [menuMode]: new Set<Key>(),
-            }))
-          }
+          onClick={() => collapseCategoryAccordion(menuMode)}
         >
           {menuMode == "full" ? "我的课程" : "精选课程"}
         </button>
@@ -318,6 +323,7 @@ export default function LearnWordsPage() {
                 aria-label="新建课程"
                 size={isDesktop ? "md" : "sm"}
                 variant="primary"
+                onClick={(event) => event.stopPropagation()}
                 onPress={openAddCourseModal}
               >
                 <Plus />
@@ -335,6 +341,7 @@ export default function LearnWordsPage() {
                 aria-label="添加精选课程"
                 size={isDesktop ? "md" : "sm"}
                 variant="primary"
+                onClick={(event) => event.stopPropagation()}
                 onPress={openAvailableCourseModal}
               >
                 <Plus />
