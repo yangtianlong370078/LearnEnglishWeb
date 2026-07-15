@@ -29,3 +29,15 @@ export interface MyCategoryContent {
   strengthenWord: CourseInfo;
   lastCourse: CourseInfo;
 }
+
+export interface AvailableCourseInfo {
+  courseId: number;
+  courseName: string;
+  wordsCount: number;
+}
+
+export interface AvailableCategoryInfo {
+  id: number;
+  name: string;
+  courseInfos: AvailableCourseInfo[];
+}

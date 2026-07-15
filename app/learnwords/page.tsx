@@ -1,8 +1,21 @@
 "use client";
 
-import type { CategoryInfo, MyCategoryContent } from "@/types/course";
+import type {
+  AvailableCategoryInfo,
+  AvailableCourseInfo,
+  CategoryInfo,
+  MyCategoryContent,
+} from "@/types/course";
 import type { Key } from "@heroui/react";
-import { Books, GraduationCap, Plus, Gear, BookOpen, Flame, ClockArrowRotateLeft } from "@gravity-ui/icons";
+import {
+  Books,
+  GraduationCap,
+  Plus,
+  Gear,
+  BookOpen,
+  Flame,
+  ClockArrowRotateLeft,
+} from "@gravity-ui/icons";
 
 import { useEffect, useState } from "react";
 import {
@@ -11,11 +24,11 @@ import {
   Chip,
   Skeleton,
   Spinner,
-  ButtonGroup,
   Button,
   Modal,
   InputGroup,
-  Separator,
+  ScrollShadow,
+  Tooltip,
 } from "@heroui/react";
 
 import PieChartWithBreakdownDemo from "@/components/learnwords/pie-chart-with-breakdown-demo";
@@ -98,6 +111,25 @@ export default function LearnWordsPage() {
   const [deleteCourseName, setDeleteCourseName] = useState("");
   const [deleting, setDeleting] = useState(false);
 
+  // 从精选课程中选择并加入学习列表
+  const [availableCourseModalOpen, setAvailableCourseModalOpen] =
+    useState(false);
+  const [availableCategories, setAvailableCategories] = useState<
+    AvailableCategoryInfo[]
+  >([]);
+  const [availableCoursesLoading, setAvailableCoursesLoading] = useState(false);
+  const [availableCoursesError, setAvailableCoursesError] = useState<
+    string | null
+  >(null);
+  const [availableExpandedKeys, setAvailableExpandedKeys] = useState<Set<Key>>(
+    new Set<Key>(),
+  );
+  const [selectedCourse, setSelectedCourse] =
+    useState<AvailableCourseInfo | null>(null);
+  const [addConfirmOpen, setAddConfirmOpen] = useState(false);
+  const [addingCourse, setAddingCourse] = useState(false);
+  const [addCourseError, setAddCourseError] = useState<string | null>(null);
+
   // 两个 Accordion（我的课程 / 精选课程）各自的展开项
   const [expandedMap, setExpandedMap] = useState<Record<"full" | "remove", Set<Key>>>({
     full: new Set<Key>(),
@@ -106,6 +138,26 @@ export default function LearnWordsPage() {
 
   const loadData = () =>
     courseApi.getMyCategoryContent(1).then((res) => setData(res));
+
+  const loadAvailableCourses = async () => {
+    setAvailableCoursesLoading(true);
+    setAvailableCoursesError(null);
+
+    try {
+      const categories = await courseApi.getCategoryList(1);
+
+      setAvailableCategories(categories);
+      setAvailableExpandedKeys(
+        new Set(categories.filter((item) => item.courseInfos.length > 0).map((item) => item.id)),
+      );
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("加载可添加课程失败:", err);
+      setAvailableCoursesError(err instanceof Error ? err.message : "加载失败");
+    } finally {
+      setAvailableCoursesLoading(false);
+    }
+  };
 
   useEffect(() => {
     loadData()
@@ -172,6 +224,37 @@ export default function LearnWordsPage() {
     }
   };
 
+  const openAvailableCourseModal = () => {
+    setAvailableCourseModalOpen(true);
+    void loadAvailableCourses();
+  };
+
+  const openAddCourseConfirm = (course: AvailableCourseInfo) => {
+    setSelectedCourse(course);
+    setAddCourseError(null);
+    setAddConfirmOpen(true);
+  };
+
+  const handleAddCourse = async () => {
+    if (!selectedCourse) return;
+
+    setAddingCourse(true);
+    setAddCourseError(null);
+
+    try {
+      await courseApi.insertMyCourse(selectedCourse.courseId);
+      setAddConfirmOpen(false);
+      setSelectedCourse(null);
+      await Promise.all([loadData(), loadAvailableCourses()]);
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("添加课程失败:", err);
+      setAddCourseError(err instanceof Error ? err.message : "添加失败");
+    } finally {
+      setAddingCourse(false);
+    }
+  };
+
   const renderCategoryAccordion = (
     categories: CategoryInfo[],
     menuMode: "full" | "remove",
@@ -185,36 +268,53 @@ export default function LearnWordsPage() {
       }
     >
       <div
-        className="flex cursor-pointer items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15"
-        onClick={() =>
-          setExpandedMap((prev) => ({ ...prev, [menuMode]: new Set<Key>() }))
-        }
+        className="flex items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15"
       >
-        <span className="text-foreground text-base font-semibold">
+        <button
+          className="text-foreground text-base font-semibold"
+          type="button"
+          onClick={() =>
+            setExpandedMap((prev) => ({
+              ...prev,
+              [menuMode]: new Set<Key>(),
+            }))
+          }
+        >
           {menuMode == "full" ? "我的课程" : "精选课程"}
-        </span>
+        </button>
 
         {menuMode === "full" && (
-          <Button
-            isIconOnly
-            size={isDesktop ? "md" : "sm"}
-            variant="primary"
-            onClick={(e) => e.stopPropagation()}
-            onPress={openAddCourseModal}
-          >
-            <Plus />
-          </Button>
+          <Tooltip>
+            <Tooltip.Trigger>
+              <Button
+                isIconOnly
+                aria-label="新建课程"
+                size={isDesktop ? "md" : "sm"}
+                variant="primary"
+                onPress={openAddCourseModal}
+              >
+                <Plus />
+              </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Content>新建课程</Tooltip.Content>
+          </Tooltip>
         )}
 
         {menuMode === "remove" && (
-          <Button
-            isIconOnly
-            size={isDesktop ? "md" : "sm"}
-            variant="primary"
-           
-          >
-            <Plus />
-          </Button>
+          <Tooltip>
+            <Tooltip.Trigger>
+              <Button
+                isIconOnly
+                aria-label="添加精选课程"
+                size={isDesktop ? "md" : "sm"}
+                variant="primary"
+                onPress={openAvailableCourseModal}
+              >
+                <Plus />
+              </Button>
+            </Tooltip.Trigger>
+            <Tooltip.Content>添加精选课程</Tooltip.Content>
+          </Tooltip>
         )}
       </div>
 
@@ -349,6 +449,148 @@ export default function LearnWordsPage() {
           </div>
         </>
       )}
+
+      {/* 精选课程选择弹框 */}
+      <Modal.Backdrop
+        isOpen={availableCourseModalOpen}
+        variant="blur"
+        onOpenChange={setAvailableCourseModalOpen}
+      >
+        <Modal.Container placement="center" size="lg">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+                <Books className="size-5" />
+              </Modal.Icon>
+              <Modal.Heading>添加精选课程</Modal.Heading>
+              <p className="mt-1.5 text-sm leading-5 text-muted">
+                按分类查看课程，并将需要学习的课程加入列表
+              </p>
+            </Modal.Header>
+            <Modal.Body>
+              {availableCoursesLoading ? (
+                <div className="flex min-h-40 items-center justify-center">
+                  <Spinner aria-label="课程加载中" />
+                </div>
+              ) : availableCoursesError ? (
+                <div className="flex min-h-40 flex-col items-center justify-center gap-3 text-center">
+                  <p className="text-sm text-danger">{availableCoursesError}</p>
+                  <Button variant="secondary" onPress={loadAvailableCourses}>
+                    重新加载
+                  </Button>
+                </div>
+              ) : availableCategories.every(
+                  (category) => category.courseInfos.length === 0,
+                ) ? (
+                <div className="flex min-h-40 items-center justify-center text-sm text-muted">
+                  暂无可添加的课程
+                </div>
+              ) : (
+                <ScrollShadow className="max-h-[60vh] overflow-y-auto pr-1">
+                  <Accordion
+                    allowsMultipleExpanded
+                    expandedKeys={availableExpandedKeys}
+                    onExpandedChange={(keys) =>
+                      setAvailableExpandedKeys(keys as Set<Key>)
+                    }
+                  >
+                    {availableCategories
+                      .filter((category) => category.courseInfos.length > 0)
+                      .map((category) => (
+                        <Accordion.Item key={category.id} id={category.id}>
+                          <Accordion.Heading>
+                            <Accordion.Trigger>
+                              <div className="flex items-center gap-2">
+                                <GraduationCap className="size-4 text-muted" />
+                                <span className="font-medium">{category.name}</span>
+                                <Chip color="accent" size="sm" variant="soft">
+                                  {category.courseInfos.length}
+                                </Chip>
+                              </div>
+                              <Accordion.Indicator />
+                            </Accordion.Trigger>
+                          </Accordion.Heading>
+                          <Accordion.Panel>
+                            <Accordion.Body>
+                              <div className="flex flex-col gap-1">
+                                {category.courseInfos.map((course) => (
+                                  <div
+                                    key={course.courseId}
+                                    className="flex min-h-14 items-center justify-between gap-4 px-1 py-2"
+                                  >
+                                    <div className="min-w-0">
+                                      <p className="truncate text-sm font-medium text-foreground">
+                                        {course.courseName}
+                                      </p>
+                                      <p className="mt-1 text-xs tabular-nums text-muted">
+                                        {course.wordsCount} 个单词
+                                      </p>
+                                    </div>
+                                    <Button
+                                      size="sm"
+                                      variant="outline"
+                                      onPress={() => openAddCourseConfirm(course)}
+                                    >
+                                      <Plus className="size-4" />
+                                      添加
+                                    </Button>
+                                  </div>
+                                ))}
+                              </div>
+                            </Accordion.Body>
+                          </Accordion.Panel>
+                        </Accordion.Item>
+                      ))}
+                  </Accordion>
+                </ScrollShadow>
+              )}
+            </Modal.Body>
+            <Modal.Footer>
+              <Button slot="close" variant="secondary">
+                关闭
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
+
+      {/* 加入学习列表确认弹框 */}
+      <Modal.Backdrop
+        isDismissable={false}
+        isOpen={addConfirmOpen}
+        variant="blur"
+        onOpenChange={(isOpen) => {
+          setAddConfirmOpen(isOpen);
+          if (!isOpen) {
+            setSelectedCourse(null);
+            setAddCourseError(null);
+          }
+        }}
+      >
+        <Modal.Container placement="center" size="md">
+          <Modal.Dialog>
+            <Modal.Header>
+              <Modal.Heading>添加课程</Modal.Heading>
+              <p className="mt-1.5 text-sm leading-5 text-muted">
+                是否将课程【{selectedCourse?.courseName}】加入学习列表
+              </p>
+            </Modal.Header>
+            {addCourseError ? (
+              <Modal.Body>
+                <p className="text-sm text-danger">{addCourseError}</p>
+              </Modal.Body>
+            ) : null}
+            <Modal.Footer>
+              <Button slot="close" variant="secondary">
+                取消
+              </Button>
+              <Button isDisabled={addingCourse} onPress={handleAddCourse}>
+                {addingCourse ? "添加中..." : "确定"}
+              </Button>
+            </Modal.Footer>
+          </Modal.Dialog>
+        </Modal.Container>
+      </Modal.Backdrop>
 
       {/* 添加/编辑课程弹框（受控） */}
       <Modal.Backdrop

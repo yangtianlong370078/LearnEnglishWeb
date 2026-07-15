@@ -2,13 +2,28 @@
  * 课程模块接口
  * 对应后端 /api/Course 路由
  */
-import type { MyCategoryContent } from "@/types/course";
+import type {
+  AvailableCategoryInfo,
+  MyCategoryContent,
+} from "@/types/course";
 
 import { get, post } from "../request";
 
 /** 获取我的分类内容（课程分类 + 我的分类 + 生词本 + 强化学习） */
 export function getMyCategoryContent(type = 1) {
   return get<MyCategoryContent>("/Course/MyCategoryContent", { type });
+}
+
+/** 获取尚未加入当前用户学习列表的课程 */
+export function getCategoryList(type = 1) {
+  return get<AvailableCategoryInfo[]>("/Course/CategoryList", { type });
+}
+
+/** 将课程加入当前用户的学习列表 */
+export function insertMyCourse(setcourseId: number) {
+  return post<void>("/Course/InsertMyCourse", null, {
+    params: { setcourseId },
+  });
 }
 
 /**
