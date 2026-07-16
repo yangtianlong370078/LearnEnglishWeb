@@ -1,22 +1,8 @@
 "use client";
 
 import type { ReactNode } from "react";
-import {
-  EllipsisVertical,
-  Pencil,
-  SquarePlus,
-  TrashBin,
-} from "@gravity-ui/icons";
-import {
-  Card,
-  Dropdown,
-  Button,
-  Header,
-  Label,
-  Description,
-  Kbd,
-  Separator,
-} from "@heroui/react";
+import { EllipsisVertical, Pencil, TrashBin } from "@gravity-ui/icons";
+import { Card, Dropdown, Button, Header, Label } from "@heroui/react";
 
 import { ChartTooltip, PieChart } from "@heroui-pro/react";
 
@@ -30,6 +16,7 @@ const CHART_COLORS = [
 ];
 
 export type PieChartMenuMode = "none" | "full" | "remove";
+export type PieChartVariant = "default" | "overview";
 
 export interface PieChartWithBreakdownDemoProps {
   /** 课程 id（编辑时回传） */
@@ -42,6 +29,14 @@ export interface PieChartWithBreakdownDemoProps {
   notDoneCount?: number;
   /** 不认识 */
   notLearned?: number;
+  /** 顶部概览卡使用的紧凑视觉变体 */
+  variant?: PieChartVariant;
+  /** 概览卡标题上方的辅助标签 */
+  eyebrow?: string;
+  /** 概览卡标题图标 */
+  leadingIcon?: ReactNode;
+  /** 概览卡无数据时的圆心文案 */
+  emptyLabel?: string;
   /**
    * 菜单显示模式：
    * - "none": 不显示 Dropdown
@@ -89,6 +84,10 @@ export default function PieChartWithBreakdownDemo({
   doneCount = 0,
   notDoneCount = 0,
   notLearned = 0,
+  variant = "default",
+  eyebrow,
+  leadingIcon,
+  emptyLabel = "暂无数据",
   menuMode = "full",
   onEdit,
   onDelete,
@@ -114,6 +113,122 @@ export default function PieChartWithBreakdownDemo({
   // 避免出现"珍珠项链"效果；无圆角时保持 0，切片端到端连接
   const paddingAngle = allSlicesAboveThreshold ? -14 : -1;
   const isDesktop = useMediaQuery("(min-width: 640px)");
+
+  if (variant === "overview") {
+    const overviewChartColors = [
+      "var(--summary-chart-1, var(--chart-1))",
+      "var(--summary-chart-2, var(--chart-2))",
+      "var(--summary-chart-3, var(--chart-3))",
+    ];
+
+    return (
+      <>
+        <Card.Header className="relative z-[1] min-h-[76px] px-5 pb-1 pt-5">
+          <div className="flex min-w-0 items-center gap-3.5">
+            <div
+              aria-hidden="true"
+              className="flex size-11 shrink-0 items-center justify-center rounded-xl"
+              style={{
+                backgroundColor:
+                  "color-mix(in srgb, var(--summary-accent) 24%, transparent)",
+                boxShadow:
+                  "inset 0 0 0 1px color-mix(in srgb, var(--summary-accent) 20%, transparent)",
+                color: "var(--summary-ink, var(--summary-accent))",
+              }}
+            >
+              {leadingIcon}
+            </div>
+            <div className="min-w-0">
+              {eyebrow ? (
+                <p
+                  className="mb-0.5 text-xs font-semibold"
+                  style={{
+                    color: "var(--summary-ink, var(--summary-accent))",
+                  }}
+                >
+                  {eyebrow}
+                </p>
+              ) : null}
+              <h2 className="line-clamp-2 text-[17px] font-semibold leading-6 text-foreground">
+                {courseName}
+              </h2>
+            </div>
+          </div>
+        </Card.Header>
+
+        <Card.Content className="relative z-[1] flex flex-1 flex-col items-center gap-4 px-4 pb-5 pt-2 sm:px-5">
+          <div className="relative size-[174px] shrink-0">
+            <PieChart height={174} width={174}>
+              <PieChart.Pie
+                cornerRadius={cornerRadius}
+                cx="50%"
+                cy="50%"
+                data={planData}
+                dataKey="value"
+                innerRadius="78%"
+                minAngle={hasMultipleSlices ? 4 : 0}
+                nameKey="name"
+                outerRadius="100%"
+                paddingAngle={paddingAngle}
+                strokeWidth={0}
+              >
+                {planData.map((_, idx) => (
+                  <PieChart.Cell
+                    key={idx}
+                    fill={
+                      isEmpty
+                        ? "color-mix(in srgb, var(--foreground) 10%, transparent)"
+                        : overviewChartColors[idx % overviewChartColors.length]
+                    }
+                  />
+                ))}
+              </PieChart.Pie>
+              {!isEmpty && <PieChart.Tooltip content={<PieTooltip />} />}
+            </PieChart>
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+              <span className="text-3xl font-semibold leading-none tabular-nums text-foreground">
+                {total.toLocaleString()}
+              </span>
+              <span className="mt-1.5 text-[11px] leading-none text-muted">
+                {isEmpty ? emptyLabel : "总词数"}
+              </span>
+            </div>
+          </div>
+
+          <dl
+            className="grid w-full grid-cols-3 gap-1 rounded-xl p-1.5"
+            style={{
+              backgroundColor:
+                "color-mix(in srgb, var(--summary-accent) 9%, transparent)",
+              boxShadow:
+                "inset 0 0 0 1px color-mix(in srgb, var(--summary-accent) 8%, transparent)",
+            }}
+          >
+            {rawData.map((entry, idx) => (
+              <div
+                key={entry.name}
+                className="flex min-w-0 flex-col items-center justify-center px-1 py-2"
+              >
+                <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
+                  <span
+                    className="size-1.5 shrink-0 rounded-full"
+                    style={{
+                      backgroundColor:
+                        overviewChartColors[idx % overviewChartColors.length],
+                    }}
+                  />
+                  {entry.name}
+                </dt>
+                <dd className="mt-1 text-base font-semibold leading-none tabular-nums text-foreground">
+                  {entry.value.toLocaleString()}
+                </dd>
+              </div>
+            ))}
+          </dl>
+        </Card.Content>
+      </>
+    );
+  }
 
   return (
     <>
@@ -191,7 +306,6 @@ export default function PieChartWithBreakdownDemo({
                 outerRadius="100%"
                 paddingAngle={paddingAngle}
                 strokeWidth={0}
-                
               >
                 {planData.map((_, idx) => (
                   <PieChart.Cell

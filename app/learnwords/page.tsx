@@ -37,23 +37,26 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 function CourseChartSkeleton() {
   return (
-    <Card className="word-search-glass !bg-transparent rounded-2xl">
-      <Card.Header className="gap-0">
-        <div className="flex items-center justify-between">
-          <Skeleton className="h-6 w-32 rounded-lg" />
+    <Card className="word-search-glass min-h-[356px] rounded-2xl">
+      <Card.Header className="min-h-[76px] px-5 pb-1 pt-5">
+        <div className="flex items-center gap-3.5">
+          <Skeleton className="size-11 shrink-0 rounded-xl" />
+          <div className="flex flex-col gap-1.5">
+            <Skeleton className="h-3 w-16 rounded-md" />
+            <Skeleton className="h-5 w-28 rounded-md" />
+          </div>
         </div>
       </Card.Header>
-      <Card.Content className="flex flex-col items-center gap-4">
-        <div className="flex flex-1 flex-col gap-3 m-3">
-          <Skeleton className="size-[190px] shrink-0 rounded-full" />
-        </div>
-        <div className="flex flex-col gap-2">
+      <Card.Content className="flex flex-col items-center gap-4 px-4 pb-5 pt-2 sm:px-5">
+        <Skeleton className="size-[174px] shrink-0 rounded-full" />
+        <div className="grid w-full grid-cols-3 gap-1 rounded-xl bg-black/[0.025] p-1.5 dark:bg-white/[0.035]">
           {Array.from({ length: 3 }).map((_, index) => (
-            <div key={index} className="flex items-center gap-3">
-              <Skeleton className="size-3 shrink-0 rounded-full" />
-              <Skeleton className="h-5 w-16 rounded-lg" />
-              <Skeleton className="h-5 w-8 rounded-lg" />
-              <Skeleton className="h-4 w-10 rounded-lg" />
+            <div
+              key={index}
+              className="flex flex-col items-center gap-1.5 px-1 py-2"
+            >
+              <Skeleton className="h-3 w-10 rounded-md" />
+              <Skeleton className="h-4 w-7 rounded-md" />
             </div>
           ))}
         </div>
@@ -420,54 +423,86 @@ export default function LearnWordsPage() {
         <div className="text-danger px-4 text-sm">{error}</div>
       ) : (
         <>
-          <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
-            <Card className="word-search-glass group relative overflow-hidden !bg-transparent rounded-2xl transition-transform duration-300 hover:-translate-y-0.5">
-              {/* 生词本 · 蓝青主题装饰 */}
-              <div className="pointer-events-none absolute -top-12 -right-12 z-[-1] size-44 rounded-full bg-[radial-gradient(circle_at_center,rgba(56,189,248,0.22),rgba(56,189,248,0.08)_45%,transparent_72%)] blur-xl transition-opacity duration-300 group-hover:opacity-90" />
-              <div className="pointer-events-none absolute top-4 right-4 z-[-1] flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-sky-400/15 to-cyan-300/5 shadow-inner ring-1 ring-white/20 backdrop-blur-sm">
-                <BookOpen className="size-8 text-sky-500/70 drop-shadow-sm dark:text-sky-300/70" />
-              </div>
+          <div className="grid w-full grid-cols-1 items-stretch gap-3 sm:grid-cols-3">
+            <Card
+              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-2xl"
+              style={
+                {
+                  "--summary-accent": "oklch(0.63 0.16 215)",
+                  "--summary-ink": "oklch(0.49 0.14 220)",
+                  "--summary-chart-1": "oklch(0.56 0.18 222)",
+                  "--summary-chart-2": "oklch(0.68 0.15 211)",
+                  "--summary-chart-3": "oklch(0.78 0.1 200)",
+                  backgroundImage:
+                    "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
+                } as React.CSSProperties
+              }
+            >
               <PieChartWithBreakdownDemo
-                courseName={data?.newWord.courseName}
+                courseName={data?.newWord.courseName ?? "生词本"}
                 doneCount={data?.newWord.doneCount}
                 notDoneCount={data?.newWord.notDoneCount}
                 notLearned={data?.newWord.notLearned}
+                eyebrow="日常积累"
+                leadingIcon={<BookOpen className="size-5" />}
                 menuMode="none"
+                variant="overview"
               />
             </Card>
-            <Card className="word-search-glass group relative overflow-hidden !bg-transparent rounded-2xl transition-transform duration-300 hover:-translate-y-0.5">
-              {/* 强化区 · 橙红主题装饰 */}
-              <div className="pointer-events-none absolute -top-12 -right-12 z-[-1] size-44 rounded-full bg-[radial-gradient(circle_at_center,rgba(251,146,60,0.22),rgba(244,63,94,0.08)_45%,transparent_72%)] blur-xl transition-opacity duration-300 group-hover:opacity-90" />
-              <div className="pointer-events-none absolute top-4 right-4 z-[-1] flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-orange-400/15 to-rose-400/5 shadow-inner ring-1 ring-white/20 backdrop-blur-sm">
-                <Flame className="size-8 text-orange-500/75 drop-shadow-sm dark:text-orange-300/70" />
-              </div>
+            <Card
+              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-2xl"
+              style={
+                {
+                  "--summary-accent": "oklch(0.65 0.19 32)",
+                  "--summary-ink": "oklch(0.51 0.19 28)",
+                  "--summary-chart-1": "oklch(0.57 0.21 25)",
+                  "--summary-chart-2": "oklch(0.69 0.18 42)",
+                  "--summary-chart-3": "oklch(0.79 0.13 58)",
+                  backgroundImage:
+                    "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
+                } as React.CSSProperties
+              }
+            >
               <PieChartWithBreakdownDemo
-                courseName={data?.strengthenWord.courseName}
+                courseName={data?.strengthenWord.courseName ?? "强化区"}
                 doneCount={data?.strengthenWord.doneCount}
                 notDoneCount={data?.strengthenWord.notDoneCount}
                 notLearned={data?.strengthenWord.notLearned}
+                eyebrow="重点复习"
+                leadingIcon={<Flame className="size-5" />}
                 menuMode="none"
+                variant="overview"
               />
             </Card>
-            <Card className="word-search-glass group relative overflow-hidden !bg-transparent rounded-2xl transition-transform duration-300 hover:-translate-y-0.5">
-              {/* 最后学习课程 · 紫靛主题装饰 */}
-              <div className="pointer-events-none absolute -top-12 -right-12 z-[-1] size-44 rounded-full bg-[radial-gradient(circle_at_center,rgba(139,92,246,0.22),rgba(99,102,241,0.08)_45%,transparent_72%)] blur-xl transition-opacity duration-300 group-hover:opacity-90" />
-              <div className="pointer-events-none absolute top-4 right-4 z-[-1] flex size-16 items-center justify-center rounded-full bg-gradient-to-br from-violet-400/15 to-indigo-400/5 shadow-inner ring-1 ring-white/20 backdrop-blur-sm">
-                <ClockArrowRotateLeft className="size-8 text-violet-500/75 drop-shadow-sm dark:text-violet-300/70" />
-              </div>
-              {data?.lastCourse.courseId ? (
-                <PieChartWithBreakdownDemo
-                  courseName={data?.lastCourse.courseName}
-                  doneCount={data?.lastCourse.doneCount}
-                  notDoneCount={data?.lastCourse.notDoneCount}
-                  notLearned={data?.lastCourse.notLearned}
-                  menuMode="none"
-                />
-              ) : (
-                <div className="flex  h-full w-full items-center justify-center text-sm text-muted">
-                  暂无学习记录
-                </div>
-              )}
+            <Card
+              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-2xl"
+              style={
+                {
+                  "--summary-accent": "oklch(0.58 0.2 285)",
+                  "--summary-ink": "oklch(0.48 0.19 285)",
+                  "--summary-chart-1": "oklch(0.51 0.21 292)",
+                  "--summary-chart-2": "oklch(0.64 0.18 283)",
+                  "--summary-chart-3": "oklch(0.75 0.13 274)",
+                  backgroundImage:
+                    "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
+                } as React.CSSProperties
+              }
+            >
+              <PieChartWithBreakdownDemo
+                courseName={
+                  data?.lastCourse.courseId
+                    ? data.lastCourse.courseName
+                    : "暂无学习记录"
+                }
+                doneCount={data?.lastCourse.doneCount}
+                notDoneCount={data?.lastCourse.notDoneCount}
+                notLearned={data?.lastCourse.notLearned}
+                emptyLabel="暂无记录"
+                eyebrow="正在学习"
+                leadingIcon={<ClockArrowRotateLeft className="size-5" />}
+                menuMode="none"
+                variant="overview"
+              />
             </Card>
           </div>
 
@@ -477,8 +512,9 @@ export default function LearnWordsPage() {
               : null}
           </div>
           <div className="relative isolate">
-            {data ? renderCategoryAccordion(data.categoryInfos, "remove") : null}
-              
+            {data
+              ? renderCategoryAccordion(data.categoryInfos, "remove")
+              : null}
           </div>
         </>
       )}
