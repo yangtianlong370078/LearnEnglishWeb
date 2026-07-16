@@ -123,11 +123,11 @@ export default function PieChartWithBreakdownDemo({
 
     return (
       <>
-        <Card.Header className="relative z-[1] min-h-[76px] px-5 pb-1 pt-5">
+        <Card.Header className="relative z-[1]  p-2">
           <div className="flex min-w-0 items-center gap-3.5">
             <div
               aria-hidden="true"
-              className="flex size-11 shrink-0 items-center justify-center rounded-xl"
+              className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full"
               style={{
                 backgroundColor:
                   "color-mix(in srgb, var(--summary-accent) 24%, transparent)",
@@ -156,7 +156,7 @@ export default function PieChartWithBreakdownDemo({
           </div>
         </Card.Header>
 
-        <Card.Content className="relative z-[1] flex flex-1 flex-col items-center gap-4 px-4 pb-5 pt-2 sm:px-5">
+        <Card.Content className="relative z-[1] flex flex-1 flex-col items-center gap-6  p-2 space-between">
           <div className="relative size-[174px] shrink-0">
             <PieChart height={174} width={174}>
               <PieChart.Pie
@@ -196,7 +196,7 @@ export default function PieChartWithBreakdownDemo({
           </div>
 
           <dl
-            className="grid w-full grid-cols-3 gap-1 rounded-xl p-1.5"
+            className="grid w-full grid-cols-3 gap-1  rounded-2xl p-1.5"
             style={{
               backgroundColor:
                 "color-mix(in srgb, var(--summary-accent) 9%, transparent)",
@@ -232,7 +232,7 @@ export default function PieChartWithBreakdownDemo({
 
   return (
     <>
-      <Card.Header className="gap-0 ">
+      <Card.Header className="gap-0 p-2">
         <div className="flex items-center justify-between  ">
           <div className="card__title text-base font-semibold">
             {courseName}
@@ -290,7 +290,7 @@ export default function PieChartWithBreakdownDemo({
           )}
         </div>
       </Card.Header>
-      <Card.Content className="flex flex-col items-center gap-4">
+      <Card.Content className="flex flex-col items-center p-2 gap-4">
         <div className="flex flex-1 flex-col gap-3 m-3 ">
           <div className="relative shrink-0 w-[190px] h-[190px]">
             <PieChart height={190} width={190}>
@@ -329,31 +329,43 @@ export default function PieChartWithBreakdownDemo({
           </div>
         </div>
 
-        <div className="flex flex-col gap-2 ">
+        <dl
+          className="grid w-full grid-cols-3 gap-1 rounded-2xl p-1.5"
+          style={{
+            backgroundColor:
+              "color-mix(in srgb, var(--foreground) 4%, transparent)",
+            boxShadow:
+              "inset 0 0 0 1px color-mix(in srgb, var(--foreground) 6%, transparent)",
+          }}
+        >
           {rawData.map((entry, idx) => {
             const pct =
               total > 0 ? ((entry.value / total) * 100).toFixed(1) : "0.0";
 
             return (
-              <div key={entry.name} className="flex items-center gap-3">
-                <span
-                  className="size-3 shrink-0 rounded-full"
-                  style={{
-                    backgroundColor: CHART_COLORS[idx % CHART_COLORS.length],
-                  }}
-                />
-                <span className="text-foreground w-16 text-sm">
+              <div
+                key={entry.name}
+                className="flex min-w-0 flex-col items-center justify-center px-1 py-2"
+              >
+                <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
+                  <span
+                    className="size-1.5 shrink-0 rounded-full"
+                    style={{
+                      backgroundColor: CHART_COLORS[idx % CHART_COLORS.length],
+                    }}
+                  />
                   {entry.name}
-                </span>
-
-                <span className="text-foreground text-sm font-semibold">
-                  {entry.value}
-                </span>
-                <span className="text-muted text-xs">({pct}%)</span>
+                </dt>
+                <dd className="mt-1 text-base font-semibold leading-none tabular-nums text-foreground">
+                  {entry.value.toLocaleString()}
+                  <span className="ml-1 text-[11px] font-normal text-muted">
+                    ({pct}%)
+                  </span>
+                </dd>
               </div>
             );
           })}
-        </div>
+        </dl>
       </Card.Content>
     </>
   );

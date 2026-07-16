@@ -393,7 +393,7 @@ export default function LearnWordsPage() {
                   {cat.courseInfos.map((course) => (
                     <Card
                       key={course.courseId}
-                      className="group relative overflow-hidden rounded-2xl transition-transform duration-300 hover:-translate-y-0.5"
+                      className="group relative overflow-hidden rounded-[25px] transition-transform duration-300 hover:-translate-y-0.5"
                     >
                       <PieChartWithBreakdownDemo
                         courseId={course.courseId}
@@ -425,7 +425,7 @@ export default function LearnWordsPage() {
         <>
           <div className="grid w-full grid-cols-1 items-stretch gap-3 sm:grid-cols-3">
             <Card
-              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-2xl"
+              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-[25px]"
               style={
                 {
                   "--summary-accent": "oklch(0.63 0.16 215)",
@@ -444,13 +444,13 @@ export default function LearnWordsPage() {
                 notDoneCount={data?.newWord.notDoneCount}
                 notLearned={data?.newWord.notLearned}
                 eyebrow="日常积累"
-                leadingIcon={<BookOpen className="size-5" />}
+                leadingIcon={<BookOpen className="size-6" />}
                 menuMode="none"
                 variant="overview"
               />
             </Card>
             <Card
-              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-2xl"
+              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-[25px]"
               style={
                 {
                   "--summary-accent": "oklch(0.65 0.19 32)",
@@ -469,13 +469,13 @@ export default function LearnWordsPage() {
                 notDoneCount={data?.strengthenWord.notDoneCount}
                 notLearned={data?.strengthenWord.notLearned}
                 eyebrow="重点复习"
-                leadingIcon={<Flame className="size-5" />}
+                leadingIcon={<Flame className="size-6" />}
                 menuMode="none"
                 variant="overview"
               />
             </Card>
             <Card
-              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-2xl"
+              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-[25px]"
               style={
                 {
                   "--summary-accent": "oklch(0.58 0.2 285)",
@@ -499,7 +499,7 @@ export default function LearnWordsPage() {
                 notLearned={data?.lastCourse.notLearned}
                 emptyLabel="暂无记录"
                 eyebrow="正在学习"
-                leadingIcon={<ClockArrowRotateLeft className="size-5" />}
+                leadingIcon={<ClockArrowRotateLeft className="size-6" />}
                 menuMode="none"
                 variant="overview"
               />
