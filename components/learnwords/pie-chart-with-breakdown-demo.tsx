@@ -89,7 +89,7 @@ export default function PieChartWithBreakdownDemo({
   leadingIcon,
   emptyLabel = "暂无数据",
   menuMode = "full",
-  onEdit,
+  onEdit, 
   onDelete,
 }: PieChartWithBreakdownDemoProps = {}) {
   const rawData = [
@@ -108,10 +108,10 @@ export default function PieChartWithBreakdownDemo({
   // 只有当所有非零项的占比都 >= 5% 时才启用大圆角，避免小切片被圆角吃掉
   const allSlicesAboveThreshold =
     total > 0 && planData.every((d) => d.value / total >= 0.05);
-  const cornerRadius = allSlicesAboveThreshold ? 12 : 0;
+  const cornerRadius = allSlicesAboveThreshold ? 10 : 0;
   // 圆角模式下用小的负 paddingAngle，让相邻切片轻微重叠以隐藏两侧独立的圆角接缝
   // 避免出现"珍珠项链"效果；无圆角时保持 0，切片端到端连接
-  const paddingAngle = allSlicesAboveThreshold ? -14 : -1;
+  const paddingAngle = allSlicesAboveThreshold ? -10 : -1;
   const isDesktop = useMediaQuery("(min-width: 640px)");
 
   if (variant === "overview") {
@@ -358,9 +358,9 @@ export default function PieChartWithBreakdownDemo({
                 </dt>
                 <dd className="mt-1 text-base font-semibold leading-none tabular-nums text-foreground">
                   {entry.value.toLocaleString()}
-                  <span className="ml-1 text-[11px] font-normal text-muted">
+                  {/* <span className="ml-1 text-[11px] font-normal text-muted">
                     ({pct}%)
-                  </span>
+                  </span> */}
                 </dd>
               </div>
             );
