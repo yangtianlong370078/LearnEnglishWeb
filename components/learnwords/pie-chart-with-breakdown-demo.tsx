@@ -57,21 +57,35 @@ interface PieTooltipProps {
     payload?: { fill?: string };
     value?: number | string;
   }>;
+  total: number;
   valueFormatter?: (value: number | string) => ReactNode;
 }
 
-function PieTooltip({ active, payload, valueFormatter }: PieTooltipProps) {
+function PieTooltip({
+  active,
+  payload,
+  total,
+  valueFormatter,
+}: PieTooltipProps) {
   const entry = payload?.[0];
 
   if (!active || !entry) return null;
+
+  const value = Number(entry.value ?? 0);
+  const pct = total > 0 ? ((value / total) * 100).toFixed(1) : "0.0";
 
   return (
     <ChartTooltip>
       <ChartTooltip.Item>
         <ChartTooltip.Indicator color={entry.payload?.fill} />
-        <ChartTooltip.Label>{entry.name}</ChartTooltip.Label>
-        <ChartTooltip.Value>
+        <ChartTooltip.Label className="min-w-[100px]">{entry.name}
+            <span className="ml-1 text-[11px] font-normal text-muted">
+            ({pct}%)
+          </span>
+        </ChartTooltip.Label>
+        <ChartTooltip.Value  className="min-w-[40px] text-right">
           {valueFormatter ? valueFormatter(entry.value ?? "") : entry.value}
+        
         </ChartTooltip.Value>
       </ChartTooltip.Item>
     </ChartTooltip>
@@ -152,7 +166,7 @@ export default function PieChartWithBreakdownDemo({
           </div>
         </Card.Header>
 
-        <Card.Content className="relative z-[1] flex flex-1 flex-col items-center gap-6  p-2 space-between">
+        <Card.Content className="relative z-[1] flex flex-1 flex-col items-center gap-6  p-2 justify-between">
           <div className="relative size-[174px] shrink-0">
             <PieChart height={174} width={174}>
               <PieChart.Pie
@@ -179,7 +193,9 @@ export default function PieChartWithBreakdownDemo({
                   />
                 ))}
               </PieChart.Pie>
-              {!isEmpty && <PieChart.Tooltip content={<PieTooltip />} />}
+              {!isEmpty && (
+                <PieChart.Tooltip content={<PieTooltip total={total} />} />
+              )}
             </PieChart>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-3xl font-semibold leading-none tabular-nums text-foreground">
@@ -287,7 +303,7 @@ export default function PieChartWithBreakdownDemo({
         </div>
       </Card.Header>
       <Card.Content className="flex flex-col items-center p-2 gap-4">
-        <div className="flex flex-1 flex-col gap-3 m-3 ">
+        <div className="flex flex-1 flex-col gap-6 p-2 justify-between">
           <div className="relative shrink-0 w-[190px] h-[190px]">
             <PieChart height={190} width={190}>
               <PieChart.Pie
@@ -314,7 +330,9 @@ export default function PieChartWithBreakdownDemo({
                   />
                 ))}
               </PieChart.Pie>
-              {!isEmpty && <PieChart.Tooltip content={<PieTooltip />} />}
+              {!isEmpty && (
+                <PieChart.Tooltip content={<PieTooltip total={total} />} />
+              )}
             </PieChart>
             <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
               <span className="text-foreground text-3xl font-bold">
