@@ -37,7 +37,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 function CourseChartSkeleton() {
   return (
-    <Card className="word-search-glass min-h-[356px] rounded-2xl">
+    <Card className="word-search-glass min-h-[356px] rounded-3xl">
       <Card.Header className="min-h-[76px] px-5 pb-1 pt-5">
         <div className="flex items-center gap-3.5">
           <Skeleton className="size-11 shrink-0 rounded-xl" />
@@ -300,7 +300,7 @@ export default function LearnWordsPage() {
   ) => (
     <Accordion
       allowsMultipleExpanded
-      className="w-full overflow-hidden rounded-[25px]  word-search-glass !bg-transparent"
+      className="w-full overflow-hidden rounded-3xl  word-search-glass !bg-transparent"
       expandedKeys={expandedMap[menuMode]}
       onExpandedChange={(keys) =>
         setExpandedMap((prev) => ({ ...prev, [menuMode]: keys as Set<Key> }))
@@ -393,7 +393,7 @@ export default function LearnWordsPage() {
                   {cat.courseInfos.map((course) => (
                     <Card
                       key={course.courseId}
-                      className="group relative overflow-hidden rounded-[25px] transition-transform duration-300 hover:-translate-y-0.5"
+                      className="group relative overflow-hidden transition-transform duration-300 hover:-translate-y-0.5"
                     >
                       <PieChartWithBreakdownDemo
                         courseId={course.courseId}
@@ -425,7 +425,7 @@ export default function LearnWordsPage() {
         <>
           <div className="grid w-full grid-cols-1 items-stretch gap-3 sm:grid-cols-3">
             <Card
-              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-[25px]"
+              className="word-search-glass relative min-h-[356px] overflow-hidden "
               style={
                 {
                   "--summary-accent": "oklch(0.63 0.16 215)",
@@ -450,7 +450,7 @@ export default function LearnWordsPage() {
               />
             </Card>
             <Card
-              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-[25px]"
+              className="word-search-glass relative min-h-[356px] overflow-hidden "
               style={
                 {
                   "--summary-accent": "oklch(0.65 0.19 32)",
@@ -475,7 +475,7 @@ export default function LearnWordsPage() {
               />
             </Card>
             <Card
-              className="word-search-glass relative min-h-[356px] overflow-hidden rounded-[25px]"
+              className="word-search-glass relative min-h-[356px] overflow-hidden "
               style={
                 {
                   "--summary-accent": "oklch(0.58 0.2 285)",
@@ -557,7 +557,7 @@ export default function LearnWordsPage() {
                 </div>
               ) : (
                 <Accordion
-                  className="w-full overflow-hidden rounded-2xl  !bg-transparent"
+                  className="w-full overflow-hidden rounded-3xl  !bg-transparent"
                   allowsMultipleExpanded
                   expandedKeys={availableExpandedKeys}
                   onExpandedChange={(keys) =>
