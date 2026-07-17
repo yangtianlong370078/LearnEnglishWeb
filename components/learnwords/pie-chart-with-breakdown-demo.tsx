@@ -127,13 +127,12 @@ export default function PieChartWithBreakdownDemo({
           <div className="flex min-w-0 items-center gap-3.5">
             <div
               aria-hidden="true"
-              className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full"
+              className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full text-[var(--summary-ink)] dark:text-[var(--summary-accent)]"
               style={{
                 backgroundColor:
                   "color-mix(in srgb, var(--summary-accent) 24%, transparent)",
                 boxShadow:
                   "inset 0 0 0 1px color-mix(in srgb, var(--summary-accent) 20%, transparent)",
-                color: "var(--summary-ink, var(--summary-accent))",
               }}
             >
               {leadingIcon}
@@ -141,10 +140,7 @@ export default function PieChartWithBreakdownDemo({
             <div className="min-w-0">
               {eyebrow ? (
                 <p
-                  className="mb-0.5 text-xs font-semibold"
-                  style={{
-                    color: "var(--summary-ink, var(--summary-accent))",
-                  }}
+                  className="mb-0.5 text-xs font-semibold text-[var(--summary-ink)] dark:text-[var(--summary-accent)]"
                 >
                   {eyebrow}
                 </p>
