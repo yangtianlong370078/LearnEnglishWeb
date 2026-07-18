@@ -40,8 +40,8 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 
 function CourseChartSkeleton() {
   return (
-    <Card className="word-search-glass min-h-[356px] rounded-3xl">
-      <Card.Header className="min-h-[76px] px-5 pb-1 pt-5">
+    <Card className="word-search-glass  rounded-3xl">
+      <Card.Header className="min-h-[76px] p-5">
         <div className="flex items-center gap-3.5">
           <Skeleton className="size-11 shrink-0 rounded-xl" />
           <div className="flex flex-col gap-1.5">
@@ -50,7 +50,7 @@ function CourseChartSkeleton() {
           </div>
         </div>
       </Card.Header>
-      <Card.Content className="flex flex-col items-center gap-4 px-4 pb-5 pt-2 sm:px-5">
+      <Card.Content className="flex flex-col items-center gap-4 p-4">
         <Skeleton className="size-[174px] shrink-0 rounded-full" />
         <div className="grid w-full grid-cols-3 gap-1 rounded-xl bg-black/[0.025] p-1.5 dark:bg-white/[0.035]">
           {Array.from({ length: 3 }).map((_, index) => (
@@ -154,13 +154,7 @@ export default function LearnWordsPage() {
       const categories = await courseApi.getCategoryList(1);
 
       setAvailableCategories(categories);
-      setAvailableExpandedKeys(
-        new Set(
-          categories
-            .filter((item) => item.courseInfos.length > 0)
-            .map((item) => item.id),
-        ),
-      );
+      setAvailableExpandedKeys(new Set<Key>());
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("加载可添加课程失败:", err);
@@ -275,13 +269,7 @@ export default function LearnWordsPage() {
 
       setData(content);
       setAvailableCategories(categories);
-      setAvailableExpandedKeys(
-        new Set(
-          categories
-            .filter((item) => item.courseInfos.length > 0)
-            .map((item) => item.id),
-        ),
-      );
+      setAvailableExpandedKeys(new Set<Key>());
     } catch (err) {
       // eslint-disable-next-line no-console
       console.error("添加课程失败:", err);
@@ -392,7 +380,7 @@ export default function LearnWordsPage() {
             </Accordion.Heading>
             <Accordion.Panel>
               <Accordion.Body>
-                <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3 pt-[2px]">
+                <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3 ">
                   {cat.courseInfos.map((course) => (
                     <Card
                       key={course.courseId}
@@ -590,9 +578,11 @@ export default function LearnWordsPage() {
                             <Accordion.Body>
                               <div className="flex flex-col gap-1">
                                 {category.courseInfos.map((course) => (
-                                  <Card className="rounded-2xl mt-2 p-1">
+                                  <Card
+                                    key={course.courseId}
+                                    className="rounded-2xl mt-2 p-1"
+                                  >
                                     <ItemCard
-                                      key={course.courseId}
                                       variant="transparent"
                                     >
                                       <ItemCard.Icon>
