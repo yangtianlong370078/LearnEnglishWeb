@@ -9,6 +9,7 @@ import type {
 import type { Key } from "@heroui/react";
 import {
   Books,
+  Book,
   GraduationCap,
   Plus,
   Gear,
@@ -16,6 +17,8 @@ import {
   Flame,
   ClockArrowRotateLeft,
 } from "@gravity-ui/icons";
+
+import { ItemCard } from "@heroui-pro/react";
 
 import { useEffect, useState } from "react";
 import {
@@ -393,7 +396,7 @@ export default function LearnWordsPage() {
                   {cat.courseInfos.map((course) => (
                     <Card
                       key={course.courseId}
-                      className="group relative overflow-hidden transition-transform gap-6 duration-300 hover:-translate-y-0.5"
+                      className="group relative overflow-hidden transition-transform gap-6 duration-300 "
                     >
                       <PieChartWithBreakdownDemo
                         courseId={course.courseId}
@@ -533,9 +536,9 @@ export default function LearnWordsPage() {
                 <Books className="size-5" />
               </Modal.Icon>
               <Modal.Heading>添加精选课程</Modal.Heading>
-              <p className="mt-1.5 text-sm leading-5 text-muted">
+              {/* <p className="mt-1.5 text-sm leading-5 text-muted">
                 按分类查看课程，并将需要学习的课程加入列表
-              </p>
+              </p> */}
             </Modal.Header>
             <Modal.Body className="p-3">
               {availableCoursesLoading ? (
@@ -587,30 +590,37 @@ export default function LearnWordsPage() {
                             <Accordion.Body>
                               <div className="flex flex-col gap-1">
                                 {category.courseInfos.map((course) => (
-                                  <div
-                                    key={course.courseId}
-                                    className="flex min-h-14 items-center justify-between gap-4 px-1 py-2"
-                                  >
-                                    <div className="min-w-0">
-                                      <p className="truncate text-sm font-medium text-foreground font-semibold">
-                                        {course.courseName}
-                                      </p>
-                                      <p className="mt-1 text-xs tabular-nums text-muted">
-                                        {course.wordsCount} 个单词
-                                      </p>
-                                    </div>
-                                    <Button
-                                      size="sm"
-                                      variant="outline"
-                                      className="inline-flex items-center gap-0.5 rounded-full wordfy bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300"
-                                      onPress={() =>
-                                        openAddCourseConfirm(course)
-                                      }
+                                  <Card className="rounded-2xl mt-2 p-1">
+                                    <ItemCard
+                                      key={course.courseId}
+                                      variant="transparent"
                                     >
-                                      <Plus className="size-4" />
-                                      添加
-                                    </Button>
-                                  </div>
+                                      <ItemCard.Icon>
+                                        <Book />
+                                      </ItemCard.Icon>
+                                      <ItemCard.Content>
+                                        <ItemCard.Title>
+                                          {course.courseName}
+                                        </ItemCard.Title>
+                                        <ItemCard.Description>
+                                          {course.wordsCount} 个单词
+                                        </ItemCard.Description>
+                                      </ItemCard.Content>
+                                      <ItemCard.Action>
+                                        <Button
+                                          size="sm"
+                                          variant="outline"
+                                          className="inline-flex items-center gap-0.5 rounded-full wordfy bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300"
+                                          onPress={() =>
+                                            openAddCourseConfirm(course)
+                                          }
+                                        >
+                                          <Plus className="size-4" />
+                                          添加
+                                        </Button>
+                                      </ItemCard.Action>
+                                    </ItemCard>
+                                  </Card>
                                 ))}
                               </div>
                             </Accordion.Body>
