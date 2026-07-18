@@ -2,7 +2,14 @@
 
 import type { ReactNode } from "react";
 import { EllipsisVertical, Pencil, TrashBin } from "@gravity-ui/icons";
-import { Card, Dropdown, Button, Header, Label } from "@heroui/react";
+import {
+  Card,
+  Dropdown,
+  Button,
+  Header,
+  Label,
+  Separator,
+} from "@heroui/react";
 
 import { ChartTooltip, PieChart } from "@heroui-pro/react";
 
@@ -78,14 +85,14 @@ function PieTooltip({
     <ChartTooltip>
       <ChartTooltip.Item>
         <ChartTooltip.Indicator color={entry.payload?.fill} />
-        <ChartTooltip.Label className="min-w-[100px]">{entry.name}
-            <span className="ml-1 text-[11px] font-normal text-muted">
+        <ChartTooltip.Label className="min-w-[100px]">
+          {entry.name}
+          <span className="ml-1 text-[11px] font-normal text-muted">
             ({pct}%)
           </span>
         </ChartTooltip.Label>
-        <ChartTooltip.Value  className="min-w-[40px] text-right">
+        <ChartTooltip.Value className="min-w-[40px] text-right">
           {valueFormatter ? valueFormatter(entry.value ?? "") : entry.value}
-        
         </ChartTooltip.Value>
       </ChartTooltip.Item>
     </ChartTooltip>
@@ -103,7 +110,7 @@ export default function PieChartWithBreakdownDemo({
   leadingIcon,
   emptyLabel = "暂无数据",
   menuMode = "full",
-  onEdit, 
+  onEdit,
   onDelete,
 }: PieChartWithBreakdownDemoProps = {}) {
   const rawData = [
@@ -153,9 +160,7 @@ export default function PieChartWithBreakdownDemo({
             </div>
             <div className="min-w-0">
               {eyebrow ? (
-                <p
-                  className="mb-0.5 text-xs font-semibold text-[var(--summary-ink)] dark:text-[var(--summary-accent)]"
-                >
+                <p className="mb-0.5 text-xs font-semibold text-[var(--summary-ink)] dark:text-[var(--summary-accent)]">
                   {eyebrow}
                 </p>
               ) : null}
@@ -166,7 +171,7 @@ export default function PieChartWithBreakdownDemo({
           </div>
         </Card.Header>
 
-        <Card.Content className="relative z-[1] flex flex-1 flex-col items-center gap-6  p-2 justify-between">
+        <Card.Content className="relative z-[1] flex flex-1 flex-col items-center justify-center">
           <div className="relative size-[174px] shrink-0">
             <PieChart height={174} width={174}>
               <PieChart.Pie
@@ -206,9 +211,11 @@ export default function PieChartWithBreakdownDemo({
               </span>
             </div>
           </div>
+        </Card.Content>
 
+        <div className=" p-2">
           <dl
-            className="grid w-full grid-cols-3 gap-1  rounded-2xl p-1.5"
+            className="flex justify-evenly w-full  gap-1  rounded-2xl p-1.5"
             style={{
               backgroundColor:
                 "color-mix(in srgb, var(--summary-accent) 9%, transparent)",
@@ -217,27 +224,42 @@ export default function PieChartWithBreakdownDemo({
             }}
           >
             {rawData.map((entry, idx) => (
-              <div
-                key={entry.name}
-                className="flex min-w-0 flex-col items-center justify-center px-1 py-2"
-              >
-                <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
-                  <span
-                    className="size-1.5 shrink-0 rounded-full"
+              <>
+                <div
+                  key={entry.name}
+                  className="flex min-w-0 flex-col items-center justify-center p-2"
+                >
+                  <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
+                    <span
+                      className="size-1.5 shrink-0 rounded-full"
+                      style={{
+                        backgroundColor:
+                          overviewChartColors[idx % overviewChartColors.length],
+                      }}
+                    />
+                    {entry.name}
+                  </dt>
+                  <dd className="mt-1 text-base font-semibold leading-none tabular-nums text-foreground">
+                    {entry.value.toLocaleString()}
+                  </dd>
+                </div>
+
+                {idx < rawData.length - 1 && (
+                  <Separator
+                    orientation="vertical"
+                    className="flex "
                     style={{
                       backgroundColor:
-                        overviewChartColors[idx % overviewChartColors.length],
+                        "color-mix(in srgb, var(--summary-accent) 9%, transparent)",
+                      boxShadow:
+                        "inset 0 0 0 1px color-mix(in srgb, var(--summary-accent) 8%, transparent)",
                     }}
                   />
-                  {entry.name}
-                </dt>
-                <dd className="mt-1 text-base font-semibold leading-none tabular-nums text-foreground">
-                  {entry.value.toLocaleString()}
-                </dd>
-              </div>
+                )}
+              </>
             ))}
           </dl>
-        </Card.Content>
+        </div>
       </>
     );
   }
@@ -302,8 +324,8 @@ export default function PieChartWithBreakdownDemo({
           )}
         </div>
       </Card.Header>
-      <Card.Content className="flex flex-col items-center p-2 gap-4">
-        <div className="flex flex-1 flex-col gap-6 p-2 justify-between">
+      <Card.Content className="flex flex-col items-center ">
+        <div className="flex flex-1 flex-col   justify-center ">
           <div className="relative shrink-0 w-[190px] h-[190px]">
             <PieChart height={190} width={190}>
               <PieChart.Pie
@@ -342,7 +364,9 @@ export default function PieChartWithBreakdownDemo({
             </div>
           </div>
         </div>
+      </Card.Content>
 
+      <div className="p-2">
         <dl
           className="grid w-full grid-cols-3 gap-1 rounded-2xl p-1.5"
           style={{
@@ -380,7 +404,7 @@ export default function PieChartWithBreakdownDemo({
             );
           })}
         </dl>
-      </Card.Content>
+      </div>
     </>
   );
 }

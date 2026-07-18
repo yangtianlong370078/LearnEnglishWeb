@@ -393,7 +393,7 @@ export default function LearnWordsPage() {
                   {cat.courseInfos.map((course) => (
                     <Card
                       key={course.courseId}
-                      className="group relative overflow-hidden transition-transform duration-300 hover:-translate-y-0.5"
+                      className="group relative overflow-hidden transition-transform gap-6 duration-300 hover:-translate-y-0.5"
                     >
                       <PieChartWithBreakdownDemo
                         courseId={course.courseId}
@@ -425,7 +425,7 @@ export default function LearnWordsPage() {
         <>
           <div className="grid w-full grid-cols-1 items-stretch gap-3 sm:grid-cols-3">
             <Card
-              className="word-search-glass relative min-h-[356px] overflow-hidden "
+              className="word-search-glass relative gap-6 overflow-hidden "
               style={
                 {
                   "--summary-accent": "oklch(0.63 0.16 215)",
@@ -450,7 +450,7 @@ export default function LearnWordsPage() {
               />
             </Card>
             <Card
-              className="word-search-glass relative min-h-[356px] overflow-hidden "
+              className="word-search-glass relative gap-6 overflow-hidden "
               style={
                 {
                   "--summary-accent": "oklch(0.65 0.19 32)",
@@ -475,7 +475,7 @@ export default function LearnWordsPage() {
               />
             </Card>
             <Card
-              className="word-search-glass relative min-h-[356px] overflow-hidden "
+              className="word-search-glass relative gap-6 overflow-hidden "
               style={
                 {
                   "--summary-accent": "oklch(0.58 0.2 285)",
