@@ -227,7 +227,7 @@ export default function PieChartWithBreakdownDemo({
               <>
                 <div
                   key={entry.name}
-                  className="flex min-w-0 flex-col items-center justify-center p-2"
+                  className="relative isolate flex min-w-0 cursor-pointer flex-col items-center justify-center bg-transparent p-2 transition-transform duration-300 ease-out before:pointer-events-none before:absolute before:-inset-x-5 before:-inset-y-3 before:-z-10 before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--summary-accent)_72%,transparent)_0%,color-mix(in_srgb,var(--summary-accent)_30%,transparent)_42%,transparent_74%)] before:opacity-0 before:blur-md before:transition-opacity before:duration-300 hover:-translate-y-1 hover:scale-[1.04] hover:!bg-transparent hover:before:opacity-100"
                 >
                   <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
                     <span
@@ -246,6 +246,7 @@ export default function PieChartWithBreakdownDemo({
 
                 {idx < rawData.length - 1 && (
                   <Separator
+                  key={idx}
                     orientation="vertical"
                     className="flex "
                     style={{
@@ -368,7 +369,7 @@ export default function PieChartWithBreakdownDemo({
 
       <div className="p-2">
         <dl
-          className="grid w-full grid-cols-3 gap-1 rounded-2xl p-1.5"
+          className="flex justify-evenly w-full rounded-2xl p-1.5"
           style={{
             backgroundColor:
               "color-mix(in srgb, var(--foreground) 4%, transparent)",
@@ -381,26 +382,43 @@ export default function PieChartWithBreakdownDemo({
               total > 0 ? ((entry.value / total) * 100).toFixed(1) : "0.0";
 
             return (
-              <div
-                key={entry.name}
-                className="flex min-w-0 flex-col items-center justify-center px-1 py-2"
-              >
-                <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
-                  <span
-                    className="size-1.5 shrink-0 rounded-full"
-                    style={{
-                      backgroundColor: CHART_COLORS[idx % CHART_COLORS.length],
-                    }}
-                  />
-                  {entry.name}
-                </dt>
-                <dd className="mt-1 text-base font-semibold leading-none tabular-nums text-foreground">
-                  {entry.value.toLocaleString()}
-                  {/* <span className="ml-1 text-[11px] font-normal text-muted">
+              <>
+                <div
+                  key={entry.name}
+                  className="relative isolate flex min-w-0 cursor-pointer flex-col items-center justify-center bg-transparent p-2 transition-transform duration-300 ease-out before:pointer-events-none before:absolute before:-inset-x-5 before:-inset-y-3 before:-z-10 before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,oklch(0.63 0.16 215)_72%,transparent)_0%,color-mix(in_srgb,oklch(0.63 0.16 215)_30%,transparent)_42%,transparent_74%)] before:opacity-0 before:blur-md before:transition-opacity before:duration-300 hover:-translate-y-1 hover:scale-[1.04] hover:!bg-transparent hover:before:opacity-100"
+                >
+                  <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
+                    <span
+                      className="size-1.5 shrink-0 rounded-full"
+                      style={{
+                        backgroundColor:
+                          CHART_COLORS[idx % CHART_COLORS.length],
+                      }}
+                    />
+                    {entry.name}
+                  </dt>
+                  <dd className="mt-1 text-base font-semibold leading-none tabular-nums text-foreground">
+                    {entry.value.toLocaleString()}
+                    {/* <span className="ml-1 text-[11px] font-normal text-muted">
                     ({pct}%)
                   </span> */}
-                </dd>
-              </div>
+                  </dd>
+                </div>
+
+                {idx < rawData.length - 1 && (
+                  <Separator
+                  key={idx}
+                    orientation="vertical"
+                    className="flex "
+                    style={{
+                      backgroundColor:
+                        "color-mix(in srgb, var(--foreground) 4%, transparent)",
+                      boxShadow:
+                        "inset 0 0 0 1px color-mix(in srgb, var(--foreground) 6%, transparent)",
+                    }}
+                  />
+                )}
+              </>
             );
           })}
         </dl>
