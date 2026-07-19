@@ -38,41 +38,103 @@ import PieChartWithBreakdownDemo from "@/components/learnwords/pie-chart-with-br
 import { courseApi } from "@/lib/api";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
 
-function CourseChartSkeleton() {
+type SummarySkeletonStyle = React.CSSProperties & {
+  "--summary-accent": string;
+};
+
+const summarySkeletonStyles: SummarySkeletonStyle[] = [
+  {
+    "--summary-accent": "oklch(0.63 0.16 215)",
+  },
+  {
+    "--summary-accent": "oklch(0.65 0.19 32)",
+  },
+  {
+    "--summary-accent": "oklch(0.58 0.2 285)",
+  },
+];
+
+function CourseChartSkeleton({ index = 0 }: { index?: number }) {
   return (
-    <Card className="word-search-glass  rounded-3xl">
-      <Card.Header className="min-h-[76px] p-5">
-        <div className="flex items-center gap-3.5">
-          <Skeleton className="size-11 shrink-0 rounded-xl" />
-          <div className="flex flex-col gap-1.5">
+    <Card
+      className="word-search-glass relative gap-6 overflow-hidden rounded-3xl"
+      style={
+        {
+          ...summarySkeletonStyles[index % summarySkeletonStyles.length],
+          backgroundImage:
+            "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 18%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 7%, transparent) 52%, transparent 78%)",
+        } as React.CSSProperties
+      }
+      variant="transparent"
+    >
+      <Card.Header className="relative z-[1] p-2">
+        <div className="flex min-w-0 items-center gap-3.5">
+          <Skeleton className="size-[50px] shrink-0 rounded-full" />
+          <div className="min-w-0 flex-1 space-y-2">
             <Skeleton className="h-3 w-16 rounded-md" />
             <Skeleton className="h-5 w-28 rounded-md" />
           </div>
         </div>
       </Card.Header>
-      <Card.Content className="flex flex-col items-center gap-4 p-4">
-        <Skeleton className="size-[174px] shrink-0 rounded-full" />
-        <div className="grid w-full grid-cols-3 gap-1 rounded-xl bg-black/[0.025] p-1.5 dark:bg-white/[0.035]">
+
+      <Card.Content className="relative z-[1] flex flex-1 flex-col items-center justify-center">
+        <div className="relative size-[174px] shrink-0">
+          <Skeleton className="absolute inset-0 rounded-full" />
+          <div className="absolute inset-[42px] rounded-full bg-white/55 dark:bg-[rgb(10_16_34/0.58)]" />
+          <div className="absolute inset-0 flex flex-col items-center justify-center gap-2">
+            <Skeleton className="h-7 w-16 rounded-lg" />
+            <Skeleton className="h-3 w-12 rounded-md" />
+          </div>
+        </div>
+      </Card.Content>
+
+      <Card.Footer className="p-2">
+        <div className="grid w-full grid-cols-3 gap-1 rounded-2xl bg-black/[0.025] p-1 dark:bg-white/[0.035]">
           {Array.from({ length: 3 }).map((_, index) => (
             <div
               key={index}
-              className="flex flex-col items-center gap-1.5 px-1 py-2"
+              className="flex min-w-0 flex-col items-center gap-1.5 px-1 py-2"
             >
               <Skeleton className="h-3 w-10 rounded-md" />
               <Skeleton className="h-4 w-7 rounded-md" />
             </div>
           ))}
         </div>
-      </Card.Content>
+      </Card.Footer>
     </Card>
   );
 }
 
-function CategoryAccordionSkeleton() {
+function CategoryAccordionSkeleton({
+  titleWidth = "w-20",
+}: {
+  titleWidth?: string;
+}) {
   return (
-    <div className="flex min-h-28 w-full items-center justify-center">
-      <Spinner aria-label="课程加载中" />
-    </div>
+    <Card
+      className="word-search-glass w-full overflow-hidden rounded-3xl"
+      variant="transparent"
+    >
+      <Card.Header className="flex-row items-center gap-2 bg-white/15 px-6 py-3 dark:bg-black/15">
+        <Skeleton className={`h-5 ${titleWidth} rounded-lg`} />
+        <Skeleton className="size-9 rounded-full" />
+      </Card.Header>
+      <Card.Content className="gap-0 p-0">
+        <div className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
+        {Array.from({ length: 2 }).map((_, index) => (
+          <div key={index} className="px-4 py-3">
+            <div className="flex items-center justify-between rounded-2xl bg-white/20 px-3 py-2 dark:bg-black/20">
+              <div className="flex items-center gap-2">
+                <Skeleton className="size-4 rounded-full" />
+                <Skeleton className="h-5 w-24 rounded-lg" />
+                <Skeleton className="h-5 w-8 rounded-full" />
+              </div>
+              <Skeleton className="size-5 rounded-full" />
+            </div>
+          </div>
+        ))}
+      </Card.Content>
+    </Card>
   );
 }
 
@@ -80,20 +142,13 @@ function LearnWordsSkeleton() {
   return (
     <>
       <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3">
-        <CourseChartSkeleton />
-        <CourseChartSkeleton />
-        <CourseChartSkeleton />
+        {Array.from({ length: 3 }).map((_, index) => (
+          <CourseChartSkeleton key={index} index={index} />
+        ))}
       </div>
 
-      <div className="flex flex-col gap-1.5 px-4 pt-2">
-        <Skeleton className="h-6 w-24 rounded-lg" />
-      </div>
       <CategoryAccordionSkeleton />
-
-      <div className="flex flex-col gap-1.5 px-4 pt-2">
-        <Skeleton className="h-6 w-24 rounded-lg" />
-      </div>
-      <CategoryAccordionSkeleton />
+      <CategoryAccordionSkeleton titleWidth="w-24" />
     </>
   );
 }
@@ -582,9 +637,7 @@ export default function LearnWordsPage() {
                                     key={course.courseId}
                                     className="rounded-2xl mt-2 p-1"
                                   >
-                                    <ItemCard
-                                      variant="transparent"
-                                    >
+                                    <ItemCard variant="transparent">
                                       <ItemCard.Icon>
                                         <Book />
                                       </ItemCard.Icon>
