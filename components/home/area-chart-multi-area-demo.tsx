@@ -130,6 +130,7 @@ export default function AreaChartMultiAreaDemo({
             width={36}
           />
           <AreaChart.Area
+            isAnimationActive
             dataKey="done"
             dot={false}
             fill="url(#organic-fill)"
@@ -139,6 +140,7 @@ export default function AreaChartMultiAreaDemo({
             type="monotone"
           />
           <AreaChart.Area
+            isAnimationActive
             dataKey="task"
             dot={false}
             fill="url(#paidads-fill)"

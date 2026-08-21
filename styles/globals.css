@@ -51,15 +51,44 @@
   }
 }
 
+/* ──────────────────────────────────────────────────────────────────────────
+ * 强制保留过渡/入场动画（覆盖系统"减少动态效果"偏好）
+ *
+ * 背景：当操作系统/浏览器开启 prefers-reduced-motion: reduce 时，
+ *  - recharts 图表（isAnimationActive 默认 'auto'）会自动关闭动画（已在各图表组件显式开启 isAnimationActive）
+ *  - HeroUI 组件（modal/popover/drawer/dropdown/tooltip 等）内部 @apply motion-reduce:animate-none / transition-none，
+ *    会关闭入场动画与过渡；且 HeroUI 仅提供 data-reduce-motion="true"（强制关闭）而无"强制开启"开关。
+ * 本项目希望始终展示动画，故在此覆盖系统偏好，重新启用被关闭的动画/过渡。
+ *
+ * 注意：这会覆盖用户的无障碍偏好。如需尊重系统"减少动态"设置，删除本整块即可。
+ * ────────────────────────────────────────────────────────────────────────── */
 @media (prefers-reduced-motion: reduce) {
 
+  /* 1) 恢复 HeroUI 覆盖层的入场/退场动画。
+        底层为 tailwindcss-animate 的 enter/exit keyframes；
+        位移/缩放/时长等由各组件在基础规则里设置的 --tw-* 变量驱动（不受本媒体查询影响），
+        因此这里仅需把被置为 none 的 animation 重新指回 enter/exit 即可，动画效果与正常一致。 */
+  [data-entering="true"] {
+    animation-name: enter !important;
+    animation-duration: var(--tw-animation-duration, var(--tw-duration, 0.15s)) !important;
+    animation-timing-function: var(--tw-ease, ease) !important;
+    animation-fill-mode: var(--tw-animation-fill-mode, none) !important;
+  }
+
+  [data-exiting="true"] {
+    animation-name: exit !important;
+    animation-duration: var(--tw-animation-duration, var(--tw-duration, 0.15s)) !important;
+    animation-timing-function: var(--tw-ease, ease) !important;
+    animation-fill-mode: var(--tw-animation-fill-mode, none) !important;
+  }
+
+  /* 2) 恢复被 motion-reduce:transition-none 关闭的微交互过渡
+        （按钮按压、手风琴指示器旋转、hover 变色等）。
+        仅恢复 transition-property；具体时长/缓动仍由各组件自身的 transition-duration 决定。 */
   *,
   *::before,
   *::after {
-    animation-duration: 0.01ms !important;
-    animation-iteration-count: 1 !important;
-    scroll-behavior: auto !important;
-    transition-duration: 0.01ms !important;
+    transition-property: revert-layer !important;
   }
 }
 

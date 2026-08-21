@@ -8,7 +8,7 @@ import { NextRequest, NextResponse } from "next/server";
  *
  * 注意：更具体的路由（如 /api/login/route.ts）会优先匹配，本路由作为兜底。
  */
-const BACKEND_URL = process.env.DOTNET_API_URL ?? "https://localhost:53201";
+const BACKEND_URL = process.env.DOTNET_API_URL ?? "https://localhost:6121";
 
 /** 不应透传到后端的请求头 */
 const HOP_BY_HOP = new Set([

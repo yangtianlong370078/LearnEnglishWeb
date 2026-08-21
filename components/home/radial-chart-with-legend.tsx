@@ -177,6 +177,7 @@ export default function RadialChartWithLegend({
               type="number"
             />
             <RadialChart.Bar
+              isAnimationActive
               background
               angleAxisId={0}
               barSize={16}

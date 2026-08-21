@@ -175,6 +175,7 @@ export default function PieChartWithBreakdownDemo({
           <div className="relative size-[174px] shrink-0">
             <PieChart height={174} width={174}>
               <PieChart.Pie
+                isAnimationActive
                 cornerRadius={cornerRadius}
                 cx="50%"
                 cy="50%"
@@ -332,6 +333,7 @@ export default function PieChartWithBreakdownDemo({
                 cx="50%"
                 cy="50%"
                 data={planData}
+                isAnimationActive
                 dataKey="value"
                 innerRadius="80%"
                 minAngle={hasMultipleSlices ? 4 : 0}
