@@ -485,11 +485,18 @@ function WordCardInner(
         ? "cl-card-wrong"
         : "word-search-glass !bg-transparent";
 
+const cardStateSubClass =
+    resultState === "correct"
+      ? ""
+      : resultState === "wrong"
+        ? ""
+        : "bg-white/15 dark:bg-black/15";
+
   const showSecondary = translationOn;
 
   return (
     <Card
-      className={`group relative overflow-visible rounded-3xl ${
+      className={`cl-card p-0 group relative overflow-visible  ${
         colorTransition
           ? "transition-[background-color,border-color,box-shadow] duration-500 ease-out"
           : ""
@@ -498,7 +505,7 @@ function WordCardInner(
       <ConfettiBurst fireKey={confettiKey} />
 
       <div
-        className={shaking ? "cl-shake" : ""}
+        className={`${shaking ? "cl-shake" : ""} p-[20px] rounded-3xl ${cardStateSubClass}`}
         onAnimationEnd={() => setShaking(false)}
       >
         <Card.Content className="flex flex-col gap-4 p-4">
@@ -519,8 +526,10 @@ function WordCardInner(
                   key={mode}
                   aria-label={MODE_LABEL[mode]}
                   aria-pressed={active}
-                  className={`inline-flex flex-col items-center gap-1 transition-opacity ${
-                    globalMode ? "cursor-not-allowed opacity-40" : "cursor-pointer"
+                  className={`inline-flex flex-col items-center gap-1 transition-all duration-300 ${
+                    globalMode
+                      ? "cursor-not-allowed opacity-40"
+                      : "cursor-pointer hover:-translate-y-0.5"
                   }`}
                   disabled={!!globalMode}
                   type="button"
@@ -532,10 +541,10 @@ function WordCardInner(
                     size={42}
                   >
                     <span
-                      className={`flex size-[30px] items-center justify-center rounded-full text-[11px] font-semibold transition-colors ${
+                      className={`flex size-[30px] items-center justify-center rounded-full text-[11px] font-semibold transition-all duration-300 ${
                         active
-                          ? "bg-accent text-accent-foreground"
-                          : "bg-black/5 text-foreground dark:bg-white/10"
+                          ? "bg-accent text-accent-foreground shadow-md shadow-accent/40"
+                          : "bg-black/5 text-foreground hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15"
                       }`}
                     >
                       {mode === "dictation" ? (
@@ -599,26 +608,42 @@ function WordCardInner(
       return (
         <>
           <button
-            aria-label="播放发音"
-            className="inline-flex size-14 items-center justify-center rounded-full bg-accent-soft text-accent-soft-foreground transition-transform hover:scale-105"
+            aria-label={
+              speakerState === "idle" ? "播放发音" : "停止播放"
+            }
+            className={`cl-speaker-btn ${
+              speakerState === "playing"
+                ? "is-playing"
+                : speakerState === "waiting"
+                  ? "is-waiting"
+                  : ""
+            }`}
             type="button"
             onClick={toggleDictation}
           >
             <Volume
               className={`size-7 ${
                 speakerState === "playing"
-                  ? "cl-speaker-playing text-accent"
+                  ? "cl-speaker-playing"
                   : speakerState === "waiting"
                     ? "cl-speaker-waiting"
                     : ""
               }`}
             />
           </button>
-          <span className="text-[11px] text-muted">
+          <span
+            className={`text-[11px] font-medium tracking-wide transition-colors ${
+              speakerState === "playing"
+                ? "text-accent"
+                : speakerState === "waiting"
+                  ? "text-muted"
+                  : "text-muted"
+            }`}
+          >
             {speakerState === "playing"
-              ? "播放中…"
+              ? "播放中 · 再次点击停止"
               : speakerState === "waiting"
-                ? "等待…"
+                ? "等待下次播放…"
                 : "点击喇叭开始听写"}
           </span>
           {renderInput("听到后输入单词")}
@@ -632,19 +657,32 @@ function WordCardInner(
         <span className="text-2xl font-bold text-foreground">{word.en}</span>
         {showSecondary && <span className="text-sm text-muted">{word.cn}</span>}
         <button
-          aria-label="开始语音识别"
-          className={`inline-flex size-14 items-center justify-center rounded-full transition-transform hover:scale-105 ${
-            micState === "recording"
-              ? "cl-mic-recording bg-danger text-danger-foreground"
-              : "bg-accent-soft text-accent-soft-foreground"
+          aria-label={
+            micState === "recording" ? "结束录音" : "开始语音识别"
+          }
+          className={`cl-mic-btn ${
+            micState === "recording" ? "is-recording" : ""
           }`}
           type="button"
           onClick={toggleSpeech}
         >
           <Microphone className="size-7" />
         </button>
-        <span className="text-[11px] text-muted">
-          {micState === "recording" ? "录音中，点击结束" : "点击麦克风朗读单词"}
+        {micState === "recording" ? (
+          <span aria-hidden="true" className="cl-wave">
+            <span />
+            <span />
+            <span />
+            <span />
+            <span />
+          </span>
+        ) : null}
+        <span
+          className={`text-[11px] font-medium tracking-wide transition-colors ${
+            micState === "recording" ? "text-danger" : "text-muted"
+          }`}
+        >
+          {micState === "recording" ? "录音中 · 点击结束" : "点击麦克风朗读单词"}
         </span>
       </>
     );

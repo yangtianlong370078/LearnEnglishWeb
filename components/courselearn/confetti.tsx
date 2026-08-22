@@ -54,7 +54,7 @@ export default function ConfettiBurst({ fireKey }: ConfettiBurstProps) {
     <div
       key={fireKey}
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-20 overflow-visible"
+      className="pointer-events-none absolute inset-0 z-20 overflow-visible "
     >
       {pieces.map((p, i) => (
         <span

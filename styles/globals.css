@@ -627,7 +627,7 @@ input:-webkit-autofill:active {
     0 8px 26px color-mix(in srgb, var(--success, #16a34a) 22%, transparent) !important;
   background-color: color-mix(
     in srgb,
-    var(--success, #16a34a) 12%,
+    var(--success, #16a34a) 22%,
     transparent
   ) !important;
 }
@@ -639,12 +639,144 @@ input:-webkit-autofill:active {
     0 8px 26px color-mix(in srgb, var(--danger, #dc2626) 22%, transparent) !important;
   background-color: color-mix(
     in srgb,
-    var(--danger, #dc2626) 12%,
+    var(--danger, #dc2626) 22%,
     transparent
   ) !important;
 }
 
-/* 听写喇叭：播放态脉冲 */
+/* ── 通用关键帧 ── */
+@keyframes cl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cl-gradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ── 卡片悬浮 ── */
+.cl-card {
+
+   -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+   
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease,
+    background-color 0.35s ease;
+}
+
+.cl-card:hover {
+  /* transform: translateY(-4px); */
+}
+
+/* ────────────────────────────────────────────────────────────────
+ * 听写喇叭按钮：idle / playing / waiting 三态
+ * ──────────────────────────────────────────────────────────────── */
+.cl-speaker-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  color: var(--accent);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 18%, transparent),
+    color-mix(in srgb, var(--accent) 6%, transparent)
+  );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent),
+    0 4px 14px color-mix(in srgb, var(--accent) 16%, transparent);
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.cl-speaker-btn:hover {
+  transform: scale(1.07);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 32%, transparent),
+    0 6px 20px color-mix(in srgb, var(--accent) 26%, transparent);
+}
+
+.cl-speaker-btn:active {
+  transform: scale(0.95);
+}
+
+/* 播放中：流光渐变底 + 旋转追光环 + 扩散涟漪 + 图标脉冲 */
+.cl-speaker-btn.is-playing {
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    color-mix(in srgb, var(--accent) 45%, #a855f7),
+    var(--accent)
+  );
+  background-size: 220% 220%;
+  animation: cl-gradient 2.2s ease-in-out infinite;
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--accent) 48%, transparent);
+}
+
+.cl-speaker-btn.is-playing::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  padding: 2.5px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 100deg,
+    color-mix(in srgb, var(--accent) 85%, #fff) 180deg,
+    transparent 260deg 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cl-spin 1.6s linear infinite;
+  pointer-events: none;
+}
+
+.cl-speaker-btn.is-playing::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: cl-ripple 1.5s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes cl-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+/* 播放中图标脉冲 */
 @keyframes cl-speaker-pulse {
   0%,
   100% {
@@ -653,8 +785,8 @@ input:-webkit-autofill:active {
   }
 
   50% {
-    transform: scale(1.12);
-    opacity: 0.7;
+    transform: scale(1.14);
+    opacity: 0.85;
   }
 }
 
@@ -662,15 +794,35 @@ input:-webkit-autofill:active {
   animation: cl-speaker-pulse 0.9s ease-in-out infinite;
 }
 
-/* 听写喇叭：等待态呼吸 */
+/* 等待中：虚线缓转环 + 图标呼吸 */
+.cl-speaker-btn.is-waiting {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent),
+    0 2px 10px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+.cl-speaker-btn.is-waiting::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: cl-spin 7s linear infinite;
+  pointer-events: none;
+}
+
 @keyframes cl-speaker-wait {
   0%,
   100% {
-    opacity: 0.45;
+    opacity: 0.4;
+    transform: scale(0.94);
   }
 
   50% {
-    opacity: 0.9;
+    opacity: 1;
+    transform: scale(1.04);
   }
 }
 
@@ -678,23 +830,143 @@ input:-webkit-autofill:active {
   animation: cl-speaker-wait 1.4s ease-in-out infinite;
 }
 
-/* 语音麦克风：录音态红点脉冲 */
-@keyframes cl-mic-pulse {
-  0% {
-    box-shadow: 0 0 0 0 color-mix(in srgb, var(--danger, #dc2626) 55%, transparent);
-  }
+/* ────────────────────────────────────────────────────────────────
+ * 语音麦克风按钮：idle / recording 两态 + 声波律动
+ * ──────────────────────────────────────────────────────────────── */
+.cl-mic-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    color-mix(in srgb, var(--accent) 55%, #8b5cf6)
+  );
+  box-shadow:
+    0 4px 16px color-mix(in srgb, var(--accent) 38%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.28);
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
 
-  70% {
-    box-shadow: 0 0 0 10px transparent;
-  }
+.cl-mic-btn:hover {
+  transform: scale(1.07);
+  box-shadow:
+    0 6px 24px color-mix(in srgb, var(--accent) 50%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.32);
+}
 
+.cl-mic-btn:active {
+  transform: scale(0.95);
+}
+
+/* 录音中：红色渐变 + 呼吸缩放 + 双光环扩散 */
+.cl-mic-btn.is-recording {
+  background: linear-gradient(135deg, #fb7185, var(--danger, #dc2626));
+  box-shadow:
+    0 6px 24px color-mix(in srgb, var(--danger, #dc2626) 50%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.28);
+  animation: cl-mic-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes cl-mic-breathe {
+  0%,
   100% {
-    box-shadow: 0 0 0 0 transparent;
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
   }
 }
 
-.cl-mic-recording {
-  animation: cl-mic-pulse 1.2s ease-out infinite;
+.cl-mic-btn.is-recording::before,
+.cl-mic-btn.is-recording::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger, #dc2626) 55%, transparent);
+  animation: cl-mic-halo 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  pointer-events: none;
+}
+
+.cl-mic-btn.is-recording::after {
+  animation-delay: 0.9s;
+}
+
+@keyframes cl-mic-halo {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* 录音中的声波律动条 */
+.cl-wave {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
+  height: 18px;
+}
+
+.cl-wave span {
+  display: block;
+  width: 3.5px;
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to top,
+    var(--danger, #dc2626),
+    #fb7185
+  );
+  transform-origin: center;
+  animation: cl-wave-bar 0.9s ease-in-out infinite;
+}
+
+.cl-wave span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.cl-wave span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.cl-wave span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.cl-wave span:nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+.cl-wave span:nth-child(5) {
+  animation-delay: 0.6s;
+}
+
+@keyframes cl-wave-bar {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
 }
 
 /* 课程学习顶部导航吸顶容器（复用 navbar 毛玻璃观感） */
@@ -718,3 +990,5 @@ input:-webkit-autofill:active {
   border-bottom: 1px solid rgb(255 255 255 / 0.06) !important;
   background-color: rgb(10 16 34 / 0.58);
 }
+
+

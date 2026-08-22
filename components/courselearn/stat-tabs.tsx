@@ -30,7 +30,7 @@ export default function StatTabs({
 
   return (
     <div className="flex justify-center">
-      <div className="inline-flex items-center gap-1 rounded-2xl bg-black/[0.04] p-1 dark:bg-white/[0.06]">
+      <div className="inline-flex items-center gap-1 rounded-2xl bg-white/50 p-1.5 shadow-lg shadow-black/[0.04] ring-1 ring-white/60 backdrop-blur-xl dark:bg-white/[0.06] dark:shadow-black/20 dark:ring-white/10">
         {TABS.map((tab) => {
           const isActive = active === tab.zt;
 
@@ -38,19 +38,19 @@ export default function StatTabs({
             <button
               key={tab.zt}
               aria-pressed={isActive}
-              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all ${
+              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
                 isActive
-                  ? "bg-white text-foreground shadow-sm dark:bg-white/15"
-                  : "text-muted hover:text-foreground"
+                  ? "bg-white text-foreground shadow-md shadow-black/[0.06] dark:bg-white/15 dark:shadow-black/20"
+                  : "text-muted hover:bg-white/40 hover:text-foreground dark:hover:bg-white/5"
               }`}
               type="button"
               onClick={() => onChange(tab.zt)}
             >
               {tab.label}
               <span
-                className={`inline-flex min-w-[22px] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold tabular-nums ${
+                className={`inline-flex min-w-[22px] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold tabular-nums transition-all duration-300 ${
                   isActive
-                    ? "bg-accent text-accent-foreground"
+                    ? "bg-accent text-accent-foreground shadow-sm shadow-accent/40"
                     : "bg-black/5 text-muted dark:bg-white/10"
                 }`}
               >

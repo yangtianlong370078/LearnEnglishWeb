@@ -25,16 +25,16 @@ export default function PaginationBar({
   const canNext = pageIndex < totalPages;
 
   const btn =
-    "inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-medium transition-colors disabled:cursor-not-allowed disabled:opacity-40";
+    "inline-flex h-9 min-w-9 items-center justify-center rounded-xl px-3 text-sm font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-40";
   const idle =
-    "bg-white/70 text-foreground hover:bg-white dark:bg-white/10 dark:hover:bg-white/15";
+    "bg-white/70 text-foreground hover:-translate-y-px hover:bg-white hover:shadow-sm dark:bg-white/10 dark:hover:bg-white/15";
 
   if (totalPages <= 0) return null;
 
   return (
     <nav
       aria-label="分页"
-      className="flex items-center justify-center gap-2 py-2"
+      className="mx-auto flex w-fit items-center justify-center gap-2 rounded-2xl bg-white/50 p-1.5 shadow-lg shadow-black/[0.04] ring-1 ring-white/60 backdrop-blur-xl dark:bg-white/[0.06] dark:shadow-black/20 dark:ring-white/10"
     >
       <button
         aria-label="首页"

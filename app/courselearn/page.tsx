@@ -235,7 +235,7 @@ function CourseLearnClient() {
         onOpenSettings={() => setSettingsOpen(true)}
       />
 
-      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-4 px-4 py-5">
+      <main className="mx-auto flex w-full max-w-5xl flex-1 flex-col gap-5 px-4 py-6">
         <StatTabs
           active={zt}
           brs={resp?.brs ?? 0}
@@ -258,10 +258,10 @@ function CourseLearnClient() {
             <Spinner size="lg" />
           </div>
         ) : error ? (
-          <div className="flex flex-1 flex-col items-center justify-center gap-2 py-20 text-center">
-            <p className="text-danger">{error}</p>
+          <div className="flex flex-1 flex-col items-center justify-center gap-3 py-20 text-center">
+            <p className="text-sm text-danger">{error}</p>
             <button
-              className="rounded-xl bg-accent px-4 py-2 text-sm font-medium text-accent-foreground"
+              className="rounded-xl bg-gradient-to-br from-accent to-accent/80 px-5 py-2 text-sm font-medium text-accent-foreground shadow-md shadow-accent/30 transition-all duration-300 hover:-translate-y-px hover:shadow-lg"
               type="button"
               onClick={() => setPageIndex((p) => p)}
             >
@@ -269,11 +269,11 @@ function CourseLearnClient() {
             </button>
           </div>
         ) : words.length === 0 ? (
-          <div className="flex flex-1 items-center justify-center py-20 text-muted">
+          <div className="flex flex-1 items-center justify-center py-20 text-sm text-muted">
             暂无单词
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
             {words.map((word, index) => (
               <WordCard
                 key={`${word.lexiconId}-${index}`}
