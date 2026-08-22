@@ -7,7 +7,7 @@ import NavbarProDocsSite from "./navbar-pro-docs-site";
 // import {Navbar} from "./navbar";
 
 /** 不需要顶部导航栏的路径 */
-const NO_NAVBAR_PATHS = ["/login"];
+const NO_NAVBAR_PATHS = ["/login", "/courselearn"];
 
 /**
  * 根据当前路径决定是否渲染导航栏及主内容容器。

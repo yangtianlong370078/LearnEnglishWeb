@@ -22,6 +22,13 @@ const CHART_COLORS = [
   "var(--chart-4)",
 ];
 
+/** 面板项名称 → 学习状态 zt（1 不认识 / 2 学习中 / 3 已掌握） */
+const ZT_BY_NAME: Record<string, 1 | 2 | 3> = {
+  已掌握: 3,
+  学习中: 2,
+  不认识: 1,
+};
+
 export type PieChartMenuMode = "none" | "full" | "remove";
 export type PieChartVariant = "default" | "overview";
 
@@ -32,7 +39,7 @@ export interface PieChartWithBreakdownDemoProps {
   courseName?: string;
   /** 已掌握 */
   doneCount?: number;
-  /** 未牢记 */
+  /** 学习中 */
   notDoneCount?: number;
   /** 不认识 */
   notLearned?: number;
@@ -115,7 +122,7 @@ export default function PieChartWithBreakdownDemo({
 }: PieChartWithBreakdownDemoProps = {}) {
   const rawData = [
     { name: "已掌握", value: doneCount },
-    { name: "未牢记", value: notDoneCount },
+    { name: "学习中", value: notDoneCount },
     { name: "不认识", value: notLearned },
   ];
   const total = rawData.reduce((sum, d) => sum + d.value, 0);
@@ -383,7 +390,21 @@ export default function PieChartWithBreakdownDemo({
 
             return (
               <Fragment key={entry.name}>
-                <div
+                <button
+                  type="button"
+                  aria-label={`${entry.name} - 进入学习`}
+                  onClick={() => {
+                    const zt = ZT_BY_NAME[entry.name];
+
+                    if (!zt) return;
+                    window.open(
+                      `/courselearn?kc=${courseId}&zt=${zt}&name=${encodeURIComponent(
+                        courseName,
+                      )}`,
+                      "_blank",
+                      "noopener,noreferrer",
+                    );
+                  }}
                   className="relative isolate flex min-w-0 cursor-pointer flex-col items-center justify-center overflow-visible rounded-xl bg-transparent p-2 transition-transform duration-300 ease-out before:pointer-events-none before:absolute before:-inset-x-5 before:-inset-y-3 before:z-0 before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,rgba(0,200,255,0.8)_0%,rgba(55,125,255,0.34)_42%,transparent_74%)] before:opacity-0 before:blur-md before:transition-opacity before:duration-300 before:content-[''] hover:-translate-y-1 hover:scale-[1.04] hover:!bg-transparent hover:before:opacity-100 [&>*]:relative [&>*]:z-[1]"
                 >
                   <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
@@ -402,7 +423,7 @@ export default function PieChartWithBreakdownDemo({
                     ({pct}%)
                   </span> */}
                   </dd>
-                </div>
+                </button>
 
                 {idx < rawData.length - 1 && (
                   <Separator

@@ -38,7 +38,7 @@ export interface PieChartWithBreakdownDemoProps {
   courseName?: string;
   /** 已掌握 */
   doneCount?: number;
-  /** 未牢记 */
+  /** 学习中 */
   notDoneCount?: number;
   /** 不认识 */
   notLearned?: number;
@@ -95,7 +95,7 @@ export default function PieChartWithBreakdownDemo({
 }: PieChartWithBreakdownDemoProps = {}) {
   const rawData = [
     { name: "已掌握", value: doneCount },
-    { name: "未牢记", value: notDoneCount },
+    { name: "学习中", value: notDoneCount },
     { name: "不认识", value: notLearned },
   ];
   const total = rawData.reduce((sum, d) => sum + d.value, 0);

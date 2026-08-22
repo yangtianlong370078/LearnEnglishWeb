@@ -6,4 +6,5 @@ export * as wordApi from "./modules/word";
 export * as authApi from "./modules/auth";
 export * as statisticsApi from "./modules/statistics";
 export * as courseApi from "./modules/course";
+export * as courseLearnApi from "./modules/courseLearn";
 export { get, post, put, del } from "./request";
