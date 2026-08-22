@@ -19,6 +19,7 @@ import { Microphone, Volume, Xmark } from "@gravity-ui/icons";
 
 import ConfettiBurst from "./confetti";
 import RingProgress from "./ring-progress";
+import { CnEnIcon, EnCnIcon } from "./mode-icons";
 import {
   MODE_FIELD,
   MODE_LABEL,
@@ -541,8 +542,10 @@ function WordCardInner(
                         <Volume className="size-4" />
                       ) : mode === "speech" ? (
                         <Microphone className="size-4" />
+                      ) : mode === "cn-en" ? (
+                        <CnEnIcon className="size-4" />
                       ) : (
-                        MODE_LABEL[mode]
+                        <EnCnIcon className="size-4" />
                       )}
                     </span>
                   </RingProgress>

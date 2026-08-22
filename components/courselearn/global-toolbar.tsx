@@ -5,6 +5,7 @@ import type { LearnMode } from "@/types/courselearn";
 import { Microphone, Volume } from "@gravity-ui/icons";
 
 import { MODE_LABEL, MODE_ORDER } from "./lib";
+import { CnEnIcon, EnCnIcon } from "./mode-icons";
 
 interface GlobalToolbarProps {
   globalMode: LearnMode | null;
@@ -51,7 +52,11 @@ export default function GlobalToolbar({
                 <Volume className="size-4" />
               ) : mode === "speech" ? (
                 <Microphone className="size-4" />
-              ) : null}
+              ) : mode === "cn-en" ? (
+                <CnEnIcon className="size-4" />
+              ) : (
+                <EnCnIcon className="size-4" />
+              )}
               {MODE_LABEL[mode]}
             </button>
           );
