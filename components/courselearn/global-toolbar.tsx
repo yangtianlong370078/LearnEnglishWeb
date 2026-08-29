@@ -30,7 +30,7 @@ export default function GlobalToolbar({
   onTogglePractice,
 }: GlobalToolbarProps) {
   return (
-    <div className="flex flex-col gap-3 rounded-2xl bg-white/50 p-2 shadow-lg shadow-black/[0.04] ring-1 ring-white/60 backdrop-blur-xl dark:bg-white/[0.06] dark:shadow-black/20 dark:ring-white/10 sm:flex-row sm:items-center sm:justify-between">
+    <div className="card card--default p-2  word-search-glass rounded-3xl !bg-transparent flex-col gap-3  sm:flex-row sm:items-center sm:justify-between">
       {/* 左侧：4 个学习模式（单选） */}
       <div className="flex flex-wrap items-center justify-center gap-2">
         {MODE_ORDER.map((mode) => {
@@ -40,7 +40,7 @@ export default function GlobalToolbar({
             <button
               key={mode}
               aria-pressed={active}
-              className={`inline-flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
+              className={`inline-flex items-center gap-1.5 rounded-3xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
                 active
                   ? "bg-gradient-to-br from-accent to-accent/80 text-accent-foreground shadow-md shadow-accent/35"
                   : "bg-white/70 text-foreground hover:-translate-y-px hover:bg-white hover:shadow-sm dark:bg-white/10 dark:hover:bg-white/15"
@@ -67,7 +67,7 @@ export default function GlobalToolbar({
       <div className="flex items-center justify-center gap-2">
         <button
           aria-pressed={translationOn}
-          className={`rounded-xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
+          className={`rounded-3xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
             translationOn
               ? "bg-gradient-to-br from-success to-success/80 text-success-foreground shadow-md shadow-success/35"
               : "bg-white/70 text-foreground hover:-translate-y-px hover:bg-white hover:shadow-sm dark:bg-white/10 dark:hover:bg-white/15"
@@ -79,7 +79,7 @@ export default function GlobalToolbar({
         </button>
         <button
           aria-pressed={practiceOn}
-          className={`rounded-xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
+          className={`rounded-3xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
             practiceOn
               ? "bg-gradient-to-br from-success to-success/80 text-success-foreground shadow-md shadow-success/35"
               : "bg-white/70 text-foreground hover:-translate-y-px hover:bg-white hover:shadow-sm dark:bg-white/10 dark:hover:bg-white/15"

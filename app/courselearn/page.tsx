@@ -23,7 +23,7 @@ import { MODE_FIELD, buildRecord, nextNumber } from "@/components/courselearn/li
 import { useCourseLearnSettings } from "@/components/courselearn/use-course-learn-settings";
 import { courseLearnApi } from "@/lib/api";
 
-const PAGE_SIZE = 30;
+const PAGE_SIZE = 12;
 
 function toStatus(value: string | null): LearnStatus {
   const n = Number(value);

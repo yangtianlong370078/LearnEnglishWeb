@@ -163,13 +163,25 @@
   position: relative;
   isolation: isolate;
   background-color: rgb(255 255 255 / 0.55) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  backdrop-filter: blur(16px) saturate(150%);
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+  backdrop-filter: blur(8px) saturate(150%);
   /* 固定为稳定的独立合成层（与页面其它不闪烁的毛玻璃卡片一致：仅 translateZ + isolation，
      不使用 will-change，避免图层被反复创建/销毁导致 backdrop-filter 采样闪烁） */
   transform: translateZ(0);
   -webkit-transform: translateZ(0);
 }
+
+.cardfilter {
+  position: relative;
+  isolation: isolate;
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+  backdrop-filter: blur(8px) saturate(150%);
+  /* 固定为稳定的独立合成层（与页面其它不闪烁的毛玻璃卡片一致：仅 translateZ + isolation，
+     不使用 will-change，避免图层被反复创建/销毁导致 backdrop-filter 采样闪烁） */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
 
 .dark .word-search-glass {
   background-color: rgb(10 16 34 / 0.58) !important;
@@ -992,3 +1004,13 @@ input:-webkit-autofill:active {
 }
 
 
+.cl-wave span {
+  --danger: #ffb0b0;
+    background: linear-gradient(to top, var(--danger, #ddb9b9), #ffdee3);
+    transform-origin: center;
+    border-radius: 9999px;
+    width: 3.5px;
+    height: 100%;
+    animation: .9s ease-in-out infinite cl-wave-bar;
+    display: block;
+}

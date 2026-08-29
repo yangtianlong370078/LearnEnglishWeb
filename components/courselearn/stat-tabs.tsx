@@ -30,7 +30,7 @@ export default function StatTabs({
 
   return (
     <div className="flex justify-center">
-      <div className="inline-flex items-center gap-1 rounded-2xl bg-white/50 p-1.5 shadow-lg shadow-black/[0.04] ring-1 ring-white/60 backdrop-blur-xl dark:bg-white/[0.06] dark:shadow-black/20 dark:ring-white/10">
+      <div className="card card--default  flex-row p-2  word-search-glass rounded-3xl !bg-transparent flex-col gap-3  sm:flex-row sm:items-center sm:justify-between">
         {TABS.map((tab) => {
           const isActive = active === tab.zt;
 
@@ -38,7 +38,7 @@ export default function StatTabs({
             <button
               key={tab.zt}
               aria-pressed={isActive}
-              className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
+              className={`inline-flex items-center gap-2 rounded-3xl px-4 py-2 text-sm font-medium transition-all duration-300 ${
                 isActive
                   ? "bg-white text-foreground shadow-md shadow-black/[0.06] dark:bg-white/15 dark:shadow-black/20"
                   : "text-muted hover:bg-white/40 hover:text-foreground dark:hover:bg-white/5"

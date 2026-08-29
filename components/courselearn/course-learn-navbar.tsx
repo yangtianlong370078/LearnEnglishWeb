@@ -46,9 +46,6 @@ export default function CourseLearnNavbar({
 
         <div className="flex items-center gap-2">
 
-
-   <InlineSelectCustomIndicatorDemo />
-
           <Segment
             // @ts-expect-error suppressHydrationWarning 由 HeroUI V3 Segment 支持但类型尚未暴露
             suppressHydrationWarning
@@ -83,7 +80,7 @@ export default function CourseLearnNavbar({
               <Display className="size-3.5" />
             </Segment.Item>
           </Segment>
-
+          <InlineSelectCustomIndicatorDemo />
           <Button
             isIconOnly
             aria-label="学习设置"

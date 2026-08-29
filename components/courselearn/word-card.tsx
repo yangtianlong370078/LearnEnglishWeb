@@ -210,25 +210,26 @@ function WordCardInner(
   /** 空格键：校验后按练习开关决定「清空留本卡」或「切换下一张」 */
   const validateTextInput = useCallback(
     (mode: "en-cn" | "cn-en") => {
-      // 防作弊：关闭【翻译】和【练习】时，若卡片已是成功/失败色（非默认色），
+      // 防作弊：关闭【翻译】和【练习】时，若卡片已是成功/失败色（非默认色），或者【翻译】开关开启、练习开关关闭
       // 按空格不再校验，仅清空输入并淡出为默认色，光标留在本卡
       if (
-        !translationOn &&
+        (!translationOn &&
         !practiceOn &&
-        resultStateRef.current !== "idle"
+        resultStateRef.current !== "idle")||
+        (!practiceOn&&translationOn&&resultStateRef.current !== "idle")
       ) {
         clearInputAndFade();
         requestAnimationFrame(() => inputRef.current?.focus());
-
         return;
       }
 
       if (!runValidation(mode)) return;
 
-      if (practiceOn) {
+      if (practiceOn ) {
         // 练习：空格校验后清空输入，光标留在本卡
         setInputValue("");
-        requestAnimationFrame(() => inputRef.current?.focus());
+          requestAnimationFrame(() => inputRef.current?.focus());
+       
       } else {
         // 非练习：不清空本卡输入，直接切换到下一张
         onAdvance(index);
@@ -480,9 +481,9 @@ function WordCardInner(
 
   const cardStateClass =
     resultState === "correct"
-      ? "cl-card-correct"
+      ? "cardfilter  cl-card-correct "
       : resultState === "wrong"
-        ? "cl-card-wrong"
+        ? "cardfilter  cl-card-wrong"
         : "word-search-glass !bg-transparent";
 
 const cardStateSubClass =
@@ -496,7 +497,7 @@ const cardStateSubClass =
 
   return (
     <Card
-      className={`cl-card p-0 group relative overflow-visible  ${
+      className={`p-0 group relative overflow-visible  ${
         colorTransition
           ? "transition-[background-color,border-color,box-shadow] duration-500 ease-out"
           : ""
@@ -505,17 +506,17 @@ const cardStateSubClass =
       <ConfettiBurst fireKey={confettiKey} />
 
       <div
-        className={`${shaking ? "cl-shake" : ""} p-[20px] rounded-3xl ${cardStateSubClass}`}
+        className={`${shaking ? "cl-shake" : ""}   rounded-3xl ${cardStateSubClass}`}
         onAnimationEnd={() => setShaking(false)}
       >
-        <Card.Content className="flex flex-col gap-4 p-4">
+        <Card.Content className="flex flex-col h-[220px]! p-[20px] justify-between ">
           {/* 主体：按模式渲染 */}
-          <div className="flex min-h-[92px] flex-col items-center justify-center gap-2 text-center">
+          <div className="flex flex-col justify-center gap-2 mb-3 h-full items-center text-center">
             {renderBody()}
           </div>
 
           {/* 四个学习按钮 + 环形进度 */}
-          <div className="flex items-center justify-center gap-3">
+          <div className="flex items-center mb-1 justify-center gap-3">
             {MODE_ORDER.map((mode) => {
               const field = MODE_FIELD[mode];
               const percent = progressPercent(word[field]);
@@ -528,7 +529,7 @@ const cardStateSubClass =
                   aria-pressed={active}
                   className={`inline-flex flex-col items-center gap-1 transition-all duration-300 ${
                     globalMode
-                      ? "cursor-not-allowed opacity-40"
+                      ? `cursor-not-allowed ${globalMode === mode ? "" : "opacity-40"}`
                       : "cursor-pointer hover:-translate-y-0.5"
                   }`}
                   disabled={!!globalMode}
@@ -611,7 +612,7 @@ const cardStateSubClass =
             aria-label={
               speakerState === "idle" ? "播放发音" : "停止播放"
             }
-            className={`cl-speaker-btn ${
+            className={`cl-speaker-btn mb-1 ${
               speakerState === "playing"
                 ? "is-playing"
                 : speakerState === "waiting"
@@ -631,7 +632,7 @@ const cardStateSubClass =
               }`}
             />
           </button>
-          <span
+          {/* <span
             className={`text-[11px] font-medium tracking-wide transition-colors ${
               speakerState === "playing"
                 ? "text-accent"
@@ -645,7 +646,7 @@ const cardStateSubClass =
               : speakerState === "waiting"
                 ? "等待下次播放…"
                 : "点击喇叭开始听写"}
-          </span>
+          </span> */}
           {renderInput("听到后输入单词")}
         </>
       );
@@ -655,20 +656,24 @@ const cardStateSubClass =
     return (
       <>
         <span className="text-2xl font-bold text-foreground">{word.en}</span>
-        {showSecondary && <span className="text-sm text-muted">{word.cn}</span>}
+        {/* {showSecondary && <span className="text-sm text-muted">{word.cn}</span>} */}
+
+
+        
         <button
           aria-label={
             micState === "recording" ? "结束录音" : "开始语音识别"
           }
-          className={`cl-mic-btn ${
-            micState === "recording" ? "is-recording" : ""
+          className={` mt-[12px]!  ${
+            micState === "recording" ? " cl-mic-btn is-recording" : "cl-speaker-btn"
           }`}
           type="button"
           onClick={toggleSpeech}
         >
-          <Microphone className="size-7" />
-        </button>
-        {micState === "recording" ? (
+          
+
+
+  {micState === "recording" ? (
           <span aria-hidden="true" className="cl-wave">
             <span />
             <span />
@@ -676,21 +681,29 @@ const cardStateSubClass =
             <span />
             <span />
           </span>
-        ) : null}
-        <span
+        ) : <Microphone className="size-7 " />}
+
+
+        </button>
+
+
+       
+
+
+        {/* <span
           className={`text-[11px] font-medium tracking-wide transition-colors ${
             micState === "recording" ? "text-danger" : "text-muted"
           }`}
         >
           {micState === "recording" ? "录音中 · 点击结束" : "点击麦克风朗读单词"}
-        </span>
+        </span> */}
       </>
     );
   }
 
   function renderInput(placeholder: string) {
     return (
-      <div className="relative mt-1 w-full max-w-[240px]">
+      <div className="relative mt-2 max-w-[240px]  w-full ">
         <input
           ref={inputRef}
           aria-label="学习输入"
