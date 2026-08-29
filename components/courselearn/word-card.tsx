@@ -55,6 +55,8 @@ interface WordCardProps {
   practiceOn: boolean;
   /** 全局学习模式，非空时强制该模式且禁用卡片按钮 */
   globalMode: LearnMode | null;
+  /** 本地学习模式变化时上报给父级（用于联动翻译按钮禁用） */
+  onLocalModeChange?: (mode: LearnMode | null) => void;
   /** 判定结果回调：由父级累加练习次数与生成记录 */
   onResult: (word: LearnWord, mode: LearnMode, correct: boolean) => void;
   /** 请求切换到下一张卡片 */
@@ -76,6 +78,7 @@ function WordCardInner(
     translationOn,
     practiceOn,
     globalMode,
+    onLocalModeChange,
     onResult,
     onAdvance,
     onFocusRequest,
@@ -85,6 +88,19 @@ function WordCardInner(
   const localModeState = useState<LearnMode | null>(null);
   const [localMode, setLocalMode] = localModeState;
   const effectiveMode: LearnMode | null = globalMode ?? localMode;
+
+  // 本地模式的最新值 + 同步上报父级
+  const localModeRef = useRef<LearnMode | null>(null);
+
+  const setLocalModeAndNotify = useCallback(
+    (next: LearnMode | null) => {
+      if (localModeRef.current === next) return;
+      localModeRef.current = next;
+      setLocalMode(next);
+      onLocalModeChange?.(next);
+    },
+    [onLocalModeChange, setLocalMode],
+  );
 
   const [inputValue, setInputValue] = useState("");
   const [resultState, setResultState] = useState<ResultState>("idle");
@@ -152,7 +168,7 @@ function WordCardInner(
     setInputValue("");
     setResultState("idle");
     // 切换全局模式时清空本地模式
-    if (globalMode) setLocalMode(null);
+    if (globalMode) setLocalModeAndNotify(null);
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [globalMode]);
 
@@ -436,9 +452,9 @@ function WordCardInner(
       stopActivity();
       setInputValue("");
       setResultState("idle");
-      setLocalMode((prev) => (prev === mode ? null : mode));
+      setLocalModeAndNotify(localModeRef.current === mode ? null : mode);
     },
-    [globalMode, index, onFocusRequest, setLocalMode, stopActivity],
+    [globalMode, index, onFocusRequest, setLocalModeAndNotify, stopActivity],
   );
 
   // ── 命令句柄 ─────────────────────────────────────────────

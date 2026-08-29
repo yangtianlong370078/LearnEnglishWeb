@@ -10,6 +10,8 @@ import { CnEnIcon, EnCnIcon } from "./mode-icons";
 interface GlobalToolbarProps {
   globalMode: LearnMode | null;
   translationOn: boolean;
+  /** 全局或任一单词卡开启【听写】/【语音】时为 true，翻译按钮禁用 */
+  translationDisabled: boolean;
   practiceOn: boolean;
   onGlobalModeChange: (mode: LearnMode | null) => void;
   onToggleTranslation: () => void;
@@ -24,6 +26,7 @@ interface GlobalToolbarProps {
 export default function GlobalToolbar({
   globalMode,
   translationOn,
+  translationDisabled,
   practiceOn,
   onGlobalModeChange,
   onToggleTranslation,
@@ -66,12 +69,17 @@ export default function GlobalToolbar({
       {/* 右侧：翻译 / 练习（多选） */}
       <div className="flex items-center justify-center gap-2">
         <button
+          aria-disabled={translationDisabled}
           aria-pressed={translationOn}
           className={`rounded-3xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
-            translationOn
-              ? "bg-gradient-to-br from-success to-success/80 text-success-foreground shadow-md shadow-success/35"
-              : "bg-white/70 text-foreground hover:-translate-y-px hover:bg-white hover:shadow-sm dark:bg-white/10 dark:hover:bg-white/15"
+            translationDisabled
+              ? "cursor-not-allowed bg-white/40 text-muted opacity-60 dark:bg-white/5"
+              : translationOn
+                ? "bg-gradient-to-br from-success to-success/80 text-success-foreground shadow-md shadow-success/35"
+                : "bg-white/70 text-foreground hover:-translate-y-px hover:bg-white hover:shadow-sm dark:bg-white/10 dark:hover:bg-white/15"
           }`}
+          disabled={translationDisabled}
+          title={translationDisabled ? "听写 / 语音模式下不可开启翻译" : undefined}
           type="button"
           onClick={onToggleTranslation}
         >

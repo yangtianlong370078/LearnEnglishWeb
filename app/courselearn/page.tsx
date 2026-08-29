@@ -19,7 +19,12 @@ import PaginationBar from "@/components/courselearn/pagination-bar";
 import SettingsModal from "@/components/courselearn/settings-modal";
 import StatTabs from "@/components/courselearn/stat-tabs";
 import WordCard from "@/components/courselearn/word-card";
-import { MODE_FIELD, buildRecord, nextNumber } from "@/components/courselearn/lib";
+import {
+  MODE_FIELD,
+  buildRecord,
+  isAudioMode,
+  nextNumber,
+} from "@/components/courselearn/lib";
 import { useCourseLearnSettings } from "@/components/courselearn/use-course-learn-settings";
 import { courseLearnApi } from "@/lib/api";
 
@@ -58,6 +63,10 @@ function CourseLearnClient() {
   const [error, setError] = useState<string | null>(null);
 
   const [globalMode, setGlobalMode] = useState<LearnMode | null>(null);
+  /** 各单词卡的本地学习模式（key 为卡片索引），用于联动翻译按钮 */
+  const [localModes, setLocalModes] = useState<
+    Record<number, LearnMode | null>
+  >({});
   const [translationOn, setTranslationOn] = useState(false);
   const [practiceOn, setPracticeOn] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -99,6 +108,7 @@ function CourseLearnClient() {
         setWords(data.data ?? []);
         cardRefs.current = [];
         setCurrentIndex(0);
+        setLocalModes({});
         setDataVersion((v) => v + 1);
       })
       .catch((err: Error) => {
@@ -216,6 +226,24 @@ function CourseLearnClient() {
     setCurrentIndex(0);
   }, []);
 
+  // 单词卡本地模式上报
+  const handleLocalModeChange = useCallback(
+    (index: number, mode: LearnMode | null) => {
+      setLocalModes((prev) =>
+        prev[index] === mode ? prev : { ...prev, [index]: mode },
+      );
+    },
+    [],
+  );
+
+  // 全局或任一单词卡开启【听写】/【语音】时，翻译须关闭且不可点击
+  const translationLocked =
+    isAudioMode(globalMode) || Object.values(localModes).some(isAudioMode);
+
+  useEffect(() => {
+    if (translationLocked) setTranslationOn(false);
+  }, [translationLocked]);
+
   // 全局英-中 / 中-英 激活或新一页数据加载时，聚焦第一张卡片输入框。
   // 注意：依赖 dataVersion 而非 words，避免计分更新 words 时把光标抢回首卡。
   useEffect(() => {
@@ -247,6 +275,7 @@ function CourseLearnClient() {
         <GlobalToolbar
           globalMode={globalMode}
           practiceOn={practiceOn}
+          translationDisabled={translationLocked}
           translationOn={translationOn}
           onGlobalModeChange={handleGlobalModeChange}
           onTogglePractice={() => setPracticeOn((v) => !v)}
@@ -288,6 +317,7 @@ function CourseLearnClient() {
                 word={word}
                 onAdvance={handleAdvance}
                 onFocusRequest={handleFocusRequest}
+                onLocalModeChange={(mode) => handleLocalModeChange(index, mode)}
                 onResult={handleResult}
               />
             ))}

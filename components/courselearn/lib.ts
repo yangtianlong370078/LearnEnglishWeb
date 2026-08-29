@@ -35,6 +35,14 @@ export const MODE_ORDER: LearnMode[] = [
 ];
 
 /**
+ * 「音频类」学习模式（听写 / 语音）判定。
+ * 全局或任一单词卡开启该类模式时，【翻译】功能须关闭且不可点击。
+ */
+export function isAudioMode(mode: LearnMode | null | undefined): boolean {
+  return mode === "dictation" || mode === "speech";
+}
+
+/**
  * 练习次数字段 → 后端 updcnoV2 的整型 type。
  * 对应后端 ModifyNumberAsync：1=zynumber 2=yznumber 3=txnumber 4=fynumber。
  */
