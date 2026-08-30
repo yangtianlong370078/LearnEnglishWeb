@@ -221,6 +221,13 @@ function CourseLearnClient() {
     setCurrentIndex(index);
   }, []);
 
+  // ── 听写/语音互斥：某张卡片启动活动时，中断其它卡片的播放与录音 ──
+  const handleExclusiveStart = useCallback((index: number) => {
+    cardRefs.current.forEach((handle, i) => {
+      if (i !== index) handle?.interrupt();
+    });
+  }, []);
+
   const handleGlobalModeChange = useCallback((mode: LearnMode | null) => {
     setGlobalMode(mode);
     setCurrentIndex(0);
@@ -316,6 +323,7 @@ function CourseLearnClient() {
                 translationOn={translationOn}
                 word={word}
                 onAdvance={handleAdvance}
+                onExclusiveStart={handleExclusiveStart}
                 onFocusRequest={handleFocusRequest}
                 onLocalModeChange={(mode) => handleLocalModeChange(index, mode)}
                 onResult={handleResult}

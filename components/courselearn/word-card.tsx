@@ -41,6 +41,8 @@ export interface WordCardHandle {
   start: () => void;
   /** 停止当前活动 */
   stop: () => void;
+  /** 被其它卡片抢占：立即停止听写播放与录音，并清空听写输入 */
+  interrupt: () => void;
   /** 重置卡片状态 */
   reset: () => void;
 }
@@ -63,6 +65,8 @@ interface WordCardProps {
   onAdvance: (index: number) => void;
   /** 用户与本卡片交互时通知父级（更新「当前卡片」指针） */
   onFocusRequest: (index: number) => void;
+  /** 本卡启动听写播放/语音识别前通知父级，父级负责中断其它卡片的活动 */
+  onExclusiveStart: (index: number) => void;
 }
 
 type ResultState = "idle" | "correct" | "wrong";
@@ -82,6 +86,7 @@ function WordCardInner(
     onResult,
     onAdvance,
     onFocusRequest,
+    onExclusiveStart,
   }: WordCardProps,
   ref: React.Ref<WordCardHandle>,
 ) {
@@ -350,8 +355,12 @@ function WordCardInner(
 
       return;
     }
+    // 同一时间只允许一个单词播放：中断其它卡片的播放/录音
+    onExclusiveStart(index);
+    // 光标定位到本卡输入框
+    requestAnimationFrame(() => inputRef.current?.focus());
     void runDictation();
-  }, [index, onFocusRequest, runDictation, speakerState, stopActivity]);
+  }, [index, onExclusiveStart, onFocusRequest, runDictation, speakerState, stopActivity]);
 
   // ── 语音：录音 + 识别 ─────────────────────────────────────
   const runSpeech = useCallback(async () => {
@@ -441,8 +450,10 @@ function WordCardInner(
 
       return;
     }
+    // 同一时间只允许一个单词录音识别：中断其它卡片的录音/播放
+    onExclusiveStart(index);
     void runSpeech();
-  }, [index, micState, onFocusRequest, runSpeech, settings.asrModelType]);
+  }, [index, micState, onExclusiveStart, onFocusRequest, runSpeech, settings.asrModelType]);
 
   // ── 卡片按钮：本地模式切换（单选互斥） ───────────────────
   const handleModeButton = useCallback(
@@ -477,13 +488,28 @@ function WordCardInner(
         }
       },
       stop: stopActivity,
+      interrupt: () => {
+        const wasDictating = speakerState !== "idle";
+
+        stopActivity();
+        // 被抢占的听写卡片：清空输入框内容
+        if (wasDictating) clearInputAndFade();
+      },
       reset: () => {
         stopActivity();
         setInputValue("");
         setResultState("idle");
       },
     }),
-    [effectiveMode, micState, runDictation, runSpeech, speakerState, stopActivity],
+    [
+      clearInputAndFade,
+      effectiveMode,
+      micState,
+      runDictation,
+      runSpeech,
+      speakerState,
+      stopActivity,
+    ],
   );
 
   // 当输入模式激活时自动聚焦（仅当有全局模式或本地模式切换）
@@ -724,7 +750,7 @@ const cardStateSubClass =
           ref={inputRef}
           aria-label="学习输入"
           autoComplete="off"
-          className="w-full rounded-3xl border border-black/10 bg-white/60 px-8 py-2 text-center text-sm text-foreground outline-none transition-colors placeholder:text-muted focus:border-accent focus:bg-white/80 dark:border-white/10 dark:bg-white/5 dark:focus:bg-white/10"
+          className="w-full rounded-3xl border border-black/10 bg-white/40 px-8 py-2 text-center text-sm text-foreground outline-none transition-colors placeholder:text-muted focus:border-accent focus:bg-white/50 dark:border-white/10 dark:bg-white/5 dark:focus:bg-white/10"
           placeholder={placeholder}
           spellCheck={false}
           type="text"
