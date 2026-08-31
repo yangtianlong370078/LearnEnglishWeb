@@ -135,7 +135,7 @@ export default function SettingsModal({
               <NumberField
                 aria-label="听写次数"
                 className="w-[130px]"
-                maxValue={20}
+                maxValue={10}
                 minValue={1}
                 value={settings.dictationCount}
                 variant="secondary"
@@ -144,9 +144,9 @@ export default function SettingsModal({
                 }
               >
                 <NumberField.Group className="flex w-full">
-                  <NumberField.DecrementButton />
+                  <NumberField.DecrementButton className="px-[10px]"/>
                   <NumberField.Input className="w-full text-center" />
-                  <NumberField.IncrementButton />
+                  <NumberField.IncrementButton className="px-[10px]"/>
                 </NumberField.Group>
               </NumberField>
             </div>

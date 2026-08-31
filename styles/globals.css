@@ -106,6 +106,15 @@
   --surface-tertiary: oklch(0.28 0.003 248 / 0.42) !important;
 }
 
+/* ── Toast 提示框背景不透明（覆盖上方毛玻璃 --surface）── */
+.toast {
+  background-color: oklch(1 0 0);
+}
+
+.dark .toast {
+  background-color: oklch(0.22 0.006 286);
+}
+
 .wordfy {
   border: none !important;
   box-shadow:

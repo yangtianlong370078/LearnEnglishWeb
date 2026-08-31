@@ -82,6 +82,7 @@ export default function CourseLearnNavbar({
           </Segment>
           <InlineSelectCustomIndicatorDemo />
           <Button
+          className="!bg-white/50 dark:!bg-black/30"
             isIconOnly
             aria-label="学习设置"
             variant="secondary"

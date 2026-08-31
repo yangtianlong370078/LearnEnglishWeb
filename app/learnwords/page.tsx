@@ -485,6 +485,7 @@ export default function LearnWordsPage() {
               }
             >
               <PieChartWithBreakdownDemo
+                courseId={data?.newWord.courseId}
                 courseName={data?.newWord.courseName ?? "生词本"}
                 doneCount={data?.newWord.doneCount}
                 notDoneCount={data?.newWord.notDoneCount}
@@ -510,6 +511,7 @@ export default function LearnWordsPage() {
               }
             >
               <PieChartWithBreakdownDemo
+                courseId={data?.strengthenWord.courseId}
                 courseName={data?.strengthenWord.courseName ?? "强化区"}
                 doneCount={data?.strengthenWord.doneCount}
                 notDoneCount={data?.strengthenWord.notDoneCount}
@@ -535,6 +537,7 @@ export default function LearnWordsPage() {
               }
             >
               <PieChartWithBreakdownDemo
+                courseId={data?.lastCourse.courseId}
                 courseName={
                   data?.lastCourse.courseId
                     ? data.lastCourse.courseName
@@ -544,6 +547,7 @@ export default function LearnWordsPage() {
                 notDoneCount={data?.lastCourse.notDoneCount}
                 notLearned={data?.lastCourse.notLearned}
                 emptyLabel="暂无记录"
+                emptyHint="暂无学习记录，请先去学习具体的课程"
                 eyebrow="正在学习"
                 leadingIcon={<ClockArrowRotateLeft className="size-6" />}
                 menuMode="none"

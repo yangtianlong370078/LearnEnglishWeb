@@ -558,7 +558,7 @@ const cardStateSubClass =
           </div>
 
           {/* 四个学习按钮 + 环形进度 */}
-          <div className="flex items-center mb-1 justify-center gap-3">
+          <div className="flex items-center mb-1 justify-center gap-4">
             {MODE_ORDER.map((mode) => {
               const field = MODE_FIELD[mode];
               const percent = progressPercent(word[field]);
@@ -750,7 +750,7 @@ const cardStateSubClass =
           ref={inputRef}
           aria-label="学习输入"
           autoComplete="off"
-          className="w-full rounded-3xl border border-black/10 bg-white/40 px-8 py-2 text-center text-sm text-foreground outline-none transition-colors placeholder:text-muted focus:border-accent focus:bg-white/50 dark:border-white/10 dark:bg-white/5 dark:focus:bg-white/10"
+          className="w-full rounded-3xl border border-black/10 bg-white/40 px-8 py-2 text-center text-sm text-foreground outline-none transition-colors placeholder:text-muted focus:border-accent/40 focus:bg-white/50 dark:border-white/10 dark:bg-white/5 dark:focus:bg-white/10"
           placeholder={placeholder}
           spellCheck={false}
           type="text"

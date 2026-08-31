@@ -42,7 +42,8 @@ function CourseLearnClient() {
   const kc = useMemo(() => {
     const n = Number(searchParams.get("kc"));
 
-    return Number.isFinite(n) && n > 0 ? n : 1;
+    // 内置集合（生词本/强化学习区等）使用负数 id，仅排除 0 与非法值
+    return Number.isFinite(n) && n !== 0 ? n : 1;
   }, [searchParams]);
   const initialName = useMemo(
     () => searchParams.get("name") ?? "",

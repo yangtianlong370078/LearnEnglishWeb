@@ -9,6 +9,7 @@ import {
   Header,
   Label,
   Separator,
+  toast,
 } from "@heroui/react";
 
 import { ChartTooltip, PieChart } from "@heroui-pro/react";
@@ -51,6 +52,8 @@ export interface PieChartWithBreakdownDemoProps {
   leadingIcon?: ReactNode;
   /** 概览卡无数据时的圆心文案 */
   emptyLabel?: string;
+  /** courseId 为空时点击底部状态项的提示文案（不跳转，改为 toast 提示） */
+  emptyHint?: string;
   /**
    * 菜单显示模式：
    * - "none": 不显示 Dropdown
@@ -116,6 +119,7 @@ export default function PieChartWithBreakdownDemo({
   eyebrow,
   leadingIcon,
   emptyLabel = "暂无数据",
+  emptyHint,
   menuMode = "full",
   onEdit,
   onDelete,
@@ -141,6 +145,24 @@ export default function PieChartWithBreakdownDemo({
   // 避免出现"珍珠项链"效果；无圆角时保持 0，切片端到端连接
   const paddingAngle = allSlicesAboveThreshold ? -10 : -1;
   const isDesktop = useMediaQuery("(min-width: 640px)");
+
+  const openCourseLearn = (entryName: string) => {
+    const zt = ZT_BY_NAME[entryName];
+
+    if (!zt) return;
+    if (!courseId) {
+      if (emptyHint) toast.info(emptyHint);
+
+      return;
+    }
+    window.open(
+      `/courselearn?kc=${courseId}&zt=${zt}&name=${encodeURIComponent(
+        courseName,
+      )}`,
+      "_blank",
+      "noopener,noreferrer",
+    );
+  };
 
   if (variant === "overview") {
     const overviewChartColors = [
@@ -233,7 +255,10 @@ export default function PieChartWithBreakdownDemo({
           >
             {rawData.map((entry, idx) => (
               <Fragment key={entry.name}>
-                <div
+                <button
+                  type="button"
+                  aria-label={`${entry.name} - 进入学习`}
+                  onClick={() => openCourseLearn(entry.name)}
                  className="relative isolate flex min-w-0 cursor-pointer flex-col items-center justify-center bg-transparent p-2 transition-transform duration-300 ease-out before:pointer-events-none before:absolute before:-inset-x-5 before:-inset-y-3 before:-z-10 before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--summary-accent)_72%,transparent)_0%,color-mix(in_srgb,var(--summary-accent)_30%,transparent)_42%,transparent_74%)] before:opacity-0 before:blur-md before:transition-opacity before:duration-300 hover:-translate-y-1 hover:scale-[1.04] hover:!bg-transparent hover:before:opacity-100"
                  >
                   <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
@@ -249,7 +274,7 @@ export default function PieChartWithBreakdownDemo({
                   <dd className="mt-1 text-base font-semibold leading-none tabular-nums text-foreground">
                     {entry.value.toLocaleString()}
                   </dd>
-                </div>
+                </button>
 
                 {idx < rawData.length - 1 && (
                   <Separator
@@ -393,18 +418,7 @@ export default function PieChartWithBreakdownDemo({
                 <button
                   type="button"
                   aria-label={`${entry.name} - 进入学习`}
-                  onClick={() => {
-                    const zt = ZT_BY_NAME[entry.name];
-
-                    if (!zt) return;
-                    window.open(
-                      `/courselearn?kc=${courseId}&zt=${zt}&name=${encodeURIComponent(
-                        courseName,
-                      )}`,
-                      "_blank",
-                      "noopener,noreferrer",
-                    );
-                  }}
+                  onClick={() => openCourseLearn(entry.name)}
                   className="relative isolate flex min-w-0 cursor-pointer flex-col items-center justify-center overflow-visible rounded-xl bg-transparent p-2 transition-transform duration-300 ease-out before:pointer-events-none before:absolute before:-inset-x-5 before:-inset-y-3 before:z-0 before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,rgba(0,200,255,0.8)_0%,rgba(55,125,255,0.34)_42%,transparent_74%)] before:opacity-0 before:blur-md before:transition-opacity before:duration-300 before:content-[''] hover:-translate-y-1 hover:scale-[1.04] hover:!bg-transparent hover:before:opacity-100 [&>*]:relative [&>*]:z-[1]"
                 >
                   <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">

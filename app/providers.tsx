@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { Toast } from "@heroui/react";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -89,7 +90,10 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   );
 
   return (
-    <ThemeContext.Provider value={value}>{children}</ThemeContext.Provider>
+    <ThemeContext.Provider value={value}>
+      {children}
+      <Toast.Provider placement="top" />
+    </ThemeContext.Provider>
   );
 }
 
