@@ -34,6 +34,17 @@ export const MODE_ORDER: LearnMode[] = [
   "speech",
 ];
 
+/** 四种学习模式主题色：from→to 激活渐变，soft 关闭态底色 */
+export const MODE_THEME: Record<
+  LearnMode,
+  { from: string; to: string; soft: string }
+> = {
+  "en-cn": { from: "#37a6ff", to: "#166bd8", soft: "rgba(38, 132, 255, 0.3)" },
+  "cn-en": { from: "#8f80ff", to: "#5a48d8", soft: "rgba(122, 100, 255, 0.3)" },
+  dictation: { from: "#3fd0c9", to: "#0d9d97", soft: "rgba(32, 196, 188, 0.3)" },
+  speech: { from: "#ffb54d", to: "#f2801f", soft: "rgba(255, 166, 51, 0.32)" },
+};
+
 /**
  * 「音频类」学习模式（听写 / 语音）判定。
  * 全局或任一单词卡开启该类模式时，【翻译】功能须关闭且不可点击。

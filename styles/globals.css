@@ -1052,6 +1052,36 @@ input:-webkit-autofill:active {
     inset 0 1px 0 rgb(255 255 255 / 0.3);
 }
 
+/* ────────────────────────────────────────────────────────────────
+ * 全局学习模式按钮：与卡片按钮同一套主题配色
+ * ──────────────────────────────────────────────────────────────── */
+.cl-global-btn {
+  --cl-ring: var(--accent);
+  --cl-ring2: var(--accent);
+  --cl-soft: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--cl-ring2);
+  background: var(--cl-soft);
+}
+
+.cl-global-btn:not(.is-active):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--cl-ring) 20%, transparent);
+}
+
+.cl-global-btn.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--cl-ring), var(--cl-ring2));
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--cl-ring) 40%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
+.cl-global-btn.is-active:hover {
+  box-shadow:
+    0 5px 16px color-mix(in srgb, var(--cl-ring) 48%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
 /* 课程学习顶部导航吸顶容器（复用 navbar 毛玻璃观感） */
 .cl-navbar {
   position: sticky;

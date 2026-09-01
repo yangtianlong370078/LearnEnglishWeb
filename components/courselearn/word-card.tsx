@@ -24,6 +24,7 @@ import {
   MODE_FIELD,
   MODE_LABEL,
   MODE_ORDER,
+  MODE_THEME,
   buildAudioUrl,
   getAudioDurationMs,
   includesIgnoreCase,
@@ -71,14 +72,6 @@ interface WordCardProps {
 
 type ResultState = "idle" | "correct" | "wrong";
 type SpeakerState = "idle" | "playing" | "waiting";
-
-/** 四种学习模式主题色：from→to 激活渐变，soft 关闭态底色 */
-const MODE_THEME: Record<LearnMode, { from: string; to: string; soft: string }> = {
-  "en-cn": { from: "#37a6ff", to: "#166bd8", soft: "rgba(38, 132, 255, 0.3)" },
-  "cn-en": { from: "#8f80ff", to: "#5a48d8", soft: "rgba(122, 100, 255, 0.3)" },
-  dictation: { from: "#3fd0c9", to: "#0d9d97", soft: "rgba(32, 196, 188, 0.3)" },
-  speech: { from: "#ffb54d", to: "#f2801f", soft: "rgba(255, 166, 51, 0.32)" },
-};
 
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
@@ -566,7 +559,7 @@ const cardStateSubClass =
           </div>
 
           {/* 四个学习按钮 + 环形进度 */}
-          <div className="flex items-center mb-1 justify-center gap-4">
+          <div className="flex items-center mb-1 justify-center gap-3">
             {MODE_ORDER.map((mode) => {
               const field = MODE_FIELD[mode];
               const percent = progressPercent(word[field]);
@@ -598,8 +591,8 @@ const cardStateSubClass =
                     className={`transition-transform duration-300 ${
                       active ? "scale-105" : ""
                     }`}
-                    color={active ? "var(--cl-ring)" : "var(--cl-soft)"}
-                    colorTo={active ? "var(--cl-ring2)" : undefined}
+                    color="var(--cl-ring)"
+                    colorTo="var(--cl-ring2)"
                     percent={percent}
                     size={46}
                     strokeWidth={3.5}
@@ -762,7 +755,7 @@ const cardStateSubClass =
 
   function renderInput(placeholder: string) {
     return (
-      <div className="relative mt-2 max-w-[240px]  w-full ">
+      <div className="relative mt-1 max-w-[240px]  w-full ">
         <input
           ref={inputRef}
           aria-label="学习输入"

@@ -4,7 +4,7 @@ import type { LearnMode } from "@/types/courselearn";
 
 import { Microphone, Volume } from "@gravity-ui/icons";
 
-import { MODE_LABEL, MODE_ORDER } from "./lib";
+import { MODE_LABEL, MODE_ORDER, MODE_THEME } from "./lib";
 import { CnEnIcon, EnCnIcon } from "./mode-icons";
 
 interface GlobalToolbarProps {
@@ -38,16 +38,22 @@ export default function GlobalToolbar({
       <div className="flex flex-wrap items-center justify-center gap-2">
         {MODE_ORDER.map((mode) => {
           const active = globalMode === mode;
+          const theme = MODE_THEME[mode];
 
           return (
             <button
               key={mode}
               aria-pressed={active}
-              className={`inline-flex items-center gap-1.5 rounded-3xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
-                active
-                  ? "bg-gradient-to-br from-accent to-accent/80 text-accent-foreground shadow-md shadow-accent/35"
-                  : "bg-white/70 text-foreground hover:-translate-y-px hover:bg-white hover:shadow-sm dark:bg-white/10 dark:hover:bg-white/15"
+              className={`cl-global-btn inline-flex items-center gap-1.5 rounded-3xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
+                active ? "is-active" : ""
               }`}
+              style={
+                {
+                  "--cl-ring": theme.from,
+                  "--cl-ring2": theme.to,
+                  "--cl-soft": theme.soft,
+                } as React.CSSProperties
+              }
               type="button"
               onClick={() => onGlobalModeChange(active ? null : mode)}
             >
