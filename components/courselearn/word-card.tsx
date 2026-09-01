@@ -15,11 +15,11 @@ import {
   useState,
 } from "react";
 import { Card } from "@heroui/react";
-import { Microphone, Volume, Xmark } from "@gravity-ui/icons";
+import { Xmark } from "@gravity-ui/icons";
 
 import ConfettiBurst from "./confetti";
 import RingProgress from "./ring-progress";
-import { CnEnIcon, EnCnIcon } from "./mode-icons";
+import { CnEnIcon, EnCnIcon, MicrophoneIcon, SpeakerIcon } from "./mode-icons";
 import {
   MODE_FIELD,
   MODE_LABEL,
@@ -601,9 +601,9 @@ const cardStateSubClass =
                       className={`cl-mode-icon ${active ? "is-active" : ""}`}
                     >
                       {mode === "dictation" ? (
-                        <Volume className="size-4" />
+                        <SpeakerIcon className="size-4" />
                       ) : mode === "speech" ? (
-                        <Microphone className="size-4" />
+                        <MicrophoneIcon className="size-4" />
                       ) : mode === "cn-en" ? (
                         <CnEnIcon className="size-4" />
                       ) : (
@@ -674,7 +674,7 @@ const cardStateSubClass =
             type="button"
             onClick={toggleDictation}
           >
-            <Volume
+            <SpeakerIcon
               className={`size-7 ${
                 speakerState === "playing"
                   ? "cl-speaker-playing"
@@ -733,7 +733,7 @@ const cardStateSubClass =
             <span />
             <span />
           </span>
-        ) : <Microphone className="size-7 " />}
+        ) : <MicrophoneIcon className="size-7 " />}
 
 
         </button>
