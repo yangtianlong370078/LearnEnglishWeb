@@ -1052,6 +1052,11 @@ input:-webkit-autofill:active {
     inset 0 1px 0 rgb(255 255 255 / 0.3);
 }
 
+/* 暗色模式：关闭态图标改用渐变亮色（激活态保持白色） */
+.dark .cl-mode-icon:not(.is-active) {
+  color: var(--cl-ring);
+}
+
 /* ────────────────────────────────────────────────────────────────
  * 全局学习模式按钮：与卡片按钮同一套主题配色
  * ──────────────────────────────────────────────────────────────── */
@@ -1080,6 +1085,11 @@ input:-webkit-autofill:active {
   box-shadow:
     0 5px 16px color-mix(in srgb, var(--cl-ring) 48%, transparent),
     inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
+/* 暗色模式：关闭态图标与文字改用渐变亮色（激活态保持白色） */
+.dark .cl-global-btn:not(.is-active) {
+  color: var(--cl-ring);
 }
 
 /* 课程学习顶部导航吸顶容器（复用 navbar 毛玻璃观感） */
