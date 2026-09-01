@@ -990,6 +990,68 @@ input:-webkit-autofill:active {
   }
 }
 
+/* ────────────────────────────────────────────────────────────────
+ * 学习模式按钮：模式主题色环 + 图标底盘
+ * 主题色由按钮内联样式 --cl-ring / --cl-ring2 / --cl-soft 注入
+ * ──────────────────────────────────────────────────────────────── */
+.cl-mode-btn {
+  --cl-ring: var(--accent);
+  --cl-ring2: var(--accent);
+  --cl-soft: color-mix(in srgb, var(--accent) 30%, transparent);
+  position: relative;
+  padding: 2px 4px;
+  border-radius: 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cl-mode-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.cl-mode-btn:not(:disabled):active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* 图标底盘：关闭态为模式色半透明碟，激活态为渐变实色碟 */
+.cl-mode-icon {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cl-ring2);
+  background: var(--cl-soft);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+}
+
+/* 悬停仅轻微反馈：微弱放大 + 淡光晕，不改变背景色 */
+.cl-mode-btn:not(:disabled):hover .cl-mode-icon {
+  transform: scale(1.05);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--cl-ring) 20%, transparent);
+}
+
+.cl-mode-icon.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--cl-ring), var(--cl-ring2));
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--cl-ring) 40%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
+/* 激活态悬停：背景保持不变，仅阴影轻微加深 */
+.cl-mode-btn:not(:disabled):hover .cl-mode-icon.is-active {
+  box-shadow:
+    0 5px 16px color-mix(in srgb, var(--cl-ring) 48%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
 /* 课程学习顶部导航吸顶容器（复用 navbar 毛玻璃观感） */
 .cl-navbar {
   position: sticky;

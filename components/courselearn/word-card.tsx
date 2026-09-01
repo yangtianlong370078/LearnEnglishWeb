@@ -72,6 +72,14 @@ interface WordCardProps {
 type ResultState = "idle" | "correct" | "wrong";
 type SpeakerState = "idle" | "playing" | "waiting";
 
+/** 四种学习模式主题色：from→to 激活渐变，soft 关闭态底色 */
+const MODE_THEME: Record<LearnMode, { from: string; to: string; soft: string }> = {
+  "en-cn": { from: "#37a6ff", to: "#166bd8", soft: "rgba(38, 132, 255, 0.3)" },
+  "cn-en": { from: "#8f80ff", to: "#5a48d8", soft: "rgba(122, 100, 255, 0.3)" },
+  dictation: { from: "#3fd0c9", to: "#0d9d97", soft: "rgba(32, 196, 188, 0.3)" },
+  speech: { from: "#ffb54d", to: "#f2801f", soft: "rgba(255, 166, 51, 0.32)" },
+};
+
 const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function WordCardInner(
@@ -563,32 +571,41 @@ const cardStateSubClass =
               const field = MODE_FIELD[mode];
               const percent = progressPercent(word[field]);
               const active = effectiveMode === mode;
+              const theme = MODE_THEME[mode];
 
               return (
                 <button
                   key={mode}
                   aria-label={MODE_LABEL[mode]}
                   aria-pressed={active}
-                  className={`inline-flex flex-col items-center gap-1 transition-all duration-300 ${
+                  className={`cl-mode-btn inline-flex flex-col items-center gap-1 transition-all duration-300 ${
                     globalMode
                       ? `cursor-not-allowed ${globalMode === mode ? "" : "opacity-40"}`
-                      : "cursor-pointer hover:-translate-y-0.5"
+                      : "cursor-pointer"
                   }`}
                   disabled={!!globalMode}
+                  style={
+                    {
+                      "--cl-ring": theme.from,
+                      "--cl-ring2": theme.to,
+                      "--cl-soft": theme.soft,
+                    } as React.CSSProperties
+                  }
                   type="button"
                   onClick={() => handleModeButton(mode)}
                 >
                   <RingProgress
-                    color={active ? "var(--accent)" : "var(--accent)"}
+                    className={`transition-transform duration-300 ${
+                      active ? "scale-105" : ""
+                    }`}
+                    color={active ? "var(--cl-ring)" : "var(--cl-soft)"}
+                    colorTo={active ? "var(--cl-ring2)" : undefined}
                     percent={percent}
-                    size={42}
+                    size={46}
+                    strokeWidth={3.5}
                   >
                     <span
-                      className={`flex size-[30px] items-center justify-center rounded-full text-[11px] font-semibold transition-all duration-300 ${
-                        active
-                          ? "bg-accent text-accent-foreground shadow-md shadow-accent/40"
-                          : "bg-black/5 text-foreground hover:bg-black/10 dark:bg-white/10 dark:hover:bg-white/15"
-                      }`}
+                      className={`cl-mode-icon ${active ? "is-active" : ""}`}
                     >
                       {mode === "dictation" ? (
                         <Volume className="size-4" />
