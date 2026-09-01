@@ -548,6 +548,44 @@ const cardStateSubClass =
     >
       <ConfettiBurst fireKey={confettiKey} />
 
+      {/* 校验结果角标：右上徽章（对勾 / 叉号描边绘制动画） */}
+      {resultState !== "idle" && (
+        <span
+          aria-hidden="true"
+          className={`cl-result-badge ${
+            resultState === "correct" ? "is-correct" : "is-wrong"
+          }`}
+        >
+          <svg fill="none" viewBox="0 0 24 24">
+            {resultState === "correct" ? (
+              <path
+                d="M5 12.5l4.5 4.5L19 7.5"
+                stroke="currentColor"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2.8"
+              />
+            ) : (
+              <>
+                <path
+                  d="M7.5 7.5l9 9"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2.8"
+                />
+                <path
+                  className="cl-badge-cross-2"
+                  d="M16.5 7.5l-9 9"
+                  stroke="currentColor"
+                  strokeLinecap="round"
+                  strokeWidth="2.8"
+                />
+              </>
+            )}
+          </svg>
+        </span>
+      )}
+
       <div
         className={`${shaking ? "cl-shake" : ""}   rounded-3xl ${cardStateSubClass}`}
         onAnimationEnd={() => setShaking(false)}
