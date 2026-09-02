@@ -540,11 +540,14 @@ const cardStateSubClass =
 
   return (
     <Card
-      className={`p-0 group relative overflow-visible  ${
+      className={`p-0 group relative overflow-visible ${
+        shaking ? "cl-shake" : ""
+      } ${
         colorTransition
           ? "transition-[background-color,border-color,box-shadow] duration-500 ease-out"
           : ""
       } ${cardStateClass}`}
+      onAnimationEnd={() => setShaking(false)}
     >
       <ConfettiBurst fireKey={confettiKey} />
 
@@ -586,10 +589,7 @@ const cardStateSubClass =
         </span>
       )}
 
-      <div
-        className={`${shaking ? "cl-shake" : ""}   rounded-3xl ${cardStateSubClass}`}
-        onAnimationEnd={() => setShaking(false)}
-      >
+      <div className={`rounded-3xl ${cardStateSubClass}`}>
         <Card.Content className="flex flex-col h-[220px]! p-[20px] justify-between ">
           {/* 主体：按模式渲染 */}
           <div className="flex flex-col justify-center gap-2 mb-3 h-full items-center text-center">
