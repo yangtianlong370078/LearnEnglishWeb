@@ -31,7 +31,7 @@ export default function GlobalToolbar({
   onTogglePractice,
 }: GlobalToolbarProps) {
   return (
-    <div className="card card--default p-2  word-search-glass rounded-3xl !bg-transparent flex-col gap-3  sm:flex-row sm:items-center sm:justify-between">
+    <div className="card card--default p-2  word-search-glass rounded-full !bg-transparent flex-col gap-3  sm:flex-row sm:items-center sm:justify-between">
       {/* 左侧：4 个学习模式（单选） */}
       <div className="flex flex-wrap items-center justify-center gap-2">
         {MODE_ORDER.map((mode) => {
@@ -42,7 +42,7 @@ export default function GlobalToolbar({
             <button
               key={mode}
               aria-pressed={active}
-              className={`cl-global-btn inline-flex items-center gap-1.5 rounded-3xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
+              className={`cl-global-btn inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium transition-all duration-300 ${
                 active ? "is-active" : ""
               }`}
               style={
@@ -75,7 +75,7 @@ export default function GlobalToolbar({
         <button
           aria-disabled={translationDisabled}
           aria-pressed={translationOn}
-          className={`rounded-3xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
+          className={`rounded-full px-3 py-2 text-sm font-medium transition-all duration-300 ${
             translationDisabled
               ? "cursor-not-allowed bg-white/40 text-muted opacity-60 dark:bg-white/5"
               : translationOn
@@ -91,7 +91,7 @@ export default function GlobalToolbar({
         </button>
         <button
           aria-pressed={practiceOn}
-          className={`rounded-3xl px-3 py-2 text-sm font-medium transition-all duration-300 ${
+          className={`rounded-full px-3 py-2 text-sm font-medium transition-all duration-300 ${
             practiceOn
               ? "bg-gradient-to-br from-success to-success/80 text-success-foreground shadow-md shadow-success/35"
               : "bg-white/70 text-foreground hover:-translate-y-px hover:bg-white hover:shadow-sm dark:bg-white/10 dark:hover:bg-white/15"
