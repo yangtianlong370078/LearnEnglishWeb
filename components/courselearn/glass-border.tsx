@@ -57,9 +57,9 @@ export function GlassWarp({
   useEffect(() => {
     if (
       typeof CSS !== "undefined" &&
-      CSS.supports?.("backdrop-filter", "url(#glass) blur(1px)")
+      CSS.supports?.("backdrop-filter", "blur(1px)")
     ) {
-      setBackdrop(`url(#${filterId}) ${plainBackdrop}`);
+      setBackdrop(` ${plainBackdrop}`);
     }
   }, [filterId, plainBackdrop]);
 

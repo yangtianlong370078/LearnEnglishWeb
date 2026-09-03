@@ -723,11 +723,7 @@ const cardStateSubClass =
           >
             <SpeakerIcon
               className={`size-7 ${
-                speakerState === "playing"
-                  ? "cl-speaker-playing"
-                  : speakerState === "waiting"
-                    ? "cl-speaker-waiting"
-                    : ""
+                speakerState === "playing"? "cl-speaker-playing": speakerState === "waiting" ? "cl-speaker-waiting": ""
               }`}
             />
           </button>
@@ -764,7 +760,7 @@ const cardStateSubClass =
             micState === "recording" ? "结束录音" : "开始语音识别"
           }
           className={` mt-[12px]!  ${
-            micState === "recording" ? " cl-mic-btn is-recording" : "cl-speaker-btn"
+            micState === "recording" ? " cl-mic-btn is-recording" : "cl-mic-btn"
           }`}
           type="button"
           onClick={toggleSpeech}
