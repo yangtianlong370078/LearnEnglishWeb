@@ -122,6 +122,8 @@ function WordCardInner(
   const inputRef = useRef<HTMLInputElement | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const dictationRunRef = useRef(0);
+  // 语音流程代际标记：stopActivity/提前停止时 +1，作废未完成的录音与识别
+  const speechRunRef = useRef(0);
   const micTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const mediaRecorderRef = useRef<MediaRecorder | null>(null);
   const mediaStreamRef = useRef<MediaStream | null>(null);
@@ -137,6 +139,7 @@ function WordCardInner(
   useEffect(() => {
     return () => {
       dictationRunRef.current += 1;
+      speechRunRef.current += 1;
       if (micTimerRef.current) clearTimeout(micTimerRef.current);
       if (resultTimerRef.current) clearTimeout(resultTimerRef.current);
       audioRef.current?.pause();
@@ -149,6 +152,7 @@ function WordCardInner(
 
   const stopActivity = useCallback(() => {
     dictationRunRef.current += 1;
+    speechRunRef.current += 1;
     audioRef.current?.pause();
     setSpeakerState("idle");
     if (micTimerRef.current) {
@@ -162,6 +166,7 @@ function WordCardInner(
         /* noop */
       }
     }
+    mediaRecorderRef.current = null;
     mediaStreamRef.current?.getTracks().forEach((t) => t.stop());
     mediaStreamRef.current = null;
     xunfeiRef.current?.stop();
@@ -366,8 +371,14 @@ function WordCardInner(
 
   // ── 语音：录音 + 识别 ─────────────────────────────────────
   const runSpeech = useCallback(async () => {
+    const runId = speechRunRef.current + 1;
+
+    speechRunRef.current = runId;
     const url = buildAudioUrl(word.en, settings.accent);
     const durationMs = await getAudioDurationMs(url);
+
+    // 等待音频元数据期间已被中断（切换模式/被抢占）：直接退出
+    if (speechRunRef.current !== runId) return;
     const recordMs = durationMs + 1000;
 
     setMicState("recording");
@@ -377,16 +388,23 @@ function WordCardInner(
       try {
         const session = await startXunfeiRecognition(word.en);
 
+        if (speechRunRef.current !== runId) {
+          // 等待建连期间已被中断：关闭会话，不再录音与判定
+          session.stop();
+          return;
+        }
         xunfeiRef.current = session;
         micTimerRef.current = setTimeout(() => session.stop(), recordMs);
         const correct = await session.result;
 
+        if (speechRunRef.current !== runId) return;
         if (micTimerRef.current) clearTimeout(micTimerRef.current);
         micTimerRef.current = null;
         xunfeiRef.current = null;
         setMicState("idle");
         flashResult("speech", correct);
       } catch {
+        if (speechRunRef.current !== runId) return;
         setMicState("idle");
         flashResult("speech", false);
       }
@@ -398,6 +416,11 @@ function WordCardInner(
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
+      if (speechRunRef.current !== runId) {
+        // 等待麦克风授权期间已被中断：释放轨道，不再录音
+        stream.getTracks().forEach((t) => t.stop());
+        return;
+      }
       mediaStreamRef.current = stream;
       const recorder = new MediaRecorder(stream);
 
@@ -410,6 +433,9 @@ function WordCardInner(
       recorder.onstop = async () => {
         stream.getTracks().forEach((t) => t.stop());
         mediaStreamRef.current = null;
+        setMicState("idle");
+        // 已被中断（切换模式/被抢占）：不识别、不判定
+        if (speechRunRef.current !== runId) return;
         const blob = new Blob(chunks, { type: "audio/webm" });
 
         try {
@@ -419,10 +445,10 @@ function WordCardInner(
             settings.asrModelType,
           );
 
-          setMicState("idle");
+          if (speechRunRef.current !== runId) return;
           flashResult("speech", correct);
         } catch {
-          setMicState("idle");
+          if (speechRunRef.current !== runId) return;
           flashResult("speech", false);
         }
       };
@@ -431,6 +457,7 @@ function WordCardInner(
         if (recorder.state === "recording") recorder.stop();
       }, recordMs);
     } catch {
+      if (speechRunRef.current !== runId) return;
       setMicState("idle");
       flashResult("speech", false);
     }
@@ -439,11 +466,22 @@ function WordCardInner(
   const toggleSpeech = useCallback(() => {
     onFocusRequest(index);
     if (micState === "recording") {
-      // 提前结束录音
+      // 提前结束录音：先立即解除录音态 UI，再停止底层录制
+      setMicState("idle");
       if (settings.asrModelType === "2") {
-        xunfeiRef.current?.stop();
+        if (xunfeiRef.current) {
+          // 会话已建立：停止后会话 result 仍会完成识别判定
+          xunfeiRef.current.stop();
+        } else {
+          // 会话尚未建立（等待建连）：作废本次运行，await 返回后自动退出
+          speechRunRef.current += 1;
+        }
       } else if (mediaRecorderRef.current?.state === "recording") {
+        // 录音中：停止后 onstop 仍会将已录内容送识别判定
         mediaRecorderRef.current.stop();
+      } else {
+        // 录音器尚未创建（等待麦克风授权）：作废本次运行
+        speechRunRef.current += 1;
       }
       if (micTimerRef.current) {
         clearTimeout(micTimerRef.current);
@@ -552,8 +590,8 @@ const cardStateSubClass =
     >
       <ConfettiBurst fireKey={confettiKey} />
 
-      {/* 液态玻璃 warp 层（位于内容之下）：整卡毛玻璃 + 边缘 SVG 位移折射，
-          把边框后面的背景提亮提饱和透上来（静态不跟随鼠标；仅默认态，避免干扰对错着色） */}
+      {/* 液态玻璃 warp 层（位于内容之下）：整卡毛玻璃，
+          把边框后面的背景提亮提饱和透上来（仅默认态，避免干扰对错着色） */}
       {resultState === "idle" && <GlassWarp />}
 
       {/* 校验结果角标：右上徽章（对勾 / 叉号描边绘制动画） */}
@@ -711,7 +749,7 @@ const cardStateSubClass =
             aria-label={
               speakerState === "idle" ? "播放发音" : "停止播放"
             }
-            className={`cl-speaker-btn mb-1 ${
+            className={`cl-mic-btn mb-2 ${
               speakerState === "playing"
                 ? "is-playing"
                 : speakerState === "waiting"
@@ -722,7 +760,7 @@ const cardStateSubClass =
             onClick={toggleDictation}
           >
             <SpeakerIcon
-              className={`size-7 ${
+              className={`size-6 ${
                 speakerState === "playing"? "cl-speaker-playing": speakerState === "waiting" ? "cl-speaker-waiting": ""
               }`}
             />
@@ -776,7 +814,7 @@ const cardStateSubClass =
             <span />
             <span />
           </span>
-        ) : <MicrophoneIcon className="size-7 " />}
+        ) : <MicrophoneIcon className="size-6 " />}
 
 
         </button>

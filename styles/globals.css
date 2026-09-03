@@ -884,13 +884,14 @@ input:-webkit-autofill:active {
   transform: scale(0.95);
 }
 
-/* 播放中：流光渐变底 + 旋转追光环 + 扩散涟漪 + 图标脉冲 */
+/* 播放中：流光渐变底 + 旋转追光环 + 扩散涟漪 + 图标脉冲
+   注意：cl-mic-btn 不套用流光底，播放中保持实心风格，仅保留追光环与涟漪 */
 .cl-speaker-btn.is-playing {
   color: #fff;
   background: linear-gradient(
     135deg,
     var(--accent),
-    color-mix(in srgb, var(--accent) 45%, #a855f7),
+    color-mix(in srgb, var(--accent) 45%, #166bd8),
     var(--accent)
   );
   background-size: 220% 220%;
@@ -898,7 +899,8 @@ input:-webkit-autofill:active {
   box-shadow: 0 6px 22px color-mix(in srgb, var(--accent) 48%, transparent);
 }
 
-.cl-speaker-btn.is-playing::before {
+.cl-speaker-btn.is-playing::before,
+.cl-mic-btn.is-playing::before {
   content: "";
   position: absolute;
   inset: -6px;
@@ -922,7 +924,8 @@ input:-webkit-autofill:active {
   pointer-events: none;
 }
 
-.cl-speaker-btn.is-playing::after {
+.cl-speaker-btn.is-playing::after,
+.cl-mic-btn.is-playing::after {
   content: "";
   position: absolute;
   inset: 0;
@@ -962,7 +965,8 @@ input:-webkit-autofill:active {
   animation: cl-speaker-pulse 0.9s ease-in-out infinite;
 }
 
-/* 等待中：虚线缓转环 + 图标呼吸 */
+/* 等待中：虚线缓转环 + 图标呼吸
+   注意：cl-mic-btn 不套用浅色等待底，等待期间保持实心风格，仅保留虚线缓转环 */
 .cl-speaker-btn.is-waiting {
   color: var(--accent);
   background: color-mix(in srgb, var(--accent) 8%, transparent);
@@ -971,7 +975,19 @@ input:-webkit-autofill:active {
     0 2px 10px color-mix(in srgb, var(--accent) 10%, transparent);
 }
 
+/* 注意：此处刻意不合并选择器 —— Lightning CSS 编译时会丢弃
+   组合选择器中第二个带 ::before 的选择器，导致虚线环丢失 */
 .cl-speaker-btn.is-waiting::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: cl-spin 7s linear infinite;
+  pointer-events: none;
+}
+
+.cl-mic-btn.is-waiting::before {
   content: "";
   position: absolute;
   inset: -6px;
@@ -1006,8 +1022,8 @@ input:-webkit-autofill:active {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  width: 3.5rem;
-  height: 3.5rem;
+  width: 3rem;
+  height: 3rem;
   border-radius: 9999px;
   color: #fff;
   background: linear-gradient(
@@ -1086,13 +1102,13 @@ input:-webkit-autofill:active {
 .cl-wave {
   display: inline-flex;
   align-items: center;
-  gap: 3px;
-  height: 18px;
+  gap: 2.5px;
+  height: 15px;
 }
 
 .cl-wave span {
   display: block;
-  width: 3.5px;
+  width: 3px;
   height: 100%;
   border-radius: 9999px;
   background: linear-gradient(
