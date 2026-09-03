@@ -18,6 +18,7 @@ import { Card } from "@heroui/react";
 import { Xmark } from "@gravity-ui/icons";
 
 import ConfettiBurst from "./confetti";
+import GlassBorder, { GlassWarp } from "./glass-border";
 import RingProgress from "./ring-progress";
 import { CnEnIcon, EnCnIcon, MicrophoneIcon, SpeakerIcon } from "./mode-icons";
 import {
@@ -527,7 +528,7 @@ function WordCardInner(
       ? "cardfilter  cl-card-correct "
       : resultState === "wrong"
         ? "cardfilter  cl-card-wrong"
-        : "word-search-glass !bg-transparent";
+        : "cl-glass-idle";
 
 const cardStateSubClass =
     resultState === "correct"
@@ -550,6 +551,10 @@ const cardStateSubClass =
       onAnimationEnd={() => setShaking(false)}
     >
       <ConfettiBurst fireKey={confettiKey} />
+
+      {/* 液态玻璃 warp 层（位于内容之下）：整卡毛玻璃 + 边缘 SVG 位移折射，
+          把边框后面的背景提亮提饱和透上来（静态不跟随鼠标；仅默认态，避免干扰对错着色） */}
+      {resultState === "idle" && <GlassWarp />}
 
       {/* 校验结果角标：右上徽章（对勾 / 叉号描边绘制动画） */}
       {resultState !== "idle" && (
@@ -589,7 +594,8 @@ const cardStateSubClass =
         </span>
       )}
 
-      <div className={`rounded-3xl ${cardStateSubClass}`}>
+      {/* 内容层需 relative z-[1]：absolute 定位的 warp 玻璃层会盖住 static 内容 */}
+      <div className={`relative z-[1] rounded-3xl ${cardStateSubClass}`}>
         <Card.Content className="flex flex-col h-[220px]! p-[20px] justify-between ">
           {/* 主体：按模式渲染 */}
           <div className="flex flex-col justify-center gap-2 mb-3 h-full items-center text-center">
@@ -655,6 +661,9 @@ const cardStateSubClass =
           </div>
         </Card.Content>
       </div>
+
+      {/* 液态玻璃描边层（位于内容之上）：源码的 screen/overlay 两层渐变描边 */}
+      {resultState === "idle" && <GlassBorder />}
     </Card>
   );
 

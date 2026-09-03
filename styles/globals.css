@@ -180,6 +180,24 @@
   -webkit-transform: translateZ(0);
 }
 
+/*
+ * 学习卡片（默认态）玻璃宿主：自身不做 backdrop-filter，且不能带
+ * transform / isolation / filter / opacity<1 等 Backdrop Root 触发属性。
+ * 毛玻璃/折射由内部 warp 子层完成——若卡片（或 warp 与页面背景之间的
+ * 任一祖先）触发 Backdrop Root，子层 backdrop-filter 只能采样到该祖先
+ * 内部，采样不到页面背景，毛玻璃与液态玻璃边框会整体失效。
+ */
+.cl-glass-idle {
+  position: relative;
+  background-color: transparent !important;
+  /* 覆盖 HeroUI .card 自带的 isolation: isolate + transform: translateZ(0)
+     （两者都会触发 Backdrop Root，导致内部 warp 子层的 backdrop-filter
+     采样不到页面背景，毛玻璃/折射整体失效） */
+  isolation: auto !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
 .cardfilter {
   position: relative;
   isolation: isolate;
