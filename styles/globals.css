@@ -1,0 +1,1337 @@
+@import "tailwindcss";
+@import "@heroui/styles";
+
+@import "@heroui/styles/css";
+@import "@heroui-pro/react/css";
+@import "./background-themes.css";
+
+@custom-variant dark (&:is(.dark *));
+
+@theme {
+  --font-sans: "font", sans-serif;
+  --font-mono: "monospace", monospace;
+}
+
+/* ── 全局去除 Recharts 图表切片/元素点击聚焦时的粗边框、高亮描边 ── */
+.recharts-wrapper,
+.recharts-wrapper:focus,
+.recharts-wrapper:focus-visible,
+.recharts-surface,
+.recharts-surface:focus,
+.recharts-surface:focus-visible,
+.recharts-wrapper svg,
+.recharts-wrapper svg:focus,
+.recharts-wrapper svg:focus-visible,
+.recharts-wrapper svg *:focus,
+.recharts-wrapper svg *:focus-visible,
+.recharts-surface *:focus,
+.recharts-surface *:focus-visible,
+.recharts-sector,
+.recharts-sector:focus,
+.recharts-sector:focus-visible {
+  outline: none !important;
+}
+
+/* 关键帧均使用 scale >= 1.05，配合 inset:-10% 确保任何时刻都铺满视口 */
+@keyframes aurora {
+  0% {
+    transform: scale(1.05) rotate(0deg);
+  }
+
+  40% {
+    transform: scale(1.1) rotate(1.2deg);
+  }
+
+  70% {
+    transform: scale(1.06) rotate(-0.8deg);
+  }
+
+  100% {
+    transform: scale(1.09) rotate(1.8deg);
+  }
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+ * 强制保留过渡/入场动画（覆盖系统"减少动态效果"偏好）
+ *
+ * 背景：当操作系统/浏览器开启 prefers-reduced-motion: reduce 时，
+ *  - recharts 图表（isAnimationActive 默认 'auto'）会自动关闭动画（已在各图表组件显式开启 isAnimationActive）
+ *  - HeroUI 组件（modal/popover/drawer/dropdown/tooltip 等）内部 @apply motion-reduce:animate-none / transition-none，
+ *    会关闭入场动画与过渡；且 HeroUI 仅提供 data-reduce-motion="true"（强制关闭）而无"强制开启"开关。
+ * 本项目希望始终展示动画，故在此覆盖系统偏好，重新启用被关闭的动画/过渡。
+ *
+ * 注意：这会覆盖用户的无障碍偏好。如需尊重系统"减少动态"设置，删除本整块即可。
+ * ────────────────────────────────────────────────────────────────────────── */
+@media (prefers-reduced-motion: reduce) {
+
+  /* 1) 恢复 HeroUI 覆盖层的入场/退场动画。
+        底层为 tailwindcss-animate 的 enter/exit keyframes；
+        位移/缩放/时长等由各组件在基础规则里设置的 --tw-* 变量驱动（不受本媒体查询影响），
+        因此这里仅需把被置为 none 的 animation 重新指回 enter/exit 即可，动画效果与正常一致。 */
+  [data-entering="true"] {
+    animation-name: enter !important;
+    animation-duration: var(--tw-animation-duration, var(--tw-duration, 0.15s)) !important;
+    animation-timing-function: var(--tw-ease, ease) !important;
+    animation-fill-mode: var(--tw-animation-fill-mode, none) !important;
+  }
+
+  [data-exiting="true"] {
+    animation-name: exit !important;
+    animation-duration: var(--tw-animation-duration, var(--tw-duration, 0.15s)) !important;
+    animation-timing-function: var(--tw-ease, ease) !important;
+    animation-fill-mode: var(--tw-animation-fill-mode, none) !important;
+  }
+
+  /* 2) 恢复被 motion-reduce:transition-none 关闭的微交互过渡
+        （按钮按压、手风琴指示器旋转、hover 变色等）。
+        仅恢复 transition-property；具体时长/缓动仍由各组件自身的 transition-duration 决定。 */
+  *,
+  *::before,
+  *::after {
+    transition-property: revert-layer !important;
+  }
+}
+
+/* ── 毛玻璃：覆盖 HeroUI v3 的 --surface* 变量为半透明 ──
+   HeroUI v3 Card/Accordion 等用 .surface--default 类，背景来自 var(--surface) */
+:root {
+  --surface: oklch(1 0 0 / 0.42) !important;
+  --surface-secondary: oklch(0.98 0.002 286 / 0.4) !important;
+  --surface-tertiary: oklch(0.96 0.002 286 / 0.38) !important;
+}
+
+.dark {
+  --surface: oklch(0.22 0.006 286 / 0.5) !important;
+  --surface-secondary: oklch(0.26 0.004 286 / 0.46) !important;
+  --surface-tertiary: oklch(0.28 0.003 248 / 0.42) !important;
+}
+
+/* ── Toast 提示框背景不透明（覆盖上方毛玻璃 --surface）── */
+.toast {
+  background-color: oklch(1 0 0);
+}
+
+.dark .toast {
+  background-color: oklch(0.22 0.006 286);
+}
+
+.wordfy {
+  border: none !important;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.08),
+    0 1px 10px rgb(0 0 0 / 0.07) !important;
+}
+
+.dark .wordfy {
+  border: none !important;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.13),
+    0 1px 10px rgb(0 0 0 / 0.3) !important;
+}
+
+.taytask {
+  border: none !important;
+  box-shadow:
+    inset 0 0 0 1px rgb(0 0 0 / 0.04) !important;
+}
+
+.dark .taytask {
+  border: none !important;
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.03),
+    0 1px 6px rgb(0 0 0 / 0.3) !important;
+}
+
+.navbar-root {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  border: none !important;
+  border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;
+  box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
+  isolation: isolate;
+  /* 直接在容器上做毛玻璃，避免负层级 overlay 触发合成层闪烁 */
+  background-color: rgb(255 255 255 / 0.55);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  /* 固定为稳定的独立合成层（与页面其它不闪烁的毛玻璃卡片一致：仅 translateZ + isolation，
+     不使用 will-change，避免图层被反复创建/销毁导致 backdrop-filter 采样闪烁） */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.dark .navbar-root {
+  border: none !important;
+  border-bottom: 1px solid rgb(255 255 255 / 0.06) !important;
+  box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
+  background-color: rgb(10 16 34 / 0.58);
+}
+
+/* 毛玻璃容器：搜索框（直接在容器上做模糊 + 半透明着色） */
+.word-search-glass {
+  position: relative;
+  isolation: isolate;
+  background-color: rgb(255 255 255 / 0.55) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+  backdrop-filter: blur(8px) saturate(150%);
+  /* 固定为稳定的独立合成层（与页面其它不闪烁的毛玻璃卡片一致：仅 translateZ + isolation，
+     不使用 will-change，避免图层被反复创建/销毁导致 backdrop-filter 采样闪烁） */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+/*
+ * 学习卡片（默认态）玻璃宿主：自身不做 backdrop-filter，且不能带
+ * transform / isolation / filter / opacity<1 等 Backdrop Root 触发属性。
+ * 毛玻璃由内部 GlassWarp 子层完成——若卡片（或 warp 与页面背景之间的
+ * 任一祖先）触发 Backdrop Root，子层 backdrop-filter 只能采样到该祖先
+ * 内部，采样不到页面背景，毛玻璃整体失效。
+ *
+ * 重要：卡片内禁止任何 mix-blend-mode 元素（GlassBorder 描边层已改为
+ * 普通 source-over 合成）——isolation: auto 下混合会穿透到根层叠上下文
+ * 与整页混合，触发 Blink 合成器 Bug（页面顶部透明色块、hover 闪烁）；
+ * 也不能给卡片加 backdrop-filter 来约束混合：Blink 中 backdrop-filter
+ * 与 mix-blend-mode 后代冲突，会导致卡片毛玻璃被跳过且合成层不稳定。
+ */
+.cl-glass-idle {
+  position: relative;
+  background-color: transparent !important;
+  /* 覆盖 HeroUI .card 自带的 isolation: isolate + transform: translateZ(0)
+    （两者都会触发 Backdrop Root，导致内部 GlassWarp 子层的 backdrop-filter
+    采样不到页面背景，毛玻璃/折射整体失效） */
+  isolation: auto !important;
+  transform: none !important;
+  -webkit-transform: none !important;
+}
+
+.cardfilter {
+  position: relative;
+  isolation: isolate;
+  -webkit-backdrop-filter: blur(8px) saturate(150%);
+  backdrop-filter: blur(8px) saturate(150%);
+  /* 固定为稳定的独立合成层（与页面其它不闪烁的毛玻璃卡片一致：仅 translateZ + isolation，
+     不使用 will-change，避免图层被反复创建/销毁导致 backdrop-filter 采样闪烁） */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+
+.dark .word-search-glass {
+  background-color: rgb(10 16 34 / 0.58) !important;
+}
+
+/*
+ * 旧的负层级模糊层会在鼠标经过其它带模糊组件时触发 Chromium 合成层重算，
+ * 导致半透明色块时隐时现地闪烁。改为容器自身做模糊后，此层不再需要模糊，
+ * 仅保留为惰性元素（不渲染任何视觉效果）。
+ */
+.glass-overlay {
+  display: none;
+}
+
+/* 模糊层之上的内容保持透明背景 */
+.glass-content {
+  position: relative;
+  z-index: 0;
+  background-color: transparent !important;
+}
+
+.backdrop-blur-xl,
+.backdrop-blur-lg,
+.backdrop-blur-md,
+.backdrop-blur-sm {
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+
+
+/* 给所有 surface 块加毛玻璃模糊 + 玻璃描边 + 顶部高光*/
+/* HeroUI v3 Card 实际使用 .card / .card--default / [data-slot="card"]，
+   以及其他组件的 .accordion / .disclosure-group / .alert。
+   为了一次性覆盖，同时针对多个选择器应用毛玻璃 + 描边 */
+.surface,
+.surface--default,
+.surface--secondary,
+.surface--tertiary,
+.card,
+.searchFieldqy,
+.card--default,
+[data-slot="card"],
+.accordion,
+.disclosure-group,
+.search-field__group,
+.alert {
+  --border-bottom-width: 1px;
+  --border-color: rgba(255, 255, 255, 0.5);
+  --border-left-width: 1px;
+  --border-right-width: 1px;
+  --border-style: solid;
+  --border-top-width: 1px;
+  border: none !important;
+  box-shadow:
+    rgba(30, 30, 30, 0.1) 0px 4px 10px 0px,
+    rgba(30, 30, 30, 0.05) 0px 4px 4px 0px,
+    rgba(30, 30, 30, 0.05) 0px 1px 0px 0px;
+  isolation: isolate;
+  opacity: 1;
+  position: relative;
+  transform: translateZ(0);
+}
+
+
+
+
+.surface:after,
+.surface--default:after,
+.surface--secondary:after,
+.surface--tertiary:after,
+.card:after,
+.searchFieldqy:after,
+.card--default:after,
+[data-slot="card"]:after,
+.accordion:after,
+.disclosure-group:after,
+.search-field__group:after,
+.alert:after {
+  content: "";
+  border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
+  border-color: var(--border-color, none);
+  border-style: var(--border-style, none);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  box-sizing: border-box;
+  left: 0;
+  top: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+
+
+.dark .surface,
+.dark .surface--default,
+.dark .surface--secondary,
+.dark .surface--tertiary,
+.dark .card,
+.dark .searchFieldqy,
+.dark .card--default,
+.dark [data-slot="card"],
+.dark .accordion,
+.dark .disclosure-group,
+.dark .search-field__group,
+.dark .alert {
+  /* 暗色：极轻描边，只比卡片背景略亮一点 */
+  border: none !important;
+
+
+  box-shadow:
+    rgba(30, 30, 30, 0.1) 0px 4px 10px 0px,
+    rgba(30, 30, 30, 0.05) 0px 4px 4px 0px,
+    rgba(30, 30, 30, 0.05) 0px 1px 0px 0px;
+  opacity: 1;
+
+  /*
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.07),
+    0 2px 20px rgb(0 0 0 / 0.3) !important;  */
+}
+
+
+.dark .surface:after,
+.dark .surface--default:after,
+.dark .surface--secondary:after,
+.dark .surface--tertiary:after,
+.dark .card:after,
+.dark .card--default:after,
+.dark .searchFieldqy:after,
+.dark .search-field__group:after,
+.dark [data-slot="card"]:after,
+.dark .accordion:after,
+.dark .disclosure-group:after,
+.dark .alert:after {
+  content: "";
+  /* 暗色：极轻描边， 只比卡片背景略亮一点*/
+  border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
+  border-color: rgb(255 255 255 / 0.1);
+  border-style: solid;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  box-sizing: border-box;
+  left: 0;
+  top: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+.yinyinkuan{
+  box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
+ --border-bottom-width: 1px;
+  --border-color: rgba(255, 255, 255, 0.1);
+  --border-left-width: 1px;
+  --border-right-width: 1px;
+  --border-style: solid;
+  --border-top-width: 1px;
+  border: none !important;
+}
+
+.yinyinkuan:after {
+  content: "";
+  border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
+  /* border-color: var(--border-color, none); */
+  border-style: var(--border-style, none);
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  box-sizing: border-box;
+  left: 0;
+  top: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+
+.dark .yinyinkuan:after {
+    content: "";
+  /* 暗色：极轻描边， 只比卡片背景略亮一点*/
+  border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
+  border-color: rgb(255 255 255 / 0.1);
+  border-style: solid;
+  width: 100%;
+  height: 100%;
+  position: absolute;
+  box-sizing: border-box;
+  left: 0;
+  top: 0;
+  border-radius: inherit;
+  pointer-events: none;
+}
+
+/* 同样的玻璃描边给 Button / Chip / Input 等通用容器（按需扩展） */
+.button,
+.chip,
+.input,
+.input-group,
+.kbd,
+.tag,
+.segment {
+  border-color: rgb(255 255 255 / 0.28) !important;
+}
+
+.dark .button,
+.dark .chip,
+.dark .input,
+.dark .input-group,
+.dark .kbd,
+.dark .tag,
+.dark .segment {
+  border-color: rgb(255 255 255 / 0.1) !important;
+}
+
+
+.radial-chart .recharts-radial-bar-background-sector {
+  fill: rgba(0, 0, 0, 0.1) !important;
+}
+
+
+.dark .radial-chart .recharts-radial-bar-background-sector {
+  fill: rgba(255, 255, 255, 0.1) !important;
+}
+
+
+
+/* 兜底：保留旧的 bg-content 规则（万一某些组件用） */
+.bg-content1 {
+  background-color: rgb(255 255 255 / 0.45) !important;
+  backdrop-filter: blur(20px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+}
+
+.bg-content2 {
+  background-color: rgb(255 255 255 / 0.38) !important;
+  backdrop-filter: blur(18px) saturate(155%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(155%) !important;
+}
+
+.bg-content3 {
+  background-color: rgb(255 255 255 / 0.32) !important;
+  backdrop-filter: blur(16px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+}
+
+.bg-content4 {
+  background-color: rgb(255 255 255 / 0.26) !important;
+  backdrop-filter: blur(14px) saturate(148%) !important;
+  -webkit-backdrop-filter: blur(14px) saturate(148%) !important;
+}
+
+.dark .bg-content1 {
+  background-color: rgb(15 20 40 / 0.48) !important;
+}
+
+.dark .bg-content2 {
+  background-color: rgb(20 28 52 / 0.44) !important;
+}
+
+.dark .bg-content3 {
+  background-color: rgb(26 36 62 / 0.4) !important;
+}
+
+.dark .bg-content4 {
+  background-color: rgb(32 44 72 / 0.36) !important;
+}
+
+/* ── Modal 边框 ── */
+.modal__dialog {
+  border: 4px solid rgb(180 180 190 / 0.55) !important;
+}
+
+.dark .modal__dialog {
+  border: 4px solid rgb(80 80 100 / 0.55) !important;
+}
+
+/* .modal__dialog input{
+  background-color:  rgb(180 180 190 / 0.15) !important;
+}
+
+.dark .modal__dialog input {
+  background-color:  rgb(80 80 100 / 0.15) !important;
+} */
+
+/* ── 兜底：data-slot=base 描边（适用于使用此 slot 的组件） ── */
+[data-slot="base"] {
+  border: 1px solid rgb(255 255 255 / 0.3) !important;
+  box-shadow:
+    0 2px 18px rgb(0 0 80 / 0.05),
+    inset 0 1px 0 rgb(255 255 255 / 0.42) !important;
+}
+
+.dark [data-slot="base"] {
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 0.5),
+    0 2px 20px rgb(0 0 0 / 0.3) !important;
+}
+
+.today-bg span {
+  color: #0485f7 !important;
+}
+
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  transition: background-color 9999s ease-in-out 0s !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+/* Search word input: keep the input paint layer transparent in every browser/state. */
+.word-search-input,
+.word-search-input:hover,
+.word-search-input:active,
+.word-search-input:focus,
+.word-search-input:focus-visible,
+.word-search-input:not(:placeholder-shown),
+.word-search-input[value]:not([value=""]) {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  outline-color: transparent !important;
+}
+
+.word-search-input:-webkit-autofill,
+.word-search-input:-webkit-autofill:hover,
+.word-search-input:-webkit-autofill:focus,
+.word-search-input:-webkit-autofill:active,
+.word-search-input:autofill,
+.word-search-input:autofill:hover,
+.word-search-input:autofill:focus,
+.word-search-input:autofill:active {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  outline-color: transparent !important;
+  /* 关键：用一个永不结束的过渡延迟，阻止浏览器把 autofill 背景色真正绘制出来。
+     这是让 autofill 背景保持透明的唯一可靠方法（透明 inset 阴影无效）。 */
+  transition: background-color 9999s ease-in-out 0s !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+.word-search-input::-webkit-search-cancel-button,
+.word-search-input::-webkit-search-decoration,
+.word-search-input::-webkit-search-results-button,
+.word-search-input::-webkit-search-results-decoration {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+}
+
+/* 暗黑模式样式 */
+.dark .word-search-input,
+.dark .word-search-input:hover,
+.dark .word-search-input:active,
+.dark .word-search-input:focus,
+.dark .word-search-input:focus-visible,
+.dark .word-search-input:not(:placeholder-shown),
+.dark .word-search-input[value]:not([value=""]) {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  outline-color: transparent !important;
+}
+
+.dark .word-search-input:-webkit-autofill,
+.dark .word-search-input:-webkit-autofill:hover,
+.dark .word-search-input:-webkit-autofill:focus,
+.dark .word-search-input:-webkit-autofill:active,
+.dark .word-search-input:autofill,
+.dark .word-search-input:autofill:hover,
+.dark .word-search-input:autofill:focus,
+.dark .word-search-input:autofill:active {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  box-shadow: none !important;
+  -webkit-box-shadow: none !important;
+  outline-color: transparent !important;
+  transition: background-color 9999s ease-in-out 0s !important;
+  -webkit-text-fill-color: inherit !important;
+}
+
+.dark .word-search-input::-webkit-search-cancel-button,
+.dark .word-search-input::-webkit-search-decoration,
+.dark .word-search-input::-webkit-search-results-button,
+.dark .word-search-input::-webkit-search-results-decoration {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  background: transparent !important;
+}
+/*
+.zdy-backdrop-blur-xl {
+  background-color: rgb(255 255 255 / 0.42) !important;
+  backdrop-filter: blur(24px) !important;
+  -webkit-backdrop-filter: blur(24px) !important;
+}
+
+.dark .zdy-backdrop-blur-xl {
+  background-color: rgb(10 16 34 / 0.5) !important;
+} */
+
+.accordion__item::after {
+  background: rgb(0 0 0 / 0.08) !important;
+}
+
+.dark .accordion__item::after {
+  background: rgb(255 255 255 / 0.08) !important;
+}
+
+.zs {
+  color: #f03744;
+  font-weight: 600;
+}
+
+/* ──────────────────────────────────────────────────────────────────────────
+ * 课程学习（courselearn）动画与状态样式
+ * ────────────────────────────────────────────────────────────────────────── */
+
+/* 错误抖动 */
+@keyframes cl-shake {
+  0%,
+  100% {
+    transform: translateX(0);
+  }
+
+  15% {
+    transform: translateX(-8px);
+  }
+
+  30% {
+    transform: translateX(7px);
+  }
+
+  45% {
+    transform: translateX(-6px);
+  }
+
+  60% {
+    transform: translateX(4px);
+  }
+
+  75% {
+    transform: translateX(-2px);
+  }
+}
+
+.cl-shake {
+  animation: cl-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* 撒花：每个纸屑用 --tx/--ty/--rot 控制方向，共用同一关键帧 */
+@keyframes cl-confetti {
+  0% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(var(--s, 1));
+  }
+
+  100% {
+    opacity: 0;
+    transform: translate3d(var(--tx, 0), var(--ty, -60px), 0)
+      rotate(var(--rot, 360deg)) scale(var(--s, 1));
+  }
+}
+
+.cl-confetti-piece {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 8px;
+  height: 8px;
+  border-radius: 2px;
+  will-change: transform, opacity;
+  animation: cl-confetti 0.9s ease-out forwards;
+}
+
+/* 正确/错误卡片着色（叠加在毛玻璃卡片之上） */
+.cl-card-correct {
+  border-color: color-mix(in srgb, var(--success, #16a34a) 55%, transparent) !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--success, #16a34a) 45%, transparent),
+    0 8px 26px color-mix(in srgb, var(--success, #16a34a) 22%, transparent) !important;
+  background-color: color-mix(
+    in srgb,
+    var(--success, #16a34a) 22%,
+    transparent
+  ) !important;
+}
+
+.cl-card-wrong {
+  border-color: color-mix(in srgb, var(--danger, #dc2626) 55%, transparent) !important;
+  box-shadow:
+    0 0 0 1px color-mix(in srgb, var(--danger, #dc2626) 45%, transparent),
+    0 8px 26px color-mix(in srgb, var(--danger, #dc2626) 22%, transparent) !important;
+  background-color: color-mix(
+    in srgb,
+    var(--danger, #dc2626) 22%,
+    transparent
+  ) !important;
+}
+
+/* ── 校验结果角标：右上圆形徽章 ── */
+
+/* 弹性入场：从缩放过冲到回弹定格，带轻微旋转 */
+@keyframes cl-badge-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.2) rotate(-24deg);
+  }
+
+  55% {
+    opacity: 1;
+    transform: scale(1.18) rotate(6deg);
+  }
+
+  75% {
+    transform: scale(0.92) rotate(-2.5deg);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+/* 描边绘制：对勾/叉号以「画上去」的方式显现 */
+@keyframes cl-badge-draw {
+  from {
+    stroke-dashoffset: 28;
+  }
+
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+.cl-result-badge {
+  position: absolute;
+  top: -11px;
+  right: -11px;
+  z-index: 30;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 9999px;
+  color: #fff;
+  pointer-events: none;
+  animation: cl-badge-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
+  will-change: transform, opacity;
+}
+
+/* 玻璃高光：左上径向提亮，营造通透的釉质感 */
+.cl-result-badge::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  background: radial-gradient(
+    130% 95% at 30% 12%,
+    rgb(255 255 255 / 0.5),
+    rgb(255 255 255 / 0.08) 48%,
+    transparent 65%
+  );
+}
+
+/* 底部内阴影：增加立体厚度 */
+.cl-result-badge::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 -3px 6px rgb(0 0 0 / 0.14);
+}
+
+.cl-result-badge.is-correct {
+  background: linear-gradient(
+    140deg,
+    #5eead4 -20%,
+    #4ade80 15%,
+    var(--success, #16a34a) 62%,
+    #15803d 100%
+  );
+  box-shadow:
+    0 0 0 2.5px rgb(255 255 255 / 0.65),
+    0 6px 20px -4px color-mix(in srgb, var(--success, #16a34a) 75%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.14);
+}
+
+.cl-result-badge.is-wrong {
+  background: linear-gradient(
+    140deg,
+    #fda4af -20%,
+    #fb7185 15%,
+    var(--danger, #dc2626) 62%,
+    #b91c1c 100%
+  );
+  box-shadow:
+    0 0 0 2.5px rgb(255 255 255 / 0.65),
+    0 6px 20px -4px color-mix(in srgb, var(--danger, #dc2626) 75%, transparent),
+    0 2px 6px rgb(0 0 0 / 0.14);
+}
+
+.dark .cl-result-badge.is-correct,
+.dark .cl-result-badge.is-wrong {
+  box-shadow:
+    0 0 0 2.5px rgb(255 255 255 / 0.28),
+    0 6px 20px -4px rgb(0 0 0 / 0.45),
+    0 2px 6px rgb(0 0 0 / 0.3);
+}
+
+.cl-result-badge svg {
+  position: relative;
+  width: 17px;
+  height: 17px;
+  filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.22));
+}
+
+.cl-result-badge path {
+  stroke-dasharray: 28;
+  stroke-dashoffset: 28;
+  animation: cl-badge-draw 0.32s 0.2s cubic-bezier(0.65, 0, 0.35, 1) both;
+}
+
+/* 叉号第二笔稍后出现，形成连续书写感 */
+.cl-result-badge path.cl-badge-cross-2 {
+  animation-delay: 0.34s;
+}
+
+/* ── 通用关键帧 ── */
+@keyframes cl-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes cl-gradient {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+/* ── 卡片悬浮 ── */
+.cl-card {
+
+   -webkit-backdrop-filter: blur(16px) saturate(150%);
+    backdrop-filter: blur(16px) saturate(150%);
+   
+  transition:
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.35s ease,
+    background-color 0.35s ease;
+}
+
+.cl-card:hover {
+  /* transform: translateY(-4px); */
+}
+
+/* ────────────────────────────────────────────────────────────────
+ * 听写喇叭按钮：idle / playing / waiting 三态
+ * ──────────────────────────────────────────────────────────────── */
+.cl-speaker-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  border-radius: 9999px;
+  color: var(--accent);
+  background: linear-gradient(
+    135deg,
+    color-mix(in srgb, var(--accent) 18%, transparent),
+    color-mix(in srgb, var(--accent) 6%, transparent)
+  );
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 24%, transparent),
+    0 4px 14px color-mix(in srgb, var(--accent) 16%, transparent);
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    background 0.25s ease,
+    color 0.25s ease;
+}
+
+.cl-speaker-btn:hover {
+  transform: scale(1.07);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 32%, transparent),
+    0 6px 20px color-mix(in srgb, var(--accent) 26%, transparent);
+}
+
+.cl-speaker-btn:active {
+  transform: scale(0.95);
+}
+
+/* 播放中：流光渐变底 + 旋转追光环 + 扩散涟漪 + 图标脉冲
+   注意：cl-mic-btn 不套用流光底，播放中保持实心风格，仅保留追光环与涟漪 */
+.cl-speaker-btn.is-playing {
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    color-mix(in srgb, var(--accent) 45%, #166bd8),
+    var(--accent)
+  );
+  background-size: 220% 220%;
+  animation: cl-gradient 2.2s ease-in-out infinite;
+  box-shadow: 0 6px 22px color-mix(in srgb, var(--accent) 48%, transparent);
+}
+
+.cl-speaker-btn.is-playing::before,
+.cl-mic-btn.is-playing::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  padding: 2.5px;
+  background: conic-gradient(
+    from 0deg,
+    transparent 0deg 100deg,
+    color-mix(in srgb, var(--accent) 85%, #fff) 180deg,
+    transparent 260deg 360deg
+  );
+  -webkit-mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  mask:
+    linear-gradient(#fff 0 0) content-box,
+    linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+  animation: cl-spin 1.6s linear infinite;
+  pointer-events: none;
+}
+
+.cl-speaker-btn.is-playing::after,
+.cl-mic-btn.is-playing::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: cl-ripple 1.5s ease-out infinite;
+  pointer-events: none;
+}
+
+@keyframes cl-ripple {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(1.7);
+    opacity: 0;
+  }
+}
+
+/* 播放中图标脉冲 */
+@keyframes cl-speaker-pulse {
+  0%,
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+
+  50% {
+    transform: scale(1.14);
+    opacity: 0.85;
+  }
+}
+
+.cl-speaker-playing {
+  animation: cl-speaker-pulse 0.9s ease-in-out infinite;
+}
+
+/* 等待中：虚线缓转环 + 图标呼吸
+   注意：cl-mic-btn 不套用浅色等待底，等待期间保持实心风格，仅保留虚线缓转环 */
+.cl-speaker-btn.is-waiting {
+  color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 8%, transparent);
+  box-shadow:
+    inset 0 0 0 1px color-mix(in srgb, var(--accent) 16%, transparent),
+    0 2px 10px color-mix(in srgb, var(--accent) 10%, transparent);
+}
+
+/* 注意：此处刻意不合并选择器 —— Lightning CSS 编译时会丢弃
+   组合选择器中第二个带 ::before 的选择器，导致虚线环丢失 */
+.cl-speaker-btn.is-waiting::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: cl-spin 7s linear infinite;
+  pointer-events: none;
+}
+
+.cl-mic-btn.is-waiting::before {
+  content: "";
+  position: absolute;
+  inset: -6px;
+  border-radius: inherit;
+  border: 2px dashed color-mix(in srgb, var(--accent) 55%, transparent);
+  animation: cl-spin 7s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes cl-speaker-wait {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: scale(0.94);
+  }
+
+  50% {
+    opacity: 1;
+    transform: scale(1.04);
+  }
+}
+
+.cl-speaker-waiting {
+  animation: cl-speaker-wait 1.4s ease-in-out infinite;
+}
+
+/* ────────────────────────────────────────────────────────────────
+ * 语音麦克风按钮：idle / recording 两态 + 声波律动
+ * ──────────────────────────────────────────────────────────────── */
+.cl-mic-btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  border-radius: 9999px;
+  color: #fff;
+  background: linear-gradient(
+    135deg,
+    var(--accent),
+    color-mix(in srgb, var(--accent) 55%, #8b5cf6)
+  );
+  box-shadow:
+    0 4px 16px color-mix(in srgb, var(--accent) 38%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.28);
+  transition:
+    transform 0.25s cubic-bezier(0.22, 1, 0.36, 1),
+    box-shadow 0.25s ease,
+    background 0.25s ease;
+}
+
+.cl-mic-btn:hover {
+  transform: scale(1.07);
+  box-shadow:
+    0 6px 24px color-mix(in srgb, var(--accent) 50%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.32);
+}
+
+.cl-mic-btn:active {
+  transform: scale(0.95);
+}
+
+/* 录音中：红色渐变 + 呼吸缩放 + 双光环扩散 */
+.cl-mic-btn.is-recording {
+  background: linear-gradient(135deg, #fb7185, var(--danger, #dc2626));
+  box-shadow:
+    0 6px 24px color-mix(in srgb, var(--danger, #dc2626) 50%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.28);
+  animation: cl-mic-breathe 1.6s ease-in-out infinite;
+}
+
+@keyframes cl-mic-breathe {
+  0%,
+  100% {
+    transform: scale(1);
+  }
+
+  50% {
+    transform: scale(1.06);
+  }
+}
+
+.cl-mic-btn.is-recording::before,
+.cl-mic-btn.is-recording::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--danger, #dc2626) 55%, transparent);
+  animation: cl-mic-halo 1.8s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+  pointer-events: none;
+}
+
+.cl-mic-btn.is-recording::after {
+  animation-delay: 0.9s;
+}
+
+@keyframes cl-mic-halo {
+  0% {
+    transform: scale(1);
+    opacity: 0.9;
+  }
+
+  100% {
+    transform: scale(2);
+    opacity: 0;
+  }
+}
+
+/* 录音中的声波律动条 */
+.cl-wave {
+  display: inline-flex;
+  align-items: center;
+  gap: 2.5px;
+  height: 15px;
+}
+
+.cl-wave span {
+  display: block;
+  width: 3px;
+  height: 100%;
+  border-radius: 9999px;
+  background: linear-gradient(
+    to top,
+    var(--danger, #dc2626),
+    #fb7185
+  );
+  transform-origin: center;
+  animation: cl-wave-bar 0.9s ease-in-out infinite;
+}
+
+.cl-wave span:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.cl-wave span:nth-child(2) {
+  animation-delay: 0.15s;
+}
+
+.cl-wave span:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.cl-wave span:nth-child(4) {
+  animation-delay: 0.45s;
+}
+
+.cl-wave span:nth-child(5) {
+  animation-delay: 0.6s;
+}
+
+@keyframes cl-wave-bar {
+  0%,
+  100% {
+    transform: scaleY(0.25);
+    opacity: 0.6;
+  }
+
+  50% {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+/* ────────────────────────────────────────────────────────────────
+ * 学习模式按钮：模式主题色环 + 图标底盘
+ * 主题色由按钮内联样式 --cl-ring / --cl-ring2 / --cl-soft 注入
+ * ──────────────────────────────────────────────────────────────── */
+.cl-mode-btn {
+  --cl-ring: var(--accent);
+  --cl-ring2: var(--accent);
+  --cl-soft: color-mix(in srgb, var(--accent) 30%, transparent);
+  position: relative;
+  padding: 2px 4px;
+  border-radius: 14px;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.cl-mode-btn:not(:disabled):hover {
+  transform: translateY(-2px);
+}
+
+.cl-mode-btn:not(:disabled):active {
+  transform: translateY(0) scale(0.95);
+}
+
+/* 图标底盘：关闭态为模式色半透明碟，激活态为渐变实色碟 */
+.cl-mode-icon {
+  display: flex;
+  width: 32px;
+  height: 32px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 9999px;
+  font-size: 11px;
+  font-weight: 600;
+  color: var(--cl-ring2);
+  background: var(--cl-soft);
+  transition:
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1),
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+}
+
+/* 悬停仅轻微反馈：微弱放大 + 淡光晕，不改变背景色 */
+.cl-mode-btn:not(:disabled):hover .cl-mode-icon {
+  transform: scale(1.05);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--cl-ring) 20%, transparent);
+}
+
+.cl-mode-icon.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--cl-ring), var(--cl-ring2));
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--cl-ring) 40%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
+/* 激活态悬停：背景保持不变，仅阴影轻微加深 */
+.cl-mode-btn:not(:disabled):hover .cl-mode-icon.is-active {
+  box-shadow:
+    0 5px 16px color-mix(in srgb, var(--cl-ring) 48%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
+/* 暗色模式：关闭态图标改用渐变亮色（激活态保持白色） */
+.dark .cl-mode-icon:not(.is-active) {
+  color: var(--cl-ring);
+}
+
+/* ────────────────────────────────────────────────────────────────
+ * 全局学习模式按钮：与卡片按钮同一套主题配色
+ * ──────────────────────────────────────────────────────────────── */
+.cl-global-btn {
+  --cl-ring: var(--accent);
+  --cl-ring2: var(--accent);
+  --cl-soft: color-mix(in srgb, var(--accent) 30%, transparent);
+  color: var(--cl-ring2);
+  background: var(--cl-soft);
+}
+
+.cl-global-btn:not(.is-active):hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 10px color-mix(in srgb, var(--cl-ring) 20%, transparent);
+}
+
+.cl-global-btn.is-active {
+  color: #fff;
+  background: linear-gradient(135deg, var(--cl-ring), var(--cl-ring2));
+  box-shadow:
+    0 4px 14px color-mix(in srgb, var(--cl-ring) 40%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
+.cl-global-btn.is-active:hover {
+  box-shadow:
+    0 5px 16px color-mix(in srgb, var(--cl-ring) 48%, transparent),
+    inset 0 1px 0 rgb(255 255 255 / 0.3);
+}
+
+/* 暗色模式：关闭态图标与文字改用渐变亮色（激活态保持白色） */
+.dark .cl-global-btn:not(.is-active) {
+  color: var(--cl-ring);
+}
+
+/* 课程学习顶部导航吸顶容器（复用 navbar 毛玻璃观感） */
+.cl-navbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  border: none !important;
+  border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;
+  box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
+  isolation: isolate;
+  background-color: rgb(255 255 255 / 0.55);
+  -webkit-backdrop-filter: blur(16px) saturate(150%);
+  backdrop-filter: blur(16px) saturate(150%);
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+}
+
+.dark .cl-navbar {
+  border: none !important;
+  border-bottom: 1px solid rgb(255 255 255 / 0.06) !important;
+  background-color: rgb(10 16 34 / 0.58);
+}
+
+
+.cl-wave span {
+  --danger: #ffb0b0;
+    background: linear-gradient(to top, var(--danger, #ddb9b9), #ffdee3);
+    transform-origin: center;
+    border-radius: 9999px;
+    width: 3.5px;
+    height: 100%;
+    animation: .9s ease-in-out infinite cl-wave-bar;
+    display: block;
+}
