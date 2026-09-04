@@ -59,7 +59,7 @@ export default function PaginationBar({
         <ChevronLeft className="size-4" />
       </button>
 
-      <span className="inline-flex h-9 relative z-[1] items-center rounded-full bg-accent px-4 text-sm font-semibold text-accent-foreground tabular-nums">
+      <span className="inline-flex min-h-9 relative z-[1] items-center rounded-full bg-accent px-4 text-sm font-semibold text-accent-foreground tabular-nums">
         {pageIndex} / {totalPages}
       </span>
 

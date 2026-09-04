@@ -378,9 +378,9 @@
 
 .yinyinkuan:after {
   content: "";
-  border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
-  /* border-color: var(--border-color, none); */
-  border-style: var(--border-style, none);
+  /*border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
+   border-color: var(--border-color, none); */
+  /* border-style: var(--border-style, none);*/
   width: 100%;
   height: 100%;
   position: absolute;
@@ -388,7 +388,7 @@
   left: 0;
   top: 0;
   border-radius: inherit;
-  pointer-events: none;
+  pointer-events: none; 
 }
 
 
