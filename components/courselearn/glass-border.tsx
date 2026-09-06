@@ -72,8 +72,8 @@ export default function GlassBorder() {
           WebkitMaskComposite: "xor",
           mask: RING_MASK,
           maskComposite: "exclude",
-          WebkitBackdropFilter: "saturate(200%) brightness(1.3)",
-          backdropFilter: "saturate(200%) brightness(1.3)",
+          WebkitBackdropFilter: "saturate(180%) brightness(1.3)",
+          backdropFilter: "saturate(180%) brightness(1.3)",
         }}
       />
 

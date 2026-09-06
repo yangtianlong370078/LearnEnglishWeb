@@ -45,7 +45,10 @@ export const MODE_THEME: Record<
   speech: { from: "#ffb54d", to: "#f2801f", soft: "rgba(255, 166, 51, 0.32)" },
 };
 
-/** 翻译 / 练习工具按钮主题色：from→to 激活渐变，soft 关闭态底色 */
+/**
+ * 【备用配色】翻译 / 练习工具按钮主题色：from→to 激活渐变，soft 关闭态底色。
+ * 当前工具按钮采用白色系配色，此主题保留备用（可配合 cl-global-btn 使用）。
+ */
 export const TOOL_THEME = {
   translation: { from: "#f472b6", to: "#d63384", soft: "rgba(244, 114, 182, 0.3)" },
   practice: { from: "#3ddc97", to: "#0e9f6e", soft: "rgba(61, 220, 151, 0.3)" },

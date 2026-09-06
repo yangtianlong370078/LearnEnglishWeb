@@ -67,6 +67,27 @@ export function TranslateIcon(props: SVGProps<SVGSVGElement>) {
   );
 }
 
+/** 【编辑/修改】图标：文档 + I 形文本光标（与铅笔造型完全不同） */
+export function EditIcon(props: SVGProps<SVGSVGElement>) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      xmlns="http://www.w3.org/2000/svg"
+      {...props}
+    >
+      <path d="M5 4.5A1.5 1.5 0 0 1 6.5 3h11A1.5 1.5 0 0 1 19 4.5v15a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 5 19.5z" />
+      <path d="M8.5 9h7" strokeOpacity=".55" />
+      <path d="M8.5 12.5h4" strokeOpacity=".55" />
+      <path d="M14.5 16h3M16 16v3.5M14.5 19.5h3" />
+    </svg>
+  );
+}
+
 /** 【练习】图标：铅笔书写（笔杆主色，笔迹辅助色） */
 export function PracticeIcon(props: SVGProps<SVGSVGElement>) {
   return (

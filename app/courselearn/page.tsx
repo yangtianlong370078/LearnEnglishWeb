@@ -64,10 +64,6 @@ function CourseLearnClient() {
   const [error, setError] = useState<string | null>(null);
 
   const [globalMode, setGlobalMode] = useState<LearnMode | null>(null);
-  /** 各单词卡的本地学习模式（key 为卡片索引），用于联动翻译按钮 */
-  const [localModes, setLocalModes] = useState<
-    Record<number, LearnMode | null>
-  >({});
   const [translationOn, setTranslationOn] = useState(false);
   const [practiceOn, setPracticeOn] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
@@ -109,7 +105,6 @@ function CourseLearnClient() {
         setWords(data.data ?? []);
         cardRefs.current = [];
         setCurrentIndex(0);
-        setLocalModes({});
         setDataVersion((v) => v + 1);
       })
       .catch((err: Error) => {
@@ -222,6 +217,16 @@ function CourseLearnClient() {
     setCurrentIndex(index);
   }, []);
 
+  // ── 卡片内编辑单词保存后，就地更新列表数据 ───────────────
+  const handleWordUpdated = useCallback(
+    (lexiconId: number, en: string, cn: string) => {
+      setWords((prev) =>
+        prev.map((w) => (w.lexiconId === lexiconId ? { ...w, en, cn } : w)),
+      );
+    },
+    [],
+  );
+
   // ── 听写/语音互斥：某张卡片启动活动时，中断其它卡片的播放与录音 ──
   const handleExclusiveStart = useCallback((index: number) => {
     cardRefs.current.forEach((handle, i) => {
@@ -232,25 +237,16 @@ function CourseLearnClient() {
   const handleGlobalModeChange = useCallback((mode: LearnMode | null) => {
     setGlobalMode(mode);
     setCurrentIndex(0);
+    if (mode) {
+      // 开启全局学习按钮：重置全局【翻译】/【练习】为关闭
+      //（各卡片的【翻译】/【练习】随 globalMode 变化自行重置）
+      setTranslationOn(false);
+      setPracticeOn(false);
+    }
   }, []);
 
-  // 单词卡本地模式上报
-  const handleLocalModeChange = useCallback(
-    (index: number, mode: LearnMode | null) => {
-      setLocalModes((prev) =>
-        prev[index] === mode ? prev : { ...prev, [index]: mode },
-      );
-    },
-    [],
-  );
-
-  // 全局或任一单词卡开启【听写】/【语音】时，翻译须关闭且不可点击
-  const translationLocked =
-    isAudioMode(globalMode) || Object.values(localModes).some(isAudioMode);
-
-  useEffect(() => {
-    if (translationLocked) setTranslationOn(false);
-  }, [translationLocked]);
+  // 全局【翻译】仅当全局学习按钮开启且非听写/语音模式时可点击
+  const translationDisabled = !globalMode || isAudioMode(globalMode);
 
   // 全局英-中 / 中-英 激活或新一页数据加载时，聚焦第一张卡片输入框。
   // 注意：依赖 dataVersion 而非 words，避免计分更新 words 时把光标抢回首卡。
@@ -282,8 +278,9 @@ function CourseLearnClient() {
 
         <GlobalToolbar
           globalMode={globalMode}
+          practiceDisabled={!globalMode}
           practiceOn={practiceOn}
-          translationDisabled={translationLocked}
+          translationDisabled={translationDisabled}
           translationOn={translationOn}
           onGlobalModeChange={handleGlobalModeChange}
           onTogglePractice={() => setPracticeOn((v) => !v)}
@@ -326,8 +323,8 @@ function CourseLearnClient() {
                 onAdvance={handleAdvance}
                 onExclusiveStart={handleExclusiveStart}
                 onFocusRequest={handleFocusRequest}
-                onLocalModeChange={(mode) => handleLocalModeChange(index, mode)}
                 onResult={handleResult}
+                onWordUpdated={handleWordUpdated}
               />
             ))}
           </div>

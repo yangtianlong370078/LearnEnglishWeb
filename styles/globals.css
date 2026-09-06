@@ -768,7 +768,7 @@ input:-webkit-autofill:active {
 .cl-result-badge {
   position: absolute;
   top: -11px;
-  right: -11px;
+  left: -11px;
   z-index: 30;
   display: flex;
   align-items: center;
