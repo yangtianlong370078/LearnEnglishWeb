@@ -2,8 +2,15 @@
 
 import type { LearnMode } from "@/types/courselearn";
 import GlassBorder, { GlassWarp } from "./glass-border";
-import { MODE_LABEL, MODE_ORDER, MODE_THEME } from "./lib";
-import { CnEnIcon, EnCnIcon, MicrophoneIcon, SpeakerIcon } from "./mode-icons";
+import { MODE_LABEL, MODE_ORDER, MODE_THEME, TOOL_THEME } from "./lib";
+import {
+  CnEnIcon,
+  EnCnIcon,
+  MicrophoneIcon,
+  PracticeIcon,
+  SpeakerIcon,
+  TranslateIcon,
+} from "./mode-icons";
 
 interface GlobalToolbarProps {
   globalMode: LearnMode | null;
@@ -77,30 +84,40 @@ export default function GlobalToolbar({
         <button
           aria-disabled={translationDisabled}
           aria-pressed={translationOn}
-          className={`rounded-full px-3 py-2 text-sm font-medium transition-all duration-300 ${
-            translationDisabled
-              ? "cursor-not-allowed bg-white/40 text-muted opacity-60 dark:bg-white/5"
-              : translationOn
-                ? "bg-gradient-to-br from-success to-success/80 text-success-foreground shadow-md shadow-success/35"
-                : "bg-white/70 text-foreground hover:-translate-y-px hover:bg-white hover:shadow-sm dark:bg-white/10 dark:hover:bg-white/15"
-          }`}
+          className={`cl-global-btn inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium transition-all duration-300 ${
+            translationOn && !translationDisabled ? "is-active" : ""
+          } ${translationDisabled ? "cursor-not-allowed opacity-60" : ""}`}
+          style={
+            {
+              "--cl-ring": TOOL_THEME.translation.from,
+              "--cl-ring2": TOOL_THEME.translation.to,
+              "--cl-soft": TOOL_THEME.translation.soft,
+            } as React.CSSProperties
+          }
           disabled={translationDisabled}
           title={translationDisabled ? "听写 / 语音模式下不可开启翻译" : undefined}
           type="button"
           onClick={onToggleTranslation}
         >
+          <TranslateIcon className="size-4" />
           翻译
         </button>
         <button
           aria-pressed={practiceOn}
-          className={`rounded-full px-3 py-2 text-sm font-medium transition-all duration-300 ${
-            practiceOn
-              ? "bg-gradient-to-br from-success to-success/80 text-success-foreground shadow-md shadow-success/35"
-              : "bg-white/70 text-foreground hover:-translate-y-px hover:bg-white hover:shadow-sm dark:bg-white/10 dark:hover:bg-white/15"
+          className={`cl-global-btn inline-flex items-center gap-1.5 rounded-full px-3 py-2 text-sm font-medium transition-all duration-300 ${
+            practiceOn ? "is-active" : ""
           }`}
+          style={
+            {
+              "--cl-ring": TOOL_THEME.practice.from,
+              "--cl-ring2": TOOL_THEME.practice.to,
+              "--cl-soft": TOOL_THEME.practice.soft,
+            } as React.CSSProperties
+          }
           type="button"
           onClick={onTogglePractice}
         >
+          <PracticeIcon className="size-4" />
           练习
         </button>
       </div>

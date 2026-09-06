@@ -45,6 +45,12 @@ export const MODE_THEME: Record<
   speech: { from: "#ffb54d", to: "#f2801f", soft: "rgba(255, 166, 51, 0.32)" },
 };
 
+/** 翻译 / 练习工具按钮主题色：from→to 激活渐变，soft 关闭态底色 */
+export const TOOL_THEME = {
+  translation: { from: "#f472b6", to: "#d63384", soft: "rgba(244, 114, 182, 0.3)" },
+  practice: { from: "#3ddc97", to: "#0e9f6e", soft: "rgba(61, 220, 151, 0.3)" },
+} as const;
+
 /**
  * 「音频类」学习模式（听写 / 语音）判定。
  * 全局或任一单词卡开启该类模式时，【翻译】功能须关闭且不可点击。
