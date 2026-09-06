@@ -15,13 +15,14 @@ import {
   useState,
 } from "react";
 import { Button, Card, InputGroup, Modal } from "@heroui/react";
-import { CircleInfo, Xmark } from "@gravity-ui/icons";
+import { Xmark } from "@gravity-ui/icons";
 
 import ConfettiBurst from "./confetti";
 import GlassBorder, { GlassWarp } from "./glass-border";
 import RingProgress from "./ring-progress";
 import {
   CnEnIcon,
+  DetailIcon,
   EditIcon,
   EnCnIcon,
   MicrophoneIcon,
@@ -699,7 +700,7 @@ function WordCardInner(
               type="button"
               onClick={openEditModal}
             >
-              <EditIcon className="size-3.5" />
+              <EditIcon className="size-3" />
             </button>
             <button
               aria-label="详情"
@@ -708,7 +709,7 @@ function WordCardInner(
               type="button"
               onClick={() => setDetailOpen(true)}
             >
-              <CircleInfo className="size-3.5" />
+              <DetailIcon className="size-3.5" />
             </button>
           </div>
         )}
