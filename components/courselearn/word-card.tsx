@@ -772,9 +772,16 @@ function WordCardInner(
         )}
         <Card.Content className="flex flex-col h-[220px]! rounded-3xl p-[20px] justify-between ">
           {/* 主体：按模式渲染 */}
-          <div className="flex flex-col justify-center gap-2 mb-3 h-full items-center text-center">
+
+
+<div className={`flex flex-col justify-center ${effectiveTranslationOn ? "mt-2 gap-0.5 " : "gap-2"} ${ !effectiveMode ?"mt-2":  effectiveMode !== "en-cn" && effectiveMode !== "cn-en" ? "mb-3 mt-1 " : ""}   h-full items-center text-center`}>
+
+  {renderBody()}
+</div>
+
+          {/* <div className="flex flex-col justify-center gap-2 mb-3 h-full items-center text-center">
             {renderBody()}
-          </div>
+          </div> */}
 
           {/* 四个学习按钮 + 环形进度 */}
           <div className="flex items-center mb-1 justify-center gap-3">
@@ -1019,7 +1026,7 @@ function WordCardInner(
             aria-label={
               speakerState === "idle" ? "播放发音" : "停止播放"
             }
-            className={`cl-mic-btn mb-2 ${
+            className={`cl-mic-btn mb-1 ${
               speakerState === "playing"
                 ? "is-playing"
                 : speakerState === "waiting"
@@ -1067,7 +1074,7 @@ function WordCardInner(
           aria-label={
             micState === "recording" ? "结束录音" : "开始语音识别"
           }
-          className={` mt-[12px]!  ${
+          className={` mt-[10px]!  ${
             micState === "recording" ? " cl-mic-btn is-recording" : "cl-mic-btn"
           }`}
           type="button"
@@ -1106,7 +1113,7 @@ function WordCardInner(
 
   function renderInput(placeholder: string) {
     return (
-      <div className="relative mt-1 max-w-[240px]  w-full ">
+      <div className={`relative mt-1 ${effectiveTranslationOn ? "mb-1" : ""} max-w-[240px]  w-full `}>
         <input
           ref={inputRef}
           aria-label="学习输入"
