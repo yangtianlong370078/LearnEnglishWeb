@@ -20,6 +20,10 @@ import SettingsModal from "@/components/courselearn/settings-modal";
 import StatTabs from "@/components/courselearn/stat-tabs";
 import WordCard from "@/components/courselearn/word-card";
 import {
+  WordDetailModal,
+  WordEditModal,
+} from "@/components/courselearn/word-modal";
+import {
   MODE_FIELD,
   buildRecord,
   isAudioMode,
@@ -67,6 +71,9 @@ function CourseLearnClient() {
   const [translationOn, setTranslationOn] = useState(false);
   const [practiceOn, setPracticeOn] = useState(false);
   const [settingsOpen, setSettingsOpen] = useState(false);
+  // 页面级共享的详情 / 编辑弹窗目标：null 表示关闭，点击卡片按钮时写入对应单词
+  const [detailWord, setDetailWord] = useState<LearnWord | null>(null);
+  const [editWord, setEditWord] = useState<LearnWord | null>(null);
   const [, setCurrentIndex] = useState(0);
   /** 数据版本号：仅在新一页数据加载完成时自增，用于触发「聚焦首卡」，
    *  避免计分导致的 words 原地更新反复触发聚焦而把光标抢回首卡 */
@@ -150,6 +157,8 @@ function CourseLearnClient() {
       if (nextZt === zt) return;
       flushRecords();
       setGlobalMode(null);
+      setDetailWord(null);
+      setEditWord(null);
       setPageIndex(1);
       setZt(nextZt);
     },
@@ -160,6 +169,8 @@ function CourseLearnClient() {
     (page: number) => {
       flushRecords();
       setGlobalMode(null);
+      setDetailWord(null);
+      setEditWord(null);
       setPageIndex(page);
     },
     [flushRecords],
@@ -217,7 +228,16 @@ function CourseLearnClient() {
     setCurrentIndex(index);
   }, []);
 
-  // ── 卡片内编辑单词保存后，就地更新列表数据 ───────────────
+  // ── 打开卡片右上角的详情 / 编辑弹窗（页面级共享，仅一个实例） ──
+  const handleOpenDetail = useCallback((word: LearnWord) => {
+    setDetailWord(word);
+  }, []);
+
+  const handleOpenEdit = useCallback((word: LearnWord) => {
+    setEditWord(word);
+  }, []);
+
+  // ── 编辑弹窗保存成功后，就地更新列表数据 ──────────────────
   const handleWordUpdated = useCallback(
     (lexiconId: number, en: string, cn: string) => {
       setWords((prev) =>
@@ -324,7 +344,8 @@ function CourseLearnClient() {
                 onExclusiveStart={handleExclusiveStart}
                 onFocusRequest={handleFocusRequest}
                 onResult={handleResult}
-                onWordUpdated={handleWordUpdated}
+                onOpenDetail={handleOpenDetail}
+                onOpenEdit={handleOpenEdit}
               />
             ))}
           </div>
@@ -348,6 +369,21 @@ function CourseLearnClient() {
         onDictationCountChange={settingsHook.setDictationCount}
         onHideMeaningChange={settingsHook.setHideMeaning}
         onOpenChange={setSettingsOpen}
+      />
+
+      {/* 页面级共享弹窗：所有单词卡片共用同一实例，点击后传入目标单词 */}
+      <WordDetailModal
+        word={detailWord}
+        onOpenChange={(open) => {
+          if (!open) setDetailWord(null);
+        }}
+      />
+      <WordEditModal
+        word={editWord}
+        onOpenChange={(open) => {
+          if (!open) setEditWord(null);
+        }}
+        onSaved={handleWordUpdated}
       />
     </div>
   );

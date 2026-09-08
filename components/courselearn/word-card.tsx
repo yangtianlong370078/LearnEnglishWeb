@@ -14,7 +14,7 @@ import {
   useRef,
   useState,
 } from "react";
-import { Button, Card, InputGroup, Modal } from "@heroui/react";
+import { Card } from "@heroui/react";
 import { Xmark } from "@gravity-ui/icons";
 
 import ConfettiBurst from "./confetti";
@@ -43,8 +43,7 @@ import {
   progressPercent,
 } from "./lib";
 import { startXunfeiRecognition, type XunfeiSession } from "./xunfei";
-import { courseLearnApi, post } from "@/lib/api";
-import WordDetail from "@/components/common/word-detail";
+import { courseLearnApi } from "@/lib/api";
 
 /** 卡片对外暴露的命令句柄，供全局流程驱动 */
 export interface WordCardHandle {
@@ -78,8 +77,10 @@ interface WordCardProps {
   onFocusRequest: (index: number) => void;
   /** 本卡启动听写播放/语音识别前通知父级，父级负责中断其它卡片的活动 */
   onExclusiveStart: (index: number) => void;
-  /** 编辑保存成功后通知父级更新列表中的单词 */
-  onWordUpdated?: (lexiconId: number, en: string, cn: string) => void;
+  /** 点击右上角【详情】：由父级打开页面级共享的单词详情弹窗 */
+  onOpenDetail?: (word: LearnWord) => void;
+  /** 点击右上角【编辑/修改】：由父级打开页面级共享的单词编辑弹窗 */
+  onOpenEdit?: (word: LearnWord) => void;
 }
 
 type ResultState = "idle" | "correct" | "wrong";
@@ -99,7 +100,8 @@ function WordCardInner(
     onAdvance,
     onFocusRequest,
     onExclusiveStart,
-    onWordUpdated,
+    onOpenDetail,
+    onOpenEdit,
   }: WordCardProps,
   ref: React.Ref<WordCardHandle>,
 ) {
@@ -119,13 +121,6 @@ function WordCardInner(
   const [confettiKey, setConfettiKey] = useState(0);
   const [shaking, setShaking] = useState(false);
 
-  // 单词详情弹窗（无学习按钮激活时右上角【详情】）
-  const [detailOpen, setDetailOpen] = useState(false);
-  // 编辑/修改弹窗（无学习按钮激活时右上角【编辑/修改】）
-  const [editOpen, setEditOpen] = useState(false);
-  const [editEn, setEditEn] = useState("");
-  const [editCn, setEditCn] = useState("");
-  const [editSaving, setEditSaving] = useState(false);
   // 颜色过渡开关：显示结果时为 false（瞬间出现，与动画同步）；
   // 清空输入淡出为默认色时为 true（渐变过渡）
   const [colorTransition, setColorTransition] = useState(false);
@@ -526,34 +521,6 @@ function WordCardInner(
     [globalMode, index, onFocusRequest, stopActivity],
   );
 
-  // ── 编辑/修改弹窗 ───────────────────────────────────────
-  const openEditModal = useCallback(() => {
-    setEditEn(word.en);
-    setEditCn(word.cn);
-    setEditOpen(true);
-  }, [word.en, word.cn]);
-
-  const handleSaveEdit = useCallback(async () => {
-    const en = editEn.trim();
-    const cn = editCn.trim();
-
-    if (!en || !cn) return;
-
-    setEditSaving(true);
-    try {
-      await post<void>("/Word/updc", null, {
-        params: { id: word.lexiconId, en, cn },
-      });
-      setEditOpen(false);
-      onWordUpdated?.(word.lexiconId, en, cn);
-    } catch (err) {
-      // eslint-disable-next-line no-console
-      console.error("[word-card] 保存单词失败:", err);
-    } finally {
-      setEditSaving(false);
-    }
-  }, [editEn, editCn, onWordUpdated, word.lexiconId]);
-
   // ── 命令句柄 ─────────────────────────────────────────────
   useImperativeHandle(
     ref,
@@ -698,7 +665,7 @@ function WordCardInner(
               className="inline-flex size-7 items-center justify-center rounded-full bg-white/60 text-foreground/75 transition-all duration-300 hover:-translate-y-px hover:bg-white/80 hover:shadow-sm dark:bg-white/10 dark:text-foreground/90 dark:hover:bg-white/15 dark:hover:shadow-none"
               title="编辑/修改"
               type="button"
-              onClick={openEditModal}
+              onClick={() => onOpenEdit?.(word)}
             >
               <EditIcon className="size-3" />
             </button>
@@ -707,7 +674,7 @@ function WordCardInner(
               className="inline-flex size-7 items-center justify-center rounded-full bg-white/60 text-foreground/75 transition-all duration-300 hover:-translate-y-px hover:bg-white/80 hover:shadow-sm dark:bg-white/10 dark:text-foreground/90 dark:hover:bg-white/15 dark:hover:shadow-none"
               title="详情"
               type="button"
-              onClick={() => setDetailOpen(true)}
+              onClick={() => onOpenDetail?.(word)}
             >
               <DetailIcon className="size-3.5" />
             </button>
@@ -845,140 +812,6 @@ function WordCardInner(
 
       {/* 液态玻璃描边层（位于内容之上）：源码的 screen/overlay 两层渐变描边 */}
       {resultState === "idle" && <GlassBorder />}
-
-      {/* 单词详情弹窗：仅展示详情，不包含「加入生词本」逻辑 */}
-      <Modal.Backdrop
-        className="!bg-transparent"
-        isOpen={detailOpen}
-        onOpenChange={setDetailOpen}
-      >
-        <Modal.Container className="w-full max-w-lg rounded-2xl">
-          <Modal.Dialog className="backdrop-blur-xl backdrop-saturate-150 bg-white/70 dark:bg-zinc-900/70 shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-            <Modal.CloseTrigger />
-            <Modal.Header>
-              <Modal.Heading className="text-2xl font-semibold">
-                {word.en}
-              </Modal.Heading>
-            </Modal.Header>
-            <div className="m-0 py-4">
-              <WordDetail key={word.en} word={word.en} />
-            </div>
-          </Modal.Dialog>
-        </Modal.Container>
-      </Modal.Backdrop>
-
-      {/* 编辑/修改弹窗：预写入单词 en / cn，校验非空后保存 */}
-      <Modal.Backdrop
-        isDismissable={false}
-        isOpen={editOpen}
-        variant="blur"
-        onOpenChange={setEditOpen}
-      >
-        <Modal.Container placement="center" size="md">
-          <Modal.Dialog>
-            <Modal.Header>
-              <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
-                <EditIcon className="size-5" />
-              </Modal.Icon>
-              <Modal.Heading>编辑/修改单词</Modal.Heading>
-              <p className="mt-1.5 text-sm leading-5 text-muted">
-                修改单词的英文与中文释义后保存即可生效
-              </p>
-            </Modal.Header>
-            <Modal.Body className="flex flex-col gap-5 py-2">
-              <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
-                <label
-                  className="text-sm text-foreground"
-                  htmlFor="word-en-input"
-                >
-                  英文单词
-                </label>
-                <InputGroup
-                  style={
-                    {
-                      "--field-border": "var(--border)",
-                    } as React.CSSProperties
-                  }
-                  variant="secondary"
-                >
-                  <InputGroup.Prefix>
-                    <EnCnIcon className="size-4 text-muted" />
-                  </InputGroup.Prefix>
-                  <InputGroup.Input
-                    className="w-full max-w-[280px]"
-                    id="word-en-input"
-                    placeholder="输入英文单词"
-                    value={editEn}
-                    onChange={(e) => setEditEn(e.target.value)}
-                  />
-                  {editEn.length > 0 && (
-                    <button
-                      aria-label="清空内容"
-                      className="inline-flex items-center justify-center px-2 hover:opacity-70"
-                      type="button"
-                      onClick={() => setEditEn("")}
-                    >
-                      <Xmark className="size-4" />
-                    </button>
-                  )}
-                </InputGroup>
-              </div>
-              <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
-                <label
-                  className="text-sm text-foreground"
-                  htmlFor="word-cn-input"
-                >
-                  中文释义
-                </label>
-                <InputGroup
-                  style={
-                    {
-                      "--field-border": "var(--border)",
-                    } as React.CSSProperties
-                  }
-                  variant="secondary"
-                >
-                  <InputGroup.Prefix>
-                    <CnEnIcon className="size-4 text-muted" />
-                  </InputGroup.Prefix>
-                  <InputGroup.Input
-                    className="w-full max-w-[280px]"
-                    id="word-cn-input"
-                    placeholder="输入中文释义"
-                    value={editCn}
-                    onChange={(e) => setEditCn(e.target.value)}
-                  />
-                  {editCn.length > 0 && (
-                    <button
-                      aria-label="清空内容"
-                      className="inline-flex items-center justify-center px-2 hover:opacity-70"
-                      type="button"
-                      onClick={() => setEditCn("")}
-                    >
-                      <Xmark className="size-4" />
-                    </button>
-                  )}
-                </InputGroup>
-              </div>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button slot="close" variant="secondary">
-                取消
-              </Button>
-              <Button
-                isDisabled={
-                  editSaving ||
-                  editEn.trim().length === 0 ||
-                  editCn.trim().length === 0
-                }
-                onPress={handleSaveEdit}
-              >
-                {editSaving ? "保存中..." : "保存"}
-              </Button>
-            </Modal.Footer>
-          </Modal.Dialog>
-        </Modal.Container>
-      </Modal.Backdrop>
     </div>
   );
 
