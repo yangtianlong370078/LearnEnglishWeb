@@ -37,12 +37,12 @@ export const MODE_ORDER: LearnMode[] = [
 /** 四种学习模式主题色：from→to 激活渐变，soft 关闭态底色 */
 export const MODE_THEME: Record<
   LearnMode,
-  { from: string; to: string; soft: string }
+  { from: string; to: string; soft: string;light:string;dark:string }
 > = {
-  "en-cn": { from: "#37a6ff", to: "#166bd8", soft: "rgba(38, 132, 255, 0.3)" },
-  "cn-en": { from: "#8f80ff", to: "#5a48d8", soft: "rgba(122, 100, 255, 0.3)" },
-  dictation: { from: "#3fd0c9", to: "#0d9d97", soft: "rgba(32, 196, 188, 0.3)" },
-  speech: { from: "#ffb54d", to: "#f2801f", soft: "rgba(255, 166, 51, 0.32)" },
+  "en-cn": {light:"#abd9ffff", from: "#37a6ff", to: "#166bd8", dark:"#0c5bc2ff", soft: "rgba(38, 132, 255, 0.3)" },
+  "cn-en": {light:"#d7d1ffff", from: "#8f80ff", to: "#5a48d8", dark: "#5641ddff", soft: "rgba(122, 100, 255, 0.3)" },
+  dictation: { light: "#b3fffbff", from: "#3fd0c9", to: "#0d9d97", dark: "#05918aff", soft: "rgba(32, 196, 188, 0.3)" },
+  speech: { light: "#ffe7c6ff", from: "#ffb54d", to: "#f2801f", dark: "#c26513ff", soft: "rgba(255, 166, 51, 0.32)" },
 };
 
 /**

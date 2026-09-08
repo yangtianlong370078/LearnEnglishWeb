@@ -771,9 +771,11 @@ function WordCardInner(
                   disabled={!!globalMode}
                   style={
                     {
-                      "--cl-ring": theme.from,
-                      "--cl-ring2": theme.to,
-                      "--cl-soft": theme.soft,
+                  "--cl-ring0": theme.light,
+                  "--cl-ring": theme.from,
+                  "--cl-ring2": theme.to,
+                  "--cl-soft": theme.soft,
+                  "--cl-ring3": theme.dark,
                     } as React.CSSProperties
                   }
                   type="button"
