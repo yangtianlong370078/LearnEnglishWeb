@@ -607,12 +607,12 @@ function WordCardInner(
           把边框后面的背景提亮提饱和透上来（仅默认态，避免干扰对错着色） */}
       {resultState === "idle" && <GlassWarp />}
 
-      {/* 内容层奶白底色：内缩 1.5px 避开描边环区，light:bg-white/15  dark:bg-black/10
+      {/* 内容层奶白底色：内缩 1.5px 避开描边环区，light:bg-white/15  dark:bg-black/10  dark:bg-[hsla(0,0%,50%,0.05)]!
           让边框环直接透出 warp 玻璃（更"裸透"的液态玻璃边框） */}
       {resultState === "idle" && (
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute light:bg-white/15 "
+          className="pointer-events-none absolute light:bg-white/15 dark:bg-white/5"
           style={{ inset: "1px", borderRadius: "calc(1.5rem - 1px)" }}
         />
       )}

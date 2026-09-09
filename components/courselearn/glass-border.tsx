@@ -59,7 +59,7 @@ export default function GlassBorder() {
     <>
       {/* 玻璃环：backdrop-filter 对环区下方的 warp 玻璃再提亮、提饱和，
           把背景"高亮高饱和"地透上来（替代源码 screen/overlay 混合叠加的效果）。
-          纯黑背景下提亮几乎无效 → 边框隐去，只剩下方乳白高光的轻微乳白边；
+          纯黑背景下提亮几乎无效 → 边框隐去，只剩下方乳白高光的轻微乳白边；            "linear-gradient(191.369deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.494) 46.0257%, rgba(255, 255, 255, 0.965) 83.3676%, rgba(255, 255, 255, 0) 100%)",
           彩色背景下色彩被提亮提饱和透上来。无 mix-blend-mode，不触发合成器 Bug。
           强度调优：saturate 控制提饱和，brightness 控制提亮 */}
       <span
@@ -92,8 +92,8 @@ export default function GlassBorder() {
           maskComposite: "exclude",
           boxShadow:
             "rgba(255, 255, 255, 0.35) 0px 0px 0px 0.5px inset, rgba(255, 255, 255, 0.18) 0px 1px 3px inset, rgba(0, 0, 0, 0.35) 0px 1px 4px",
-          background:
-            "linear-gradient(191.369deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.494) 46.0257%, rgba(255, 255, 255, 0.965) 83.3676%, rgba(255, 255, 255, 0) 100%)",
+          background:"linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.494) 23%, rgba(255, 255, 255, 0.965) 50%, rgba(255, 255, 255, 0.494) 77%, rgba(255, 255, 255, 0) 100%)",
+
         }}
       />
     </>
