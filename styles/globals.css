@@ -259,7 +259,7 @@
 .searchFieldqy,
 .card--default,
 [data-slot="card"],
-.accordion,
+/* .accordion, */
 .disclosure-group,
 .search-field__group,
 .alert {
@@ -291,7 +291,7 @@
 .searchFieldqy:after,
 .card--default:after,
 [data-slot="card"]:after,
-.accordion:after,
+/* .accordion:after, */
 .disclosure-group:after,
 .search-field__group:after,
 .alert:after {
@@ -319,7 +319,7 @@
 .dark .searchFieldqy,
 .dark .card--default,
 .dark [data-slot="card"],
-.dark .accordion,
+/* .dark .accordion, */
 .dark .disclosure-group,
 .dark .search-field__group,
 .dark .alert {
@@ -349,7 +349,7 @@
 .dark .searchFieldqy:after,
 .dark .search-field__group:after,
 .dark [data-slot="card"]:after,
-.dark .accordion:after,
+/* .dark .accordion:after, */
 .dark .disclosure-group:after,
 .dark .alert:after {
   content: "";
@@ -633,13 +633,21 @@ input:-webkit-autofill:active {
   background-color: rgb(10 16 34 / 0.5) !important;
 } */
 
-.accordion__item::after {
+/* .accordion__item::after {
   background: rgb(0 0 0 / 0.08) !important;
 }
 
 .dark .accordion__item::after {
   background: rgb(255 255 255 / 0.08) !important;
+} */
+
+ .accordion__item::after {
+  background: transparent !important;
 }
+
+.dark .accordion__item::after {
+  background:transparent !important;
+} 
 
 .zs {
   color: #f03744;
@@ -1341,3 +1349,5 @@ input:-webkit-autofill:active {
     animation: .9s ease-in-out infinite cl-wave-bar;
     display: block;
 }
+
+

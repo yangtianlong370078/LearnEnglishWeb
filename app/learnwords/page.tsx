@@ -345,18 +345,19 @@ export default function LearnWordsPage() {
     categories: CategoryInfo[],
     menuMode: "full" | "remove",
   ) => (
+     <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
+      <GlassWarp/>
     <Accordion
       allowsMultipleExpanded
-      className="w-full overflow-hidden rounded-3xl relative yinyinkuan cl-glass-idle"
+      className="w-full rounded-3xl overflow-hidden  "
       expandedKeys={expandedMap[menuMode]}
       onExpandedChange={(keys) =>
         setExpandedMap((prev) => ({ ...prev, [menuMode]: keys as Set<Key> }))
       }
     >
-
-      <GlassWarp/>
+   
       <div
-        className="flex items-center relative z-[1]  gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15"
+        className="flex items-center relative z-[1]  gap-1.5 px-6 py-3 bg-white/15 dark:bg-white/5"
         onClick={() => collapseCategoryAccordion(menuMode)}
       >
         <button
@@ -404,7 +405,7 @@ export default function LearnWordsPage() {
         )}
       </div>
 
-      <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
+     
 
       {categories.every((cat) => cat.courseInfos.length === 0) ? (
         <div className="px-6 py-5 text-center text-sm text-muted">
@@ -415,9 +416,13 @@ export default function LearnWordsPage() {
       {categories
         .filter((cat) => cat.courseInfos.length > 0)
         .map((cat) => (
-          <Accordion.Item key={cat.id} id={cat.id}>
+          <div key={cat.id} >
+            <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
+
+          <Accordion.Item id={cat.id}>
             <Accordion.Heading>
               <Accordion.Trigger>
+                <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
                 <div>
                   <span className="inline-flex rounded-xl  min-h-9 items-center gap-2 rounded-medium bg-white/50 px-3 text-small dark:bg-black/30">
                     {menuMode == "full" ? (
@@ -460,10 +465,13 @@ export default function LearnWordsPage() {
               </Accordion.Body>
             </Accordion.Panel>
           </Accordion.Item>
+          </div>
         ))}
 
-        <GlassBorder />
+       
     </Accordion>
+     <GlassBorder />
+        </div>
   );
 
   return (
@@ -561,16 +569,12 @@ export default function LearnWordsPage() {
             </Card>
           </div>
 
-          <div className="relative isolate">
             {data && data.myCategoryInfos.length > 0
               ? renderCategoryAccordion(data.myCategoryInfos, "full")
               : null}
-          </div>
-          <div className="relative isolate">
             {data
               ? renderCategoryAccordion(data.categoryInfos, "remove")
               : null}
-          </div>
         </>
       )}
 
@@ -612,7 +616,7 @@ export default function LearnWordsPage() {
                 </div>
               ) : (
                 <Accordion
-                  className="w-full overflow-hidden rounded-3xl  !bg-transparent"
+                  className="w-full overflow-hidden rounded-3xl card p-0 !bg-transparent"
                   allowsMultipleExpanded
                   expandedKeys={availableExpandedKeys}
                   onExpandedChange={(keys) =>
@@ -623,7 +627,12 @@ export default function LearnWordsPage() {
                     {availableCategories
                       .filter((category) => category.courseInfos.length > 0)
                       .map((category) => (
-                        <Accordion.Item key={category.id} id={category.id}>
+
+                        <div key={category.id} >
+                          
+                         <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
+
+                        <Accordion.Item  id={category.id}>
                           <Accordion.Heading>
                             <Accordion.Trigger>
                               <div className="flex items-center gap-2">
@@ -678,6 +687,7 @@ export default function LearnWordsPage() {
                             </Accordion.Body>
                           </Accordion.Panel>
                         </Accordion.Item>
+                        </div>
                       ))}
                   </ScrollShadow>
                 </Accordion>
