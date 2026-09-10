@@ -626,11 +626,13 @@ export default function LearnWordsPage() {
                   <ScrollShadow className="max-h-[40vh]  overflow-y-auto pr-1">
                     {availableCategories
                       .filter((category) => category.courseInfos.length > 0)
-                      .map((category) => (
+                      .map((category, index) => (
 
                         <div key={category.id} >
-                          
-                         <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
+
+                         {index > 0 && (
+                           <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
+                         )}
 
                         <Accordion.Item  id={category.id}>
                           <Accordion.Heading>

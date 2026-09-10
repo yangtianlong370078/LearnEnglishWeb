@@ -92,7 +92,7 @@ export default function GlassBorder() {
           maskComposite: "exclude",
           boxShadow:
             "rgba(255, 255, 255, 0.35) 0px 0px 0px 0.5px inset, rgba(255, 255, 255, 0.18) 0px 1px 3px inset, rgba(0, 0, 0, 0.35) 0px 1px 4px",
-          background:"linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.494) 23%, rgba(255, 255, 255, 0.965) 50%, rgba(255, 255, 255, 0.494) 77%, rgba(255, 255, 255, 0) 100%)",
+          background:"linear-gradient(90deg, rgba(255, 255, 255, 0) 0%, rgba(255, 255, 255, 0.494) 30%, rgba(255, 255, 255, 0.965) 50%, rgba(255, 255, 255, 0.494) 70%, rgba(255, 255, 255, 0) 100%)",
 
         }}
       />
