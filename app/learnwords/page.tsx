@@ -6,6 +6,7 @@ import type {
   CategoryInfo,
   MyCategoryContent,
 } from "@/types/course";
+import GlassBorder, { GlassWarp } from "@/components/courselearn/glass-border";
 import type { Key } from "@heroui/react";
 import {
   Books,
@@ -346,14 +347,16 @@ export default function LearnWordsPage() {
   ) => (
     <Accordion
       allowsMultipleExpanded
-      className="w-full overflow-hidden rounded-3xl  word-search-glass !bg-transparent"
+      className="w-full overflow-hidden rounded-3xl relative yinyinkuan cl-glass-idle"
       expandedKeys={expandedMap[menuMode]}
       onExpandedChange={(keys) =>
         setExpandedMap((prev) => ({ ...prev, [menuMode]: keys as Set<Key> }))
       }
     >
+
+      <GlassWarp/>
       <div
-        className="flex items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15"
+        className="flex items-center relative z-[1]  gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15"
         onClick={() => collapseCategoryAccordion(menuMode)}
       >
         <button
@@ -458,6 +461,8 @@ export default function LearnWordsPage() {
             </Accordion.Panel>
           </Accordion.Item>
         ))}
+
+        <GlassBorder />
     </Accordion>
   );
 

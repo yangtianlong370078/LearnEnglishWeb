@@ -43,7 +43,7 @@ export function GlassWarp({ blurPx = 8, saturation = 150 }: GlassWarpProps) {
   return (
     <span
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0"
+      className="pointer-events-none absolute inset-0 dark:bg-white/5"
       style={{
         borderRadius: "inherit",
         WebkitBackdropFilter: backdrop,
