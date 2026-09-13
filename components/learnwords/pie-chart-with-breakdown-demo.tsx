@@ -245,13 +245,7 @@ export default function PieChartWithBreakdownDemo({
 
         <div className=" p-2">
           <dl
-            className="flex justify-evenly w-full  gap-1  rounded-2xl p-1"
-            style={{
-              backgroundColor:
-                "color-mix(in srgb, var(--summary-accent) 9%, transparent)",
-              boxShadow:
-                "inset 0 0 0 1px color-mix(in srgb, var(--summary-accent) 8%, transparent)",
-            }}
+            className="flex justify-evenly w-full kctj gap-1  rounded-2xl p-1"
           >
             {rawData.map((entry, idx) => (
               <Fragment key={entry.name}>
@@ -279,13 +273,8 @@ export default function PieChartWithBreakdownDemo({
                 {idx < rawData.length - 1 && (
                   <Separator
                     orientation="vertical"
-                    className="flex "
-                    style={{
-                      backgroundColor:
-                        "color-mix(in srgb, var(--summary-accent) 9%, transparent)",
-                      boxShadow:
-                        "inset 0 0 0 1px color-mix(in srgb, var(--summary-accent) 8%, transparent)",
-                    }}
+                    className="flex kctj"
+                   
                   />
                 )}
               </Fragment>

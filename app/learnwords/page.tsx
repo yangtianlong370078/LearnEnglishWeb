@@ -345,133 +345,133 @@ export default function LearnWordsPage() {
     categories: CategoryInfo[],
     menuMode: "full" | "remove",
   ) => (
-     <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
-      <GlassWarp/>
-    <Accordion
-      allowsMultipleExpanded
-      className="w-full rounded-3xl overflow-hidden  "
-      expandedKeys={expandedMap[menuMode]}
-      onExpandedChange={(keys) =>
-        setExpandedMap((prev) => ({ ...prev, [menuMode]: keys as Set<Key> }))
-      }
-    >
-   
-      <div
-        className="flex items-center relative z-[1]  gap-1.5 px-6 py-3 bg-white/15 dark:bg-white/5"
-        onClick={() => collapseCategoryAccordion(menuMode)}
+    <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
+      <GlassWarp />
+      <Accordion
+        allowsMultipleExpanded
+        className="w-full rounded-3xl overflow-hidden  "
+        expandedKeys={expandedMap[menuMode]}
+        onExpandedChange={(keys) =>
+          setExpandedMap((prev) => ({ ...prev, [menuMode]: keys as Set<Key> }))
+        }
       >
-        <button
-          className="text-foreground text-base font-semibold"
-          type="button"
+
+        <div
+          className="flex items-center relative z-[1]  gap-1.5 px-6 py-3 bg-white/15 dark:bg-white/5"
           onClick={() => collapseCategoryAccordion(menuMode)}
         >
-          {menuMode == "full" ? "我的课程" : "精选课程"}
-        </button>
+          <button
+            className="text-foreground text-base font-semibold"
+            type="button"
+            onClick={() => collapseCategoryAccordion(menuMode)}
+          >
+            {menuMode == "full" ? "我的课程" : "精选课程"}
+          </button>
 
-        {menuMode === "full" && (
-          <Tooltip>
-            <Tooltip.Trigger>
-              <Button
-                isIconOnly
-                aria-label="新建课程"
-                size={isDesktop ? "md" : "sm"}
-                variant="primary"
-                onClick={(event) => event.stopPropagation()}
-                onPress={openAddCourseModal}
-              >
-                <Plus />
-              </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>新建课程</Tooltip.Content>
-          </Tooltip>
-        )}
+          {menuMode === "full" && (
+            <Tooltip>
+              <Tooltip.Trigger>
+                <Button
+                  isIconOnly
+                  aria-label="新建课程"
+                  size={isDesktop ? "md" : "sm"}
+                  variant="primary"
+                  onClick={(event) => event.stopPropagation()}
+                  onPress={openAddCourseModal}
+                >
+                  <Plus />
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Content>新建课程</Tooltip.Content>
+            </Tooltip>
+          )}
 
-        {menuMode === "remove" && (
-          <Tooltip>
-            <Tooltip.Trigger>
-              <Button
-                isIconOnly
-                aria-label="添加精选课程"
-                size={isDesktop ? "md" : "sm"}
-                variant="primary"
-                onClick={(event) => event.stopPropagation()}
-                onPress={openAvailableCourseModal}
-              >
-                <Plus />
-              </Button>
-            </Tooltip.Trigger>
-            <Tooltip.Content>添加精选课程</Tooltip.Content>
-          </Tooltip>
-        )}
-      </div>
-
-     
-
-      {categories.every((cat) => cat.courseInfos.length === 0) ? (
-        <div className="px-6 py-5 text-center text-sm text-muted">
-          暂无课程，请先添加课程
+          {menuMode === "remove" && (
+            <Tooltip>
+              <Tooltip.Trigger>
+                <Button
+                  isIconOnly
+                  aria-label="添加精选课程"
+                  size={isDesktop ? "md" : "sm"}
+                  variant="primary"
+                  onClick={(event) => event.stopPropagation()}
+                  onPress={openAvailableCourseModal}
+                >
+                  <Plus />
+                </Button>
+              </Tooltip.Trigger>
+              <Tooltip.Content>添加精选课程</Tooltip.Content>
+            </Tooltip>
+          )}
         </div>
-      ) : null}
 
-      {categories
-        .filter((cat) => cat.courseInfos.length > 0)
-        .map((cat) => (
-          <div key={cat.id} >
-            <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
 
-          <Accordion.Item id={cat.id}>
-            <Accordion.Heading>
-              <Accordion.Trigger>
-                <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
-                <div>
-                  <span className="inline-flex rounded-xl  min-h-9 items-center gap-2 rounded-medium bg-white/50 px-3 text-small dark:bg-black/30">
-                    {menuMode == "full" ? (
-                      <GraduationCap className="size-3.5" />
-                    ) : (
-                      <Books className="size-3.5" />
-                    )}
 
-                    {cat.name}
-                    <Chip color="accent" size="sm" variant="soft">
-                      {cat.courseInfos.length}
-                    </Chip>
-                  </span>
-                </div>
-
-                <Accordion.Indicator />
-              </Accordion.Trigger>
-            </Accordion.Heading>
-            <Accordion.Panel>
-              <Accordion.Body>
-                <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3 ">
-                  {cat.courseInfos.map((course) => (
-                    <Card
-                      key={course.courseId}
-                      className="group relative overflow-hidden transition-transform gap-4 duration-300 "
-                    >
-                      <PieChartWithBreakdownDemo
-                        courseId={course.courseId}
-                        courseName={course.courseName}
-                        doneCount={course.doneCount}
-                        notDoneCount={course.notDoneCount}
-                        notLearned={course.notLearned}
-                        menuMode={menuMode}
-                        onEdit={openEditCourseModal}
-                        onDelete={openDeleteCourseModal}
-                      />
-                    </Card>
-                  ))}
-                </div>
-              </Accordion.Body>
-            </Accordion.Panel>
-          </Accordion.Item>
+        {categories.every((cat) => cat.courseInfos.length === 0) ? (
+          <div className="px-6 py-5 text-center text-sm text-muted">
+            暂无课程，请先添加课程
           </div>
-        ))}
+        ) : null}
 
-       
-    </Accordion>
-     <GlassBorder />
-        </div>
+        {categories
+          .filter((cat) => cat.courseInfos.length > 0)
+          .map((cat) => (
+            <div key={cat.id} >
+              <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
+
+              <Accordion.Item id={cat.id}>
+                <Accordion.Heading>
+                  <Accordion.Trigger>
+                    <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
+                    <div>
+                      <span className="inline-flex rounded-xl  min-h-9 items-center gap-2 rounded-medium bg-white/50 px-3 text-small dark:bg-black/30">
+                        {menuMode == "full" ? (
+                          <GraduationCap className="size-3.5" />
+                        ) : (
+                          <Books className="size-3.5" />
+                        )}
+
+                        {cat.name}
+                        <Chip color="accent" size="sm" variant="soft">
+                          {cat.courseInfos.length}
+                        </Chip>
+                      </span>
+                    </div>
+
+                    <Accordion.Indicator />
+                  </Accordion.Trigger>
+                </Accordion.Heading>
+                <Accordion.Panel>
+                  <Accordion.Body>
+                    <div className="grid w-full grid-cols-1 gap-3 sm:grid-cols-3 ">
+                      {cat.courseInfos.map((course) => (
+                        <Card
+                          key={course.courseId}
+                          className="group relative overflow-hidden transition-transform gap-4 duration-300 "
+                        >
+                          <PieChartWithBreakdownDemo
+                            courseId={course.courseId}
+                            courseName={course.courseName}
+                            doneCount={course.doneCount}
+                            notDoneCount={course.notDoneCount}
+                            notLearned={course.notLearned}
+                            menuMode={menuMode}
+                            onEdit={openEditCourseModal}
+                            onDelete={openDeleteCourseModal}
+                          />
+                        </Card>
+                      ))}
+                    </div>
+                  </Accordion.Body>
+                </Accordion.Panel>
+              </Accordion.Item>
+            </div>
+          ))}
+
+
+      </Accordion>
+      <GlassBorder />
+    </div>
   );
 
   return (
@@ -483,98 +483,123 @@ export default function LearnWordsPage() {
       ) : (
         <>
           <div className="grid w-full grid-cols-1 items-stretch gap-3 sm:grid-cols-3">
-            <Card
-              className="word-search-glass relative gap-4 overflow-hidden "
-              style={
-                {
-                  "--summary-accent": "oklch(0.63 0.16 215)",
-                  "--summary-ink": "oklch(0.49 0.14 220)",
-                  "--summary-chart-1": "oklch(0.56 0.18 222)",
-                  "--summary-chart-2": "oklch(0.68 0.15 211)",
-                  "--summary-chart-3": "oklch(0.78 0.1 200)",
-                  backgroundImage:
-                    "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
-                } as React.CSSProperties
-              }
-            >
-              <PieChartWithBreakdownDemo
-                courseId={data?.newWord.courseId}
-                courseName={data?.newWord.courseName ?? "生词本"}
-                doneCount={data?.newWord.doneCount}
-                notDoneCount={data?.newWord.notDoneCount}
-                notLearned={data?.newWord.notLearned}
-                eyebrow="日常积累"
-                leadingIcon={<BookOpen className="size-6" />}
-                menuMode="none"
-                variant="overview"
-              />
-            </Card>
-            <Card
-              className="word-search-glass relative gap-4 overflow-hidden "
-              style={
-                {
-                  "--summary-accent": "oklch(0.65 0.19 32)",
-                  "--summary-ink": "oklch(0.51 0.19 28)",
-                  "--summary-chart-1": "oklch(0.57 0.21 25)",
-                  "--summary-chart-2": "oklch(0.69 0.18 42)",
-                  "--summary-chart-3": "oklch(0.79 0.13 58)",
-                  backgroundImage:
-                    "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
-                } as React.CSSProperties
-              }
-            >
-              <PieChartWithBreakdownDemo
-                courseId={data?.strengthenWord.courseId}
-                courseName={data?.strengthenWord.courseName ?? "强化区"}
-                doneCount={data?.strengthenWord.doneCount}
-                notDoneCount={data?.strengthenWord.notDoneCount}
-                notLearned={data?.strengthenWord.notLearned}
-                eyebrow="重点复习"
-                leadingIcon={<Flame className="size-6" />}
-                menuMode="none"
-                variant="overview"
-              />
-            </Card>
-            <Card
-              className="word-search-glass relative gap-4 overflow-hidden "
-              style={
-                {
-                  "--summary-accent": "oklch(0.58 0.2 285)",
-                  "--summary-ink": "oklch(0.48 0.19 285)",
-                  "--summary-chart-1": "oklch(0.51 0.21 292)",
-                  "--summary-chart-2": "oklch(0.64 0.18 283)",
-                  "--summary-chart-3": "oklch(0.75 0.13 274)",
-                  backgroundImage:
-                    "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
-                } as React.CSSProperties
-              }
-            >
-              <PieChartWithBreakdownDemo
-                courseId={data?.lastCourse.courseId}
-                courseName={
-                  data?.lastCourse.courseId
-                    ? data.lastCourse.courseName
-                    : "暂无学习记录"
+            <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
+              <GlassWarp />
+              <div
+                className="rounded-3xl relative overflow-hidden "
+                style={
+                  {
+                    "--summary-accent": "oklch(0.63 0.16 215)",
+                    "--summary-ink": "oklch(0.49 0.14 220)",
+                    "--summary-chart-1": "oklch(0.56 0.18 222)",
+                    "--summary-chart-2": "oklch(0.68 0.15 211)",
+                    "--summary-chart-3": "oklch(0.78 0.1 200)",
+                    "--summary-chart-4": "oklch(0.9 0.1 200)",
+                    backgroundImage:
+                      "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
+                  } as React.CSSProperties
                 }
-                doneCount={data?.lastCourse.doneCount}
-                notDoneCount={data?.lastCourse.notDoneCount}
-                notLearned={data?.lastCourse.notLearned}
-                emptyLabel="暂无记录"
-                emptyHint="暂无学习记录，请先去学习具体的课程"
-                eyebrow="正在学习"
-                leadingIcon={<ClockArrowRotateLeft className="size-6" />}
-                menuMode="none"
-                variant="overview"
-              />
-            </Card>
+              >
+                 <div className="dark:bg-black/15   p-4 flex flex-col h-full  gap-4 ">
+                <PieChartWithBreakdownDemo
+                  courseId={data?.newWord.courseId}
+                  courseName={data?.newWord.courseName ?? "生词本"}
+                  doneCount={data?.newWord.doneCount}
+                  notDoneCount={data?.newWord.notDoneCount}
+                  notLearned={data?.newWord.notLearned}
+                  eyebrow="日常积累"
+                  leadingIcon={<BookOpen className="size-6" />}
+                  menuMode="none"
+                  variant="overview"
+                />
+                </div>
+              </div>
+              <GlassBorder />
+
+            </div>
+
+            <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
+              <GlassWarp />
+              <div
+                className="rounded-3xl relative overflow-hidden "
+                style={
+                  {
+                    "--summary-accent": "oklch(0.65 0.19 32)",
+                    "--summary-ink": "oklch(0.51 0.19 28)",
+                    "--summary-chart-1": "oklch(0.57 0.21 25)",
+                    "--summary-chart-2": "oklch(0.69 0.18 42)",
+                    "--summary-chart-3": "oklch(0.79 0.13 58)",
+                    "--summary-chart-4": "oklch(0.9 0.13 58)",
+                    backgroundImage:
+                      "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
+                  } as React.CSSProperties
+                }
+              >
+                 <div className="dark:bg-black/15  p-4 flex flex-col h-full  gap-4 ">
+                <PieChartWithBreakdownDemo
+                  courseId={data?.strengthenWord.courseId}
+                  courseName={data?.strengthenWord.courseName ?? "强化区"}
+                  doneCount={data?.strengthenWord.doneCount}
+                  notDoneCount={data?.strengthenWord.notDoneCount}
+                  notLearned={data?.strengthenWord.notLearned}
+                  eyebrow="重点复习"
+                  leadingIcon={<Flame className="size-6" />}
+                  menuMode="none"
+                  variant="overview"
+                />
+              </div>
+               </div>
+              <GlassBorder />
+
+            </div>
+            <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
+              <GlassWarp />
+              <div
+                className="rounded-3xl  relative overflow-hidden "
+                style={
+                  {
+                    "--summary-accent": "oklch(0.58 0.2 285)",
+                    "--summary-ink": "oklch(0.48 0.19 285)",
+                    "--summary-chart-1": "oklch(0.51 0.21 292)",
+                    "--summary-chart-2": "oklch(0.64 0.18 283)",
+                    "--summary-chart-3": "oklch(0.75 0.13 274)",
+                    "--summary-chart-4": "oklch(0.9 0.05 276.42)",
+                    backgroundImage:
+                      "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
+                  } as React.CSSProperties
+                }
+              >
+                <div className="dark:bg-black/15 p-4 flex flex-col h-full  gap-4 ">
+                <PieChartWithBreakdownDemo
+                  courseId={data?.lastCourse.courseId}
+                  courseName={
+                    data?.lastCourse.courseId
+                      ? data.lastCourse.courseName
+                      : "暂无学习记录"
+                  }
+                  doneCount={data?.lastCourse.doneCount}
+                  notDoneCount={data?.lastCourse.notDoneCount}
+                  notLearned={data?.lastCourse.notLearned}
+                  emptyLabel="暂无记录"
+                  emptyHint="暂无学习记录，请先去学习具体的课程"
+                  eyebrow="正在学习"
+                  leadingIcon={<ClockArrowRotateLeft className="size-6" />}
+                  menuMode="none"
+                  variant="overview"
+                />
+                </div>
+              </div>
+              <GlassBorder />
+
+            </div>
           </div>
 
-            {data && data.myCategoryInfos.length > 0
-              ? renderCategoryAccordion(data.myCategoryInfos, "full")
-              : null}
-            {data
-              ? renderCategoryAccordion(data.categoryInfos, "remove")
-              : null}
+          {data && data.myCategoryInfos.length > 0
+            ? renderCategoryAccordion(data.myCategoryInfos, "full")
+            : null}
+          {data
+            ? renderCategoryAccordion(data.categoryInfos, "remove")
+            : null}
         </>
       )}
 
@@ -609,8 +634,8 @@ export default function LearnWordsPage() {
                   </Button>
                 </div>
               ) : availableCategories.every(
-                  (category) => category.courseInfos.length === 0,
-                ) ? (
+                (category) => category.courseInfos.length === 0,
+              ) ? (
                 <div className="flex min-h-40 items-center justify-center text-sm text-muted">
                   暂无可添加的课程
                 </div>
@@ -630,65 +655,65 @@ export default function LearnWordsPage() {
 
                         <div key={category.id} >
 
-                         {index > 0 && (
-                           <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
-                         )}
+                          {index > 0 && (
+                            <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
+                          )}
 
-                        <Accordion.Item  id={category.id}>
-                          <Accordion.Heading>
-                            <Accordion.Trigger>
-                              <div className="flex items-center gap-2">
-                                <GraduationCap className="size-4 text-muted" />
-                                <span className="font-medium">
-                                  {category.name}
-                                </span>
-                                <Chip color="accent" size="sm" variant="soft">
-                                  {category.courseInfos.length}
-                                </Chip>
-                              </div>
-                              <Accordion.Indicator />
-                            </Accordion.Trigger>
-                          </Accordion.Heading>
-                          <Accordion.Panel>
-                            <Accordion.Body>
-                              <div className="flex flex-col gap-1">
-                                {category.courseInfos.map((course) => (
-                                  <Card
-                                    key={course.courseId}
-                                    className="rounded-2xl mt-2 p-1"
-                                  >
-                                    <ItemCard variant="transparent">
-                                      <ItemCard.Icon>
-                                        <Book />
-                                      </ItemCard.Icon>
-                                      <ItemCard.Content>
-                                        <ItemCard.Title>
-                                          {course.courseName}
-                                        </ItemCard.Title>
-                                        <ItemCard.Description>
-                                          {course.wordsCount} 个单词
-                                        </ItemCard.Description>
-                                      </ItemCard.Content>
-                                      <ItemCard.Action>
-                                        <Button
-                                          size="sm"
-                                          variant="outline"
-                                          className="inline-flex items-center gap-0.5 rounded-full wordfy bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300"
-                                          onPress={() =>
-                                            openAddCourseConfirm(course)
-                                          }
-                                        >
-                                          <Plus className="size-4" />
-                                          添加
-                                        </Button>
-                                      </ItemCard.Action>
-                                    </ItemCard>
-                                  </Card>
-                                ))}
-                              </div>
-                            </Accordion.Body>
-                          </Accordion.Panel>
-                        </Accordion.Item>
+                          <Accordion.Item id={category.id}>
+                            <Accordion.Heading>
+                              <Accordion.Trigger>
+                                <div className="flex items-center gap-2">
+                                  <GraduationCap className="size-4 text-muted" />
+                                  <span className="font-medium">
+                                    {category.name}
+                                  </span>
+                                  <Chip color="accent" size="sm" variant="soft">
+                                    {category.courseInfos.length}
+                                  </Chip>
+                                </div>
+                                <Accordion.Indicator />
+                              </Accordion.Trigger>
+                            </Accordion.Heading>
+                            <Accordion.Panel>
+                              <Accordion.Body>
+                                <div className="flex flex-col gap-1">
+                                  {category.courseInfos.map((course) => (
+                                    <Card
+                                      key={course.courseId}
+                                      className="rounded-2xl mt-2 p-1"
+                                    >
+                                      <ItemCard variant="transparent">
+                                        <ItemCard.Icon>
+                                          <Book />
+                                        </ItemCard.Icon>
+                                        <ItemCard.Content>
+                                          <ItemCard.Title>
+                                            {course.courseName}
+                                          </ItemCard.Title>
+                                          <ItemCard.Description>
+                                            {course.wordsCount} 个单词
+                                          </ItemCard.Description>
+                                        </ItemCard.Content>
+                                        <ItemCard.Action>
+                                          <Button
+                                            size="sm"
+                                            variant="outline"
+                                            className="inline-flex items-center gap-0.5 rounded-full wordfy bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300"
+                                            onPress={() =>
+                                              openAddCourseConfirm(course)
+                                            }
+                                          >
+                                            <Plus className="size-4" />
+                                            添加
+                                          </Button>
+                                        </ItemCard.Action>
+                                      </ItemCard>
+                                    </Card>
+                                  ))}
+                                </div>
+                              </Accordion.Body>
+                            </Accordion.Panel>
+                          </Accordion.Item>
                         </div>
                       ))}
                   </ScrollShadow>

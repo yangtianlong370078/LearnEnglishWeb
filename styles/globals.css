@@ -719,8 +719,7 @@ input:-webkit-autofill:active {
 .cl-card-correct {
   border-color: color-mix(in srgb, var(--success, #16a34a) 55%, transparent) !important;
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--success, #16a34a) 45%, transparent),
-    0 8px 26px color-mix(in srgb, var(--success, #16a34a) 22%, transparent) !important;
+     0 0 0 1px color-mix(in srgb, var(--success, #16a34a) 70%, transparent), 0 4px 16px color-mix(in srgb, var(--success, #16a34a) 38%, transparent) !important;
   background-color: color-mix(
     in srgb,
     var(--success, #16a34a) 22%,
@@ -731,8 +730,7 @@ input:-webkit-autofill:active {
 .cl-card-wrong {
   border-color: color-mix(in srgb, var(--danger, #dc2626) 55%, transparent) !important;
   box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--danger, #dc2626) 45%, transparent),
-    0 8px 26px color-mix(in srgb, var(--danger, #dc2626) 22%, transparent) !important;
+    0 0 0 1px color-mix(in srgb, var(--danger, #dc2626) 70%, transparent), 0 4px 16px color-mix(in srgb, var(--danger, #dc2626) 38%, transparent) !important;
   background-color: color-mix(
     in srgb,
     var(--danger, #dc2626) 22%,
@@ -1314,6 +1312,27 @@ input:-webkit-autofill:active {
 /* 暗色模式：关闭态图标与文字改用渐变亮色（激活态保持白色） */
 .dark .cl-global-btn:not(.is-active) {
   color: var(--cl-ring0);
+}
+
+.text-muted{
+  color: rgba(0, 0, 0, 0.5);
+  text-shadow:0 2px 16px rgba(255,255,255,0.8);
+}
+
+
+.dark .text-muted{
+  color: rgba(255, 255, 255, 0.6);
+  text-shadow:0 2px 16px rgba(0,0,0,0.8);
+}
+
+.kctj{
+  background-Color: color-mix(in srgb, var(--summary-accent) 9%, transparent); 
+  box-Shadow:inset 0 0 0 1px color-mix(in srgb, var(--summary-ink) 8%, transparent);
+}
+
+.dark .kctj{
+  background-Color: color-mix(in srgb, var(--summary-accent) 9%, transparent);
+  box-Shadow:inset 0 0 0 1px color-mix(in srgb, var(--summary-chart-4) 8%, transparent);
 }
 
 /* 课程学习顶部导航吸顶容器（复用 navbar 毛玻璃观感） */
