@@ -166,9 +166,9 @@ export default function PieChartWithBreakdownDemo({
 
   if (variant === "overview") {
     const overviewChartColors = [
-      "var(--summary-chart-1, var(--chart-1))",
-      "var(--summary-chart-2, var(--chart-2))",
-      "var(--summary-chart-3, var(--chart-3))",
+      "oklch(var(--summary-chart-1, 0.56 0.18 222))",
+      "oklch(var(--summary-chart-2, 0.68 0.15 211))",
+      "oklch(var(--summary-chart-3, 0.78 0.1 200))",
     ];
 
     return (
@@ -177,19 +177,18 @@ export default function PieChartWithBreakdownDemo({
           <div className="flex min-w-0 items-center gap-3.5">
             <div
               aria-hidden="true"
-              className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full text-[var(--summary-ink)] dark:text-[var(--summary-accent)]"
+              className="flex h-[50px] w-[50px] shrink-0 items-center justify-center rounded-full text-[oklch(var(--summary-ink))] dark:text-[oklch(var(--summary-accent))]"
               style={{
-                backgroundColor:
-                  "color-mix(in srgb, var(--summary-accent) 24%, transparent)",
+                backgroundColor: "oklch(var(--summary-accent) / 0.24)",
                 boxShadow:
-                  "inset 0 0 0 1px color-mix(in srgb, var(--summary-accent) 20%, transparent)",
+                  "inset 0 0 0 1px oklch(var(--summary-accent) / 0.2)",
               }}
             >
               {leadingIcon}
             </div>
             <div className="min-w-0">
               {eyebrow ? (
-                <p className="mb-0.5 text-xs font-semibold text-[var(--summary-ink)] dark:text-[var(--summary-accent)]">
+                <p className="mb-0.5 text-xs font-semibold text-[oklch(var(--summary-ink))] dark:text-[oklch(var(--summary-accent))]">
                   {eyebrow}
                 </p>
               ) : null}
@@ -253,7 +252,7 @@ export default function PieChartWithBreakdownDemo({
                   type="button"
                   aria-label={`${entry.name} - 进入学习`}
                   onClick={() => openCourseLearn(entry.name)}
-                 className="relative isolate flex min-w-0 cursor-pointer flex-col items-center justify-center bg-transparent p-2 transition-transform duration-300 ease-out before:pointer-events-none before:absolute before:-inset-x-5 before:-inset-y-3 before:-z-10 before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,color-mix(in_srgb,var(--summary-accent)_72%,transparent)_0%,color-mix(in_srgb,var(--summary-accent)_30%,transparent)_42%,transparent_74%)] before:opacity-0 before:blur-md before:transition-opacity before:duration-300 hover:-translate-y-1 hover:scale-[1.04] hover:!bg-transparent hover:before:opacity-100"
+                 className="relative isolate flex min-w-0 cursor-pointer flex-col items-center justify-center bg-transparent p-2 transition-transform duration-300 ease-out before:pointer-events-none before:absolute before:-inset-x-5 before:-inset-y-3 before:-z-10 before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,oklch(var(--summary-accent)/0.72)_0%,oklch(var(--summary-accent)/0.3)_42%,transparent_74%)] before:opacity-0 before:blur-md before:transition-opacity before:duration-300 hover:-translate-y-1 hover:scale-[1.04] hover:!bg-transparent hover:before:opacity-100"
                  >
                   <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
                     <span

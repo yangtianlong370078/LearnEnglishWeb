@@ -45,13 +45,13 @@ type SummarySkeletonStyle = React.CSSProperties & {
 
 const summarySkeletonStyles: SummarySkeletonStyle[] = [
   {
-    "--summary-accent": "oklch(0.63 0.16 215)",
+    "--summary-accent": "0.63 0.16 215",
   },
   {
-    "--summary-accent": "oklch(0.65 0.19 32)",
+    "--summary-accent": "0.65 0.19 32",
   },
   {
-    "--summary-accent": "oklch(0.58 0.2 285)",
+    "--summary-accent": "0.58 0.2 285",
   },
 ];
 
@@ -63,7 +63,7 @@ function CourseChartSkeleton({ index = 0 }: { index?: number }) {
         {
           ...summarySkeletonStyles[index % summarySkeletonStyles.length],
           backgroundImage:
-            "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 18%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 7%, transparent) 52%, transparent 78%)",
+            "linear-gradient(145deg, oklch(var(--summary-accent) / 0.18) 0%, oklch(var(--summary-accent) / 0.07) 52%, transparent 78%)",
         } as React.CSSProperties
       }
       variant="transparent"
@@ -489,14 +489,14 @@ export default function LearnWordsPage() {
                 className="rounded-3xl relative overflow-hidden "
                 style={
                   {
-                    "--summary-accent": "oklch(0.63 0.16 215)",
-                    "--summary-ink": "oklch(0.49 0.14 220)",
-                    "--summary-chart-1": "oklch(0.56 0.18 222)",
-                    "--summary-chart-2": "oklch(0.68 0.15 211)",
-                    "--summary-chart-3": "oklch(0.78 0.1 200)",
-                    "--summary-chart-4": "oklch(0.9 0.1 200)",
+                    "--summary-accent": "0.63 0.16 215",
+                    "--summary-ink": "0.49 0.14 220",
+                    "--summary-chart-1": "0.56 0.18 222",
+                    "--summary-chart-2": "0.68 0.15 211",
+                    "--summary-chart-3": "0.78 0.1 200",
+                    "--summary-chart-4": "0.9 0.1 200",
                     backgroundImage:
-                      "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
+                      "linear-gradient(145deg, oklch(var(--summary-accent) / 0.24) 0%, oklch(var(--summary-accent) / 0.09) 52%, transparent 78%), linear-gradient(315deg, oklch(var(--summary-chart-3) / 0.12), transparent 46%)",
                   } as React.CSSProperties
                 }
               >
@@ -524,14 +524,14 @@ export default function LearnWordsPage() {
                 className="rounded-3xl relative overflow-hidden "
                 style={
                   {
-                    "--summary-accent": "oklch(0.65 0.19 32)",
-                    "--summary-ink": "oklch(0.51 0.19 28)",
-                    "--summary-chart-1": "oklch(0.57 0.21 25)",
-                    "--summary-chart-2": "oklch(0.69 0.18 42)",
-                    "--summary-chart-3": "oklch(0.79 0.13 58)",
-                    "--summary-chart-4": "oklch(0.9 0.13 58)",
+                    "--summary-accent": "0.65 0.19 32",
+                    "--summary-ink": "0.51 0.19 28",
+                    "--summary-chart-1": "0.57 0.21 25",
+                    "--summary-chart-2": "0.69 0.18 42",
+                    "--summary-chart-3": "0.79 0.13 58",
+                    "--summary-chart-4": "0.9 0.13 58",
                     backgroundImage:
-                      "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
+                      "linear-gradient(145deg, oklch(var(--summary-accent) / 0.24) 0%, oklch(var(--summary-accent) / 0.09) 52%, transparent 78%), linear-gradient(315deg, oklch(var(--summary-chart-3) / 0.12), transparent 46%)",
                   } as React.CSSProperties
                 }
               >
@@ -558,14 +558,14 @@ export default function LearnWordsPage() {
                 className="rounded-3xl  relative overflow-hidden "
                 style={
                   {
-                    "--summary-accent": "oklch(0.58 0.2 285)",
-                    "--summary-ink": "oklch(0.48 0.19 285)",
-                    "--summary-chart-1": "oklch(0.51 0.21 292)",
-                    "--summary-chart-2": "oklch(0.64 0.18 283)",
-                    "--summary-chart-3": "oklch(0.75 0.13 274)",
-                    "--summary-chart-4": "oklch(0.9 0.05 276.42)",
+                    "--summary-accent": "0.58 0.2 285",
+                    "--summary-ink": "0.48 0.19 285",
+                    "--summary-chart-1": "0.51 0.21 292",
+                    "--summary-chart-2": "0.64 0.18 283",
+                    "--summary-chart-3": "0.75 0.13 274",
+                    "--summary-chart-4": "0.9 0.05 276.42",
                     backgroundImage:
-                      "linear-gradient(145deg, color-mix(in srgb, var(--summary-accent) 24%, transparent) 0%, color-mix(in srgb, var(--summary-accent) 9%, transparent) 52%, transparent 78%), linear-gradient(315deg, color-mix(in srgb, var(--summary-chart-3) 12%, transparent), transparent 46%)",
+                      "linear-gradient(145deg, oklch(var(--summary-accent) / 0.24) 0%, oklch(var(--summary-accent) / 0.09) 52%, transparent 78%), linear-gradient(315deg, oklch(var(--summary-chart-3) / 0.12), transparent 46%)",
                   } as React.CSSProperties
                 }
               >

@@ -1326,13 +1326,13 @@ input:-webkit-autofill:active {
 }
 
 .kctj{
-  background-Color: color-mix(in srgb, var(--summary-accent) 9%, transparent); 
-  box-Shadow:inset 0 0 0 1px color-mix(in srgb, var(--summary-ink) 8%, transparent);
+  background-color: oklch(var(--summary-accent) / 0.09);
+  box-shadow: inset 0 0 0 1px oklch(var(--summary-ink) / 0.08);
 }
 
 .dark .kctj{
-  background-Color: color-mix(in srgb, var(--summary-accent) 9%, transparent);
-  box-Shadow:inset 0 0 0 1px color-mix(in srgb, var(--summary-chart-4) 8%, transparent);
+  background-color: oklch(var(--summary-accent) / 0.09);
+  box-shadow: inset 0 0 0 1px oklch(var(--summary-chart-4) / 0.08);
 }
 
 /* 课程学习顶部导航吸顶容器（复用 navbar 毛玻璃观感） */
@@ -1370,3 +1370,18 @@ input:-webkit-autofill:active {
 }
 
 
+/* 浅色 */
+input::placeholder {
+  color: rgba(0, 0, 0, 0.5);
+}
+input::-moz-placeholder {
+  color:  rgba(0, 0, 0, 0.5);
+}
+
+/* 页面加上 .dark 类时触发暗黑样式 */
+.dark input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
+.dark input::-moz-placeholder {
+  color: rgba(255, 255, 255, 0.5);
+}
