@@ -18,6 +18,8 @@ import {
   Switch,
 } from "@heroui/react";
 
+import ModalBackdrop from "@/components/common/modal-backdrop";
+
 interface SettingsModalProps {
   isOpen: boolean;
   onOpenChange: (open: boolean) => void;
@@ -40,7 +42,7 @@ export default function SettingsModal({
   onAsrModelChange,
 }: SettingsModalProps) {
   return (
-    <Modal.Backdrop isOpen={isOpen} onOpenChange={onOpenChange}>
+    <ModalBackdrop isOpen={isOpen} onOpenChange={onOpenChange}>
       <Modal.Container placement="center" size="md">
         <Modal.Dialog>
           <Modal.CloseTrigger />
@@ -201,6 +203,6 @@ export default function SettingsModal({
           </Modal.Footer>
         </Modal.Dialog>
       </Modal.Container>
-    </Modal.Backdrop>
+    </ModalBackdrop>
   );
 }

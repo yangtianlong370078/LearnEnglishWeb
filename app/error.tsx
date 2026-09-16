@@ -16,7 +16,7 @@ export default function Error({
   }, [error]);
 
   return (
-    <div>
+    <div data-glass-navigation-content="">
       <h2>Something went wrong!</h2>
       <button
         type="button"

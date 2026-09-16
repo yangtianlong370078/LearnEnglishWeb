@@ -22,6 +22,7 @@ import { siteConfig } from "@/config/site";
 import { Logo } from "@/components/icons";
 import { MaterBasic } from "@/components/meter-base";
 import InlineSelectCustomIndicatorDemo from "@/components/common/inline-select-custom-indicator-demo";
+import GlassNavigation from "@/components/common/glass-navigation";
 
 function subscribeMounted(onStoreChange: () => void) {
   onStoreChange();
@@ -45,6 +46,7 @@ export default function NavbarProDocsSite() {
 
   return (
     <div className="sticky top-0 z-50 navbar-root">
+      <GlassNavigation />
       <div aria-hidden="true" className="glass-overlay" />
       <Navbar
         className="glass-content !bg-transparent "

@@ -2,6 +2,14 @@
 
 html,
 html[data-bg-theme="defalut"] {
+  --glass-ambient-base: oklch(0.95 0.006 240);
+  --glass-ambient-1: oklch(0.80 0.13 280 / 0.4);
+  --glass-ambient-2: oklch(0.83 0.12 190 / 0.35);
+  --glass-ambient-3: oklch(0.80 0.13 320 / 0.3);
+  --glass-ambient-4: oklch(0.86 0.11 55 / 0.3);
+  --glass-viewport-width: 100vw;
+  --glass-viewport-height: 100dvh;
+  --glass-background-size: var(--glass-viewport-width) var(--glass-viewport-height);
   --app-background:
     radial-gradient(ellipse 80% 75% at 12% 18%, oklch(0.80 0.13 280 / 0.4) 0%, transparent 60%),
     radial-gradient(ellipse 70% 58% at 78% 14%, oklch(0.83 0.12 190 / 0.35) 0%, transparent 58%),
@@ -14,6 +22,11 @@ html[data-bg-theme="defalut"] {
 
 html.dark,
 html.dark[data-bg-theme="defalut"] {
+  --glass-ambient-base: oklch(0.12 0.008 240);
+  --glass-ambient-1: oklch(0.43 0.07 280 / 0.6);
+  --glass-ambient-2: oklch(0.40 0.07 190 / 0.52);
+  --glass-ambient-3: oklch(0.45 0.07 320 / 0.5);
+  --glass-ambient-4: oklch(0.42 0.06 55 / 0.42);
   --app-background:
     radial-gradient(ellipse 90% 85% at 12% 18%, oklch(0.43 0.07 280 / 0.6) 0%, transparent 62%),
     radial-gradient(ellipse 80% 68% at 78% 14%, oklch(0.40 0.07 190 / 0.52) 0%, transparent 58%),
@@ -38,9 +51,8 @@ body {
   min-height: 100dvh;
 }
 
-/* 背景独立固定层：把背景（尤其图片）绘制在一个固定、GPU 固化的稳定纹理上。
-   这样 navbar / 搜索框等独立合成层的 backdrop-filter 始终从这张永不随内容
-   重绘而失效的纹理采样，避免图片背景被反复解码/重栅格化导致半透明色块闪烁 */
+/* Fixed page background. Leave layer allocation to the browser; a forced 3D
+   layer does not guarantee stable backdrop capture, especially in software. */
 .app-shell::before {
   content: "";
   position: fixed;
@@ -51,17 +63,21 @@ body {
   background-size: cover;
   background-position: center;
   background-repeat: no-repeat;
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
 }
 
 html[data-bg-theme="magnificent"] {
+  /* Match cover against the viewport, even inside a transformed card. */
+  --wallpaper-ratio: 1.7647058824;
+  --wallpaper-width: max(var(--glass-viewport-width), calc(var(--glass-viewport-height) * var(--wallpaper-ratio)));
+  --wallpaper-height: max(var(--glass-viewport-height), calc(var(--glass-viewport-width) / var(--wallpaper-ratio)));
+  --glass-background-size: var(--glass-viewport-width) var(--glass-viewport-height), var(--wallpaper-width) var(--wallpaper-height);
   --app-background:
     linear-gradient(to bottom, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.12)),
     url("/images/bg01_light.jpeg") center / cover no-repeat;
 }
 
 html.dark[data-bg-theme="magnificent"] {
+  --wallpaper-ratio: 1.7843137255;
   --app-background:
     linear-gradient(to bottom, rgb(5 10 24 / 0.16), rgb(5 10 24 / 0.32)),
     url("/images/bg01_dark.jpeg") center / cover no-repeat;

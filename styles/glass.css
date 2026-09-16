@@ -1,0 +1,257 @@
+/* Glass paints its own background source. No component reads back lower
+   compositor surfaces through backdrop-filter. Content stays unfiltered. */
+:root {
+  --app-glass-blur: 8px;
+}
+
+.login-scene {
+  --app-background: linear-gradient(to bottom right, var(--color-blue-50), var(--color-indigo-50), var(--color-purple-50));
+  --glass-background-size: var(--glass-viewport-width) var(--glass-viewport-height);
+  --glass-tint: color-mix(in srgb, var(--background) 90%, transparent);
+}
+
+.dark .login-scene {
+  --app-background: linear-gradient(to bottom right, var(--color-gray-950), var(--color-indigo-950), var(--color-gray-900));
+}
+
+.glass-surface,
+.word-search-glass,
+.cardfilter,
+.cl-card,
+.app-glass-dialog,
+.bg-content1,
+.bg-content2,
+.bg-content3,
+.bg-content4 {
+  position: relative;
+  isolation: isolate;
+}
+
+.navbar-root,
+.cl-navbar {
+  isolation: isolate;
+}
+
+.app-glass-dialog::before,
+.app-modal-backdrop::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  /* Bound both paint invalidation and compositor output to this surface.
+     Clip the effect itself, not the host (menus/shadows can still overflow). */
+  contain: paint;
+  clip-path: inset(0);
+  background: var(--glass-tint, transparent);
+}
+
+.glass-warp {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  pointer-events: none;
+  transition: inherit;
+  overflow: hidden;
+}
+
+.glass-warp::before,
+.glass-border::before {
+  content: "";
+  position: absolute;
+  inset: -32px;
+  background: var(--app-background);
+  background-size: var(--glass-background-size);
+  background-position: top left;
+  background-attachment: fixed;
+  background-repeat: no-repeat;
+  filter: blur(var(--app-glass-blur)) saturate(150%);
+  pointer-events: none;
+}
+
+html[data-bg-theme="magnificent"] :is(.glass-warp, .glass-border)::before {
+  background-position:
+    top left,
+    center;
+}
+
+html .login-scene .glass-warp::before {
+  background-position: top left;
+}
+
+.glass-warp::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--glass-tint, transparent);
+  transition: inherit;
+}
+
+.glass-border {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  padding: 1px;
+  contain: paint;
+  -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  -webkit-mask-composite: xor;
+  mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
+  mask-composite: exclude;
+}
+
+.glass-border::before {
+  filter: blur(var(--app-glass-blur)) saturate(150%) saturate(var(--glass-border-saturation)) brightness(var(--glass-border-brightness));
+}
+
+.glass-border::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.12);
+  background: linear-gradient(90deg, transparent, rgb(255 255 255 / 0.1) 30%, rgb(255 255 255 / 0.2) 50%, rgb(255 255 255 / 0.1) 70%, transparent);
+}
+
+html[data-glass-wallpaper-ready] :is(.glass-warp, .glass-border)::before {
+  inset: 0;
+  background-image: var(--glass-cached-base);
+  background-size: var(--glass-viewport-width) var(--glass-viewport-height);
+  background-position: top left;
+  background-attachment: fixed;
+  filter: none;
+}
+
+/* The browser keeps the cached wallpaper in viewport coordinates while its
+   card clip scrolls. Do not promote these layers with transform or
+   will-change: transform: that makes fixed backgrounds scroll with the card. */
+
+html[data-glass-wallpaper-ready] .glass-border::before {
+  background-image: var(--glass-cached-border);
+}
+
+
+html[data-glass-wallpaper-ready] .login-scene .glass-warp::before {
+  inset: -32px;
+  width: auto;
+  height: auto;
+  transform: none;
+  background: var(--app-background);
+  background-size: var(--glass-viewport-width) var(--glass-viewport-height);
+  background-position: top left;
+  background-attachment: fixed;
+  filter: blur(var(--app-glass-blur)) saturate(150%);
+}
+
+.app-glass-dialog {
+  --glass-tint: rgb(255 255 255 / 0.7);
+  background: transparent;
+}
+
+.dark .app-glass-dialog {
+  --glass-tint: rgb(24 24 27 / 0.7);
+}
+
+/* React Aria supplies only portal/focus/scroll-lock behavior. The viewport
+   scrim and its blur are ours, separate from the animated dialog container. */
+.app-modal-backdrop {
+  --glass-tint: rgb(0 0 0 / 0.24);
+  position: fixed;
+  inset: 0;
+  /* Match the overlay stack so portaled selects/tooltips can appear above us. */
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: var(--visual-viewport-height, 100dvh);
+  isolation: isolate;
+}
+
+.dark .app-modal-backdrop {
+  --glass-tint: rgb(0 0 0 / 0.4);
+}
+
+/* Keep the uniform tint below the dialog with explicit sibling levels,
+   independent of hit tests. The blur belongs to the page source below it. */
+.app-modal-backdrop::before {
+  z-index: 0;
+}
+
+.app-modal-backdrop > .modal__container {
+  position: relative;
+  z-index: 1;
+}
+
+/* Fullscreen glass is a source filter: the page paints into a bounded SVG
+   filter. Pointer-driven damage no longer requests a backdrop readback.
+   Keep fixed wallpaper aligned with the viewport, including scrolled pages;
+   filter establishes a containing block for otherwise fixed descendants. */
+body[data-glass-source-blur] .app-shell {
+  filter: var(--glass-source-filter);
+}
+
+body[data-glass-source-blur] .app-shell::before {
+  position: absolute;
+  inset: auto;
+  left: var(--glass-source-x);
+  top: var(--glass-source-y);
+  width: var(--glass-source-width);
+  height: var(--glass-source-height);
+}
+
+/* Each covered dialog is blurred once. Its constant scrim remains separate,
+   so filtering a transparent fullscreen box cannot introduce pale edges. */
+body[data-glass-source-blur] .app-modal-backdrop:not([data-glass-backdrop-top]) > .modal__container {
+  filter: blur(var(--app-glass-blur)) saturate(150%);
+}
+
+/* Do not blur the already blurred page a second time inside a dialog, or
+   animate an opacity Backdrop Root containing another backdrop capture. */
+body[data-glass-modal-open] :is(.glass-warp, .glass-border)::before {
+  display: none;
+}
+
+[data-glass-navigation-source] {
+  position: relative;
+  isolation: isolate;
+}
+
+[data-glass-navigation-card] {
+  filter: var(--glass-navigation-filter);
+}
+
+.glass-navigation-wallpaper {
+  display: none;
+  position: fixed;
+  left: 0;
+  width: var(--glass-viewport-width);
+  z-index: -10;
+  pointer-events: none;
+  background-image: var(--glass-cached-base);
+  background-size: var(--glass-viewport-width) var(--glass-viewport-height);
+  background-position: top left;
+  background-repeat: no-repeat;
+}
+
+[data-glass-navigation-source] > .glass-navigation-wallpaper {
+  display: block;
+}
+
+[data-glass-navigation-active] > .glass-warp::before {
+  display: none;
+}
+
+html:not([data-glass-wallpaper-ready]) [data-glass-navigation-active] > .glass-warp::before {
+  display: block;
+}
+
+body[data-glass-modal-open] [data-glass-navigation-card] {
+  filter: none;
+}
+
+body[data-glass-modal-open] .glass-navigation-wallpaper {
+  display: none;
+}

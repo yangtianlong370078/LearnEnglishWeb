@@ -28,6 +28,7 @@ import {
   Plus,
 } from "@gravity-ui/icons";
 
+import ModalBackdrop from "@/components/common/modal-backdrop";
 import RadialChartWithLegend from "@/components/home/radial-chart-with-legend";
 import { saveLearntask } from "@/lib/api/modules/statistics";
 
@@ -368,7 +369,7 @@ function CreateTaskButton({
       </ButtonGroup>
 
       <Modal state={state}>
-        <Modal.Backdrop isDismissable={false} variant="blur">
+        <ModalBackdrop isDismissable={false}>
           <Modal.Container placement="center" size="md">
             <Modal.Dialog>
               <Modal.Header>
@@ -479,7 +480,7 @@ function CreateTaskButton({
               </Modal.Footer>
             </Modal.Dialog>
           </Modal.Container>
-        </Modal.Backdrop>
+        </ModalBackdrop>
       </Modal>
     </>
   );

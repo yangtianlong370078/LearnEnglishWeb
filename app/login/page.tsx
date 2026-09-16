@@ -6,6 +6,7 @@ import { Button, Card } from "@heroui/react";
 
 import { login } from "@/lib/api/modules/auth";
 import { storage } from "@/utils/storage";
+import { GlassWarp } from "@/components/courselearn/glass-border";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -48,7 +49,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-950 dark:via-indigo-950 dark:to-gray-900">
+    <div className="login-scene min-h-screen flex items-center justify-center relative overflow-hidden bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 dark:from-gray-950 dark:via-indigo-950 dark:to-gray-900">
       {/* 背景装饰圆 */}
       <div className="absolute top-[-10%] left-[-5%] w-96 h-96 rounded-full bg-gradient-to-br from-blue-400/20 to-indigo-500/20 blur-3xl pointer-events-none" />
       <div className="absolute bottom-[-10%] right-[-5%] w-96 h-96 rounded-full bg-gradient-to-tl from-purple-400/20 to-pink-500/20 blur-3xl pointer-events-none" />
@@ -79,7 +80,8 @@ export default function LoginPage() {
         </div>
 
         {/* 登录卡片 */}
-        <Card className="shadow-xl border border-separator/50 backdrop-blur-sm bg-background/90">
+        <Card className="glass-surface shadow-xl border border-separator/50 !bg-transparent">
+          <GlassWarp />
           <Card.Content className="p-8">
             <form className="flex flex-col gap-5" onSubmit={handleSubmit}>
               {/* 错误提示 */}

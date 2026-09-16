@@ -17,6 +17,8 @@ import {
   Separator,
 } from "@heroui/react";
 
+import ModalBackdrop from "@/components/common/modal-backdrop";
+import { GlassWarp } from "@/components/courselearn/glass-border";
 import PieChartWithBreakdownDemo from "@/components/learnwords/pie-chart-with-breakdown-demo";
 import { courseApi } from "@/lib/api";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -24,6 +26,7 @@ import { useMediaQuery } from "@/hooks/useMediaQuery";
 function CourseChartSkeleton() {
   return (
     <Card className="word-search-glass !bg-transparent rounded-2xl">
+      <GlassWarp />
       <Card.Header>
         <Skeleton className="h-6 w-32 rounded-lg" />
       </Card.Header>
@@ -167,6 +170,7 @@ export default function LearnWordsPage() {
       allowsMultipleExpanded
       className="w-full overflow-hidden rounded-[25px]  word-search-glass !bg-transparent"
     >
+      <GlassWarp />
       <div className="flex items-center gap-1.5 px-6 py-3 bg-white/15 dark:bg-black/15">
         <span className="text-foreground text-base font-semibold">
           {menuMode == "full" ? "我的课程" : "精选课程"}
@@ -262,6 +266,7 @@ export default function LearnWordsPage() {
         <>
           <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
             <Card className="word-search-glass !bg-transparent rounded-2xl ">
+              <GlassWarp />
               <div className="absolute inset-0 bg-[url('/images/scb.png')] bg-[width:100%] bg-center bg-no-repeat bg-cover z-[-1] mt-[20px] absolute top-1/2 -translate-y-1/2 h-[130px] w-[130px] ml-[10px]"></div>
               <PieChartWithBreakdownDemo
                 courseName={data?.newWord.courseName}
@@ -272,6 +277,7 @@ export default function LearnWordsPage() {
               />
             </Card>
             <Card className="word-search-glass !bg-transparent rounded-2xl ">
+              <GlassWarp />
               <div className="absolute inset-0 bg-[url('/images/qhq.png')] bg-[width:100%] bg-center bg-no-repeat bg-cover z-[-1] mt-[20px] absolute top-1/2 -translate-y-1/2 h-[130px] w-[130px] ml-[10px]"></div>
               <PieChartWithBreakdownDemo
                 courseName={data?.strengthenWord.courseName}
@@ -297,10 +303,9 @@ export default function LearnWordsPage() {
       )}
 
       {/* 添加/编辑课程弹框（受控） */}
-      <Modal.Backdrop
+      <ModalBackdrop
         isDismissable={false}
         isOpen={courseModalOpen}
-        variant="blur"
         onOpenChange={setCourseModalOpen}
       >
         <Modal.Container placement="center" size="md">
@@ -375,13 +380,12 @@ export default function LearnWordsPage() {
             </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>
-      </Modal.Backdrop>
+      </ModalBackdrop>
 
       {/* 删除课程确认弹框（受控） */}
-      <Modal.Backdrop
+      <ModalBackdrop
         isDismissable={false}
         isOpen={deleteModalOpen}
-        variant="blur"
         onOpenChange={setDeleteModalOpen}
       >
         <Modal.Container placement="center" size="md">
@@ -406,7 +410,7 @@ export default function LearnWordsPage() {
             </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>
-      </Modal.Backdrop>
+      </ModalBackdrop>
     </div>
   );
 }

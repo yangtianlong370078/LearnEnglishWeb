@@ -576,9 +576,9 @@ function WordCardInner(
 
   const cardStateClass =
     resultState === "correct"
-      ? "cardfilter  cl-card-correct "
+      ? "cl-glass-idle cl-card-correct"
       : resultState === "wrong"
-        ? "cardfilter  cl-card-wrong"
+        ? "cl-glass-idle cl-card-wrong"
         : "cl-glass-idle";
 
   const showSecondary = effectiveTranslationOn;
@@ -603,9 +603,8 @@ function WordCardInner(
     >
       <ConfettiBurst fireKey={confettiKey} />
 
-      {/* 液态玻璃 warp 层（位于内容之下）：整卡毛玻璃，
-          把边框后面的背景提亮提饱和透上来（仅默认态，避免干扰对错着色） */}
-      {resultState === "idle" && <GlassWarp />}
+      {/* Keep the same blur layer mounted when the answer tint changes. */}
+      <GlassWarp />
 
       {/* 内容层奶白底色：内缩 1.5px 避开描边环区，light:bg-white/15  dark:bg-black/10 dark:bg-white/5 dark:bg-[hsla(0,0%,50%,0.05)]!
           让边框环直接透出 warp 玻璃（更"裸透"的液态玻璃边框） */}

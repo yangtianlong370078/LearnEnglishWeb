@@ -10,6 +10,8 @@ import WordDetail from "@/components/common/word-detail";
 import { post } from "@/lib/api";
 import { CnEnIcon, EditIcon, EnCnIcon } from "./mode-icons";
 
+import ModalBackdrop from "@/components/common/modal-backdrop";
+
 /**
  * 页面级共享的单词【详情】弹窗：每页仅此一个实例。
  * word 为空视为关闭；卡片点击【详情】时把目标 word 传入即可。
@@ -30,13 +32,9 @@ export function WordDetailModal({
   }, [word]);
 
   return (
-    <Modal.Backdrop
-      className="!bg-transparent"
-      isOpen={open}
-      onOpenChange={onOpenChange}
-    >
+    <ModalBackdrop isOpen={open} onOpenChange={onOpenChange}>
       <Modal.Container className="w-full max-w-lg rounded-2xl">
-        <Modal.Dialog className="backdrop-blur-xl backdrop-saturate-150 bg-white/70 dark:bg-zinc-900/70 shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+        <Modal.Dialog className="app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
           <Modal.CloseTrigger />
           <Modal.Header>
             <Modal.Heading className="text-2xl font-semibold">
@@ -51,7 +49,7 @@ export function WordDetailModal({
           </div>
         </Modal.Dialog>
       </Modal.Container>
-    </Modal.Backdrop>
+    </ModalBackdrop>
   );
 }
 
@@ -108,10 +106,9 @@ export function WordEditModal({
   };
 
   return (
-    <Modal.Backdrop
+    <ModalBackdrop
       isDismissable={false}
       isOpen={open}
-      variant="blur"
       onOpenChange={onOpenChange}
     >
       <Modal.Container placement="center" size="md">
@@ -218,6 +215,6 @@ export function WordEditModal({
           </Modal.Footer>
         </Modal.Dialog>
       </Modal.Container>
-    </Modal.Backdrop>
+    </ModalBackdrop>
   );
 }

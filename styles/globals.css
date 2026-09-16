@@ -1,9 +1,8 @@
 @import "tailwindcss";
 @import "@heroui/styles";
-
-@import "@heroui/styles/css";
 @import "@heroui-pro/react/css";
 @import "./background-themes.css";
+@import "./glass.css";
 
 @custom-variant dark (&:is(.dark *));
 
@@ -68,14 +67,14 @@
         底层为 tailwindcss-animate 的 enter/exit keyframes；
         位移/缩放/时长等由各组件在基础规则里设置的 --tw-* 变量驱动（不受本媒体查询影响），
         因此这里仅需把被置为 none 的 animation 重新指回 enter/exit 即可，动画效果与正常一致。 */
-  [data-entering="true"] {
+  [data-entering="true"]:not(.app-modal-backdrop) {
     animation-name: enter !important;
     animation-duration: var(--tw-animation-duration, var(--tw-duration, 0.15s)) !important;
     animation-timing-function: var(--tw-ease, ease) !important;
     animation-fill-mode: var(--tw-animation-fill-mode, none) !important;
   }
 
-  [data-exiting="true"] {
+  [data-exiting="true"]:not(.app-modal-backdrop) {
     animation-name: exit !important;
     animation-duration: var(--tw-animation-duration, var(--tw-duration, 0.15s)) !important;
     animation-timing-function: var(--tw-ease, ease) !important;
@@ -150,83 +149,41 @@
   border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;
   box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
   isolation: isolate;
-  /* 直接在容器上做毛玻璃，避免负层级 overlay 触发合成层闪烁 */
-  background-color: rgb(255 255 255 / 0.55);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  backdrop-filter: blur(16px) saturate(150%);
-  /* 固定为稳定的独立合成层（与页面其它不闪烁的毛玻璃卡片一致：仅 translateZ + isolation，
-     不使用 will-change，避免图层被反复创建/销毁导致 backdrop-filter 采样闪烁） */
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  --glass-tint: rgb(255 255 255 / 0.55);
+  background: transparent;
 }
 
 .dark .navbar-root {
   border: none !important;
   border-bottom: 1px solid rgb(255 255 255 / 0.06) !important;
   box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
-  background-color: rgb(10 16 34 / 0.58);
+  --glass-tint: rgb(10 16 34 / 0.58);
 }
 
-/* 毛玻璃容器：搜索框（直接在容器上做模糊 + 半透明着色） */
+/* Tint is painted together with blur on the pseudo-element in glass.css. */
 .word-search-glass {
-  position: relative;
-  isolation: isolate;
-  background-color: rgb(255 255 255 / 0.55) !important;
-  -webkit-backdrop-filter: blur(8px) saturate(150%);
-  backdrop-filter: blur(8px) saturate(150%);
-  /* 固定为稳定的独立合成层（与页面其它不闪烁的毛玻璃卡片一致：仅 translateZ + isolation，
-     不使用 will-change，避免图层被反复创建/销毁导致 backdrop-filter 采样闪烁） */
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  --glass-tint: rgb(255 255 255 / 0.55);
+  background: transparent !important;
 }
 
-/*
- * 学习卡片（默认态）玻璃宿主：自身不做 backdrop-filter，且不能带
- * transform / isolation / filter / opacity<1 等 Backdrop Root 触发属性。
- * 毛玻璃由内部 GlassWarp 子层完成——若卡片（或 warp 与页面背景之间的
- * 任一祖先）触发 Backdrop Root，子层 backdrop-filter 只能采样到该祖先
- * 内部，采样不到页面背景，毛玻璃整体失效。
- *
- * 重要：卡片内禁止任何 mix-blend-mode 元素（GlassBorder 描边层已改为
- * 普通 source-over 合成）——isolation: auto 下混合会穿透到根层叠上下文
- * 与整页混合，触发 Blink 合成器 Bug（页面顶部透明色块、hover 闪烁）；
- * 也不能给卡片加 backdrop-filter 来约束混合：Blink 中 backdrop-filter
- * 与 mix-blend-mode 后代冲突，会导致卡片毛玻璃被跳过且合成层不稳定。
- */
+/* Contain GlassWarp behind the content without a forced compositor layer.
+   Isolation is a stacking context, not a Backdrop Root. */
 .cl-glass-idle {
+  --glass-tint: transparent;
   position: relative;
   background-color: transparent !important;
-  /* 覆盖 HeroUI .card 自带的 isolation: isolate + transform: translateZ(0)
-    （两者都会触发 Backdrop Root，导致内部 GlassWarp 子层的 backdrop-filter
-    采样不到页面背景，毛玻璃/折射整体失效） */
-  isolation: auto !important;
-  transform: none !important;
-  -webkit-transform: none !important;
-}
-
-
-
-.cardfilter {
-  position: relative;
   isolation: isolate;
-  -webkit-backdrop-filter: blur(8px) saturate(150%);
-  backdrop-filter: blur(8px) saturate(150%);
-  /* 固定为稳定的独立合成层（与页面其它不闪烁的毛玻璃卡片一致：仅 translateZ + isolation，
-     不使用 will-change，避免图层被反复创建/销毁导致 backdrop-filter 采样闪烁） */
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
 }
 
+.dark .cl-glass-idle {
+  --glass-tint: rgb(255 255 255 / 0.05);
+}
 
 .dark .word-search-glass {
-  background-color: rgb(10 16 34 / 0.58) !important;
+  --glass-tint: rgb(10 16 34 / 0.58);
 }
 
-/*
- * 旧的负层级模糊层会在鼠标经过其它带模糊组件时触发 Chromium 合成层重算，
- * 导致半透明色块时隐时现地闪烁。改为容器自身做模糊后，此层不再需要模糊，
- * 仅保留为惰性元素（不渲染任何视觉效果）。
- */
+/* Legacy decorative placeholders; glass now lives in pseudo-elements. */
 .glass-overlay {
   display: none;
 }
@@ -237,15 +194,6 @@
   z-index: 0;
   background-color: transparent !important;
 }
-
-.backdrop-blur-xl,
-.backdrop-blur-lg,
-.backdrop-blur-md,
-.backdrop-blur-sm {
-  backface-visibility: hidden;
-  -webkit-backface-visibility: hidden;
-}
-
 
 /* 给所有 surface 块加毛玻璃模糊 + 玻璃描边 + 顶部高光*/
 /* HeroUI v3 Card 实际使用 .card / .card--default / [data-slot="card"]，
@@ -277,7 +225,6 @@
   isolation: isolate;
   opacity: 1;
   position: relative;
-  transform: translateZ(0);
 }
 
 
@@ -445,43 +392,39 @@
 
 /* 兜底：保留旧的 bg-content 规则（万一某些组件用） */
 .bg-content1 {
-  background-color: rgb(255 255 255 / 0.45) !important;
-  backdrop-filter: blur(20px) saturate(160%) !important;
-  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+  --glass-tint: rgb(255 255 255 / 0.45);
+  background: transparent !important;
 }
 
 .bg-content2 {
-  background-color: rgb(255 255 255 / 0.38) !important;
-  backdrop-filter: blur(18px) saturate(155%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(155%) !important;
+  --glass-tint: rgb(255 255 255 / 0.38);
+  background: transparent !important;
 }
 
 .bg-content3 {
-  background-color: rgb(255 255 255 / 0.32) !important;
-  backdrop-filter: blur(16px) saturate(150%) !important;
-  -webkit-backdrop-filter: blur(16px) saturate(150%) !important;
+  --glass-tint: rgb(255 255 255 / 0.32);
+  background: transparent !important;
 }
 
 .bg-content4 {
-  background-color: rgb(255 255 255 / 0.26) !important;
-  backdrop-filter: blur(14px) saturate(148%) !important;
-  -webkit-backdrop-filter: blur(14px) saturate(148%) !important;
+  --glass-tint: rgb(255 255 255 / 0.26);
+  background: transparent !important;
 }
 
 .dark .bg-content1 {
-  background-color: rgb(15 20 40 / 0.48) !important;
+  --glass-tint: rgb(15 20 40 / 0.48);
 }
 
 .dark .bg-content2 {
-  background-color: rgb(20 28 52 / 0.44) !important;
+  --glass-tint: rgb(20 28 52 / 0.44);
 }
 
 .dark .bg-content3 {
-  background-color: rgb(26 36 62 / 0.4) !important;
+  --glass-tint: rgb(26 36 62 / 0.4);
 }
 
 .dark .bg-content4 {
-  background-color: rgb(32 44 72 / 0.36) !important;
+  --glass-tint: rgb(32 44 72 / 0.36);
 }
 
 /* ── Modal 边框 ── */
@@ -622,16 +565,6 @@ input:-webkit-autofill:active {
   -webkit-appearance: none !important;
   background: transparent !important;
 }
-/*
-.zdy-backdrop-blur-xl {
-  background-color: rgb(255 255 255 / 0.42) !important;
-  backdrop-filter: blur(24px) !important;
-  -webkit-backdrop-filter: blur(24px) !important;
-}
-
-.dark .zdy-backdrop-blur-xl {
-  background-color: rgb(10 16 34 / 0.5) !important;
-} */
 
 /* .accordion__item::after {
   background: rgb(0 0 0 / 0.08) !important;
@@ -662,31 +595,33 @@ input:-webkit-autofill:active {
 @keyframes cl-shake {
   0%,
   100% {
-    transform: translateX(0);
+    left: 0;
   }
 
   15% {
-    transform: translateX(-8px);
+    left: -8px;
   }
 
   30% {
-    transform: translateX(7px);
+    left: 7px;
   }
 
   45% {
-    transform: translateX(-6px);
+    left: -6px;
   }
 
   60% {
-    transform: translateX(4px);
+    left: 4px;
   }
 
   75% {
-    transform: translateX(-2px);
+    left: -2px;
   }
 }
 
 .cl-shake {
+  /* Relative offsets preserve viewport-fixed glass during the brief shake.
+     A transform, including translateX(0), would re-anchor its wallpaper. */
   animation: cl-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
@@ -716,22 +651,24 @@ input:-webkit-autofill:active {
 }
 
 /* 正确/错误卡片着色（叠加在毛玻璃卡片之上） */
-.cl-card-correct {
+.cl-card-correct,
+.dark .cl-card-correct {
   border-color: color-mix(in srgb, var(--success, #16a34a) 55%, transparent) !important;
   box-shadow:
      0 0 0 1px color-mix(in srgb, var(--success, #16a34a) 70%, transparent), 0 4px 16px color-mix(in srgb, var(--success, #16a34a) 38%, transparent) !important;
-  background-color: color-mix(
+  --glass-tint: color-mix(
     in srgb,
     var(--success, #16a34a) 22%,
     transparent
   ) !important;
 }
 
-.cl-card-wrong {
+.cl-card-wrong,
+.dark .cl-card-wrong {
   border-color: color-mix(in srgb, var(--danger, #dc2626) 55%, transparent) !important;
   box-shadow:
     0 0 0 1px color-mix(in srgb, var(--danger, #dc2626) 70%, transparent), 0 4px 16px color-mix(in srgb, var(--danger, #dc2626) 38%, transparent) !important;
-  background-color: color-mix(
+  --glass-tint: color-mix(
     in srgb,
     var(--danger, #dc2626) 22%,
     transparent
@@ -887,10 +824,6 @@ input:-webkit-autofill:active {
 
 /* ── 卡片悬浮 ── */
 .cl-card {
-
-   -webkit-backdrop-filter: blur(16px) saturate(150%);
-    backdrop-filter: blur(16px) saturate(150%);
-   
   transition:
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1),
     box-shadow 0.35s ease,
@@ -1344,17 +1277,14 @@ input:-webkit-autofill:active {
   border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;
   box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
   isolation: isolate;
-  background-color: rgb(255 255 255 / 0.55);
-  -webkit-backdrop-filter: blur(16px) saturate(150%);
-  backdrop-filter: blur(16px) saturate(150%);
-  transform: translateZ(0);
-  -webkit-transform: translateZ(0);
+  --glass-tint: rgb(255 255 255 / 0.55);
+  background: transparent;
 }
 
 .dark .cl-navbar {
   border: none !important;
   border-bottom: 1px solid rgb(255 255 255 / 0.06) !important;
-  background-color: rgb(10 16 34 / 0.58);
+  --glass-tint: rgb(10 16 34 / 0.58);
 }
 
 

@@ -98,7 +98,10 @@ export default function Home() {
 
       {/* 数据统计看板：月/年视图平滑切换 */}
       <div className="relative isolate">
-        <div className="flex flex-col gap-1.5 px-4 pb-2">
+        <div
+          className="flex flex-col gap-1.5 px-4 pb-2"
+          data-glass-navigation-content=""
+        >
           <span className="text-foreground text-base font-semibold">
             任务日历
           </span>

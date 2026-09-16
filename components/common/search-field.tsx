@@ -2,6 +2,7 @@
 
 import { SearchField, Button, Modal, Spinner } from "@heroui/react";
 import React from "react";
+import ModalBackdrop from "@/components/common/modal-backdrop";
 import WordDetail from "@/components/common/word-detail";
 import { get, post } from "@/lib/api/request";
 
@@ -103,13 +104,9 @@ export default function FullWidth() {
   <GlassBorder /> 
        </div>
       </SearchField>
-      <Modal.Backdrop
-        className="!bg-transparent"
-        isOpen={isOpen}
-        onOpenChange={setIsOpen}
-      >
+      <ModalBackdrop isOpen={isOpen} onOpenChange={setIsOpen}>
         <Modal.Container className="w-full max-w-lg rounded-2xl">
-          <Modal.Dialog className="backdrop-blur-xl backdrop-saturate-150 bg-white/70 dark:bg-zinc-900/70 shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+          <Modal.Dialog className="app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
             <Modal.CloseTrigger />
             <Modal.Header>
               <Modal.Heading className="text-2xl font-semibold">
@@ -139,7 +136,7 @@ export default function FullWidth() {
             )}
           </Modal.Dialog>
         </Modal.Container>
-      </Modal.Backdrop>
+      </ModalBackdrop>
 
       
     </div>

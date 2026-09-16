@@ -35,6 +35,7 @@ import {
   Tooltip,
 } from "@heroui/react";
 
+import ModalBackdrop from "@/components/common/modal-backdrop";
 import PieChartWithBreakdownDemo from "@/components/learnwords/pie-chart-with-breakdown-demo";
 import { courseApi } from "@/lib/api";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -68,6 +69,7 @@ function CourseChartSkeleton({ index = 0 }: { index?: number }) {
       }
       variant="transparent"
     >
+      <GlassWarp />
       <Card.Header className="relative z-[1] p-2">
         <div className="flex min-w-0 items-center gap-3.5">
           <Skeleton className="size-[50px] shrink-0 rounded-full" />
@@ -116,6 +118,7 @@ function CategoryAccordionSkeleton({
       className="word-search-glass w-full overflow-hidden rounded-3xl"
       variant="transparent"
     >
+      <GlassWarp />
       <Card.Header className="flex-row items-center gap-2 bg-white/15 px-6 py-3 dark:bg-black/15">
         <Skeleton className={`h-5 ${titleWidth} rounded-lg`} />
         <Skeleton className="size-9 rounded-full" />
@@ -479,7 +482,12 @@ export default function LearnWordsPage() {
       {loading ? (
         <LearnWordsSkeleton />
       ) : error ? (
-        <div className="text-danger px-4 text-sm">{error}</div>
+        <div
+          className="text-danger px-4 text-sm"
+          data-glass-navigation-content=""
+        >
+          {error}
+        </div>
       ) : (
         <>
           <div className="grid w-full grid-cols-1 items-stretch gap-3 sm:grid-cols-3">
@@ -604,14 +612,12 @@ export default function LearnWordsPage() {
       )}
 
       {/* 精选课程选择弹框 */}
-      <Modal.Backdrop
-        className="!bg-transparent backdrop-blur-xl "
+      <ModalBackdrop
         isOpen={availableCourseModalOpen}
-        variant="blur"
         onOpenChange={setAvailableCourseModalOpen}
       >
         <Modal.Container placement="center" size="lg">
-          <Modal.Dialog className=" backdrop-saturate-150 p-2 bg-white/70 dark:bg-zinc-900/70 shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+          <Modal.Dialog className="app-glass-dialog p-2 shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
             <Modal.Header className="p-3">
               <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
                 <Books className="size-5" />
@@ -727,13 +733,12 @@ export default function LearnWordsPage() {
             </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>
-      </Modal.Backdrop>
+      </ModalBackdrop>
 
       {/* 加入学习列表确认弹框 */}
-      <Modal.Backdrop
+      <ModalBackdrop
         isDismissable={false}
         isOpen={addConfirmOpen}
-        variant="blur"
         onOpenChange={(isOpen) => {
           setAddConfirmOpen(isOpen);
           if (!isOpen) {
@@ -763,13 +768,12 @@ export default function LearnWordsPage() {
             </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>
-      </Modal.Backdrop>
+      </ModalBackdrop>
 
       {/* 添加/编辑课程弹框（受控） */}
-      <Modal.Backdrop
+      <ModalBackdrop
         isDismissable={false}
         isOpen={courseModalOpen}
-        variant="blur"
         onOpenChange={setCourseModalOpen}
       >
         <Modal.Container placement="center" size="md">
@@ -853,13 +857,12 @@ export default function LearnWordsPage() {
             </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>
-      </Modal.Backdrop>
+      </ModalBackdrop>
 
       {/* 删除课程确认弹框（受控） */}
-      <Modal.Backdrop
+      <ModalBackdrop
         isDismissable={false}
         isOpen={deleteModalOpen}
-        variant="blur"
         onOpenChange={setDeleteModalOpen}
       >
         <Modal.Container placement="center" size="md">
@@ -884,7 +887,7 @@ export default function LearnWordsPage() {
             </Modal.Footer>
           </Modal.Dialog>
         </Modal.Container>
-      </Modal.Backdrop>
+      </ModalBackdrop>
     </div>
   );
 }

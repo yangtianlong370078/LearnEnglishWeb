@@ -7,6 +7,7 @@ import { useSyncExternalStore } from "react";
 
 import { useTheme } from "@/app/providers";
 import InlineSelectCustomIndicatorDemo from "@/components/common/inline-select-custom-indicator-demo";
+import GlassNavigation from "@/components/common/glass-navigation";
 
 interface CourseLearnNavbarProps {
   courseName: string;
@@ -39,6 +40,7 @@ export default function CourseLearnNavbar({
 
   return (
     <div className="cl-navbar w-full px-6 py-3">
+      <GlassNavigation />
       <div className="mx-auto flex max-w-5xl items-center justify-between gap-3">
         <h1 className="line-clamp-1 bg-gradient-to-r from-foreground via-foreground to-foreground/60 bg-clip-text text-lg font-semibold tracking-tight text-transparent">
           {courseName || "课程学习"}
