@@ -131,6 +131,12 @@ html[data-glass-wallpaper-ready] :is(.glass-warp, .glass-border)[data-glass-visi
   will-change: opacity;
 }
 
+/* Repaint the brief relative-position shake instead of translating an old
+   cached layer, so its wallpaper remains fixed while the card moves. */
+html[data-glass-wallpaper-ready] .cl-shake :is(.glass-warp, .glass-border) {
+  will-change: auto;
+}
+
 html[data-glass-wallpaper-ready] .glass-border::before {
   background-image: var(--glass-cached-border);
 }
