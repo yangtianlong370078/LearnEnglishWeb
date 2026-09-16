@@ -50,7 +50,9 @@ The decorative spans no longer use `translateZ(0)`: any transform ancestor
 background scroll with that ancestor in Chromium. Masks, paint containment,
 isolation and the navigation's SVG filter preserve fixed background alignment.
 The brief wrong-answer shake now uses equivalent relative `left` offsets, so
-the whole card still shakes without re-anchoring the wallpaper.
+the whole card still shakes without re-anchoring the wallpaper. Its decorations
+temporarily drop the compositor hint during that 0.5s animation to avoid moving
+an old cached layer with the relative offset.
 
 Visible decorative spans use `will-change: opacity` to retain compositor
 caching without changing coordinates or opacity. An IntersectionObserver
@@ -135,7 +137,8 @@ differed by at most 1/255 in a channel (full-image mean 0.000007/255). An earlie
 run showed small raster rounding differences (mean 0.009/255, maximum 3/255),
 so exact encoded screenshot equality is not a reliable universal invariant.
 
-The final production scroll stress comparison used 20 course cards, a
+Before the native fixed-background correction, the production scroll comparison
+used 20 course cards, a
 1440 x 1000 viewport and 90 animation frames, alternating new/previous CSS
 rendering twice per mode. Both variants retained the current controllers:
 
@@ -156,3 +159,35 @@ The original intermittent browser-window artifact is not reliably reproduced
 by automation. Pointer screenshot comparisons must distinguish sub-channel
 raster rounding from an actual translucent rectangle; they cannot establish
 correctness for every browser/driver. Real-device verification is still useful.
+
+## Fixed-background follow-up
+
+The viewport-alignment regression uses real wheel events while stopping the
+page's scroll-event propagation, so JavaScript cannot compensate the source
+coordinates. A fixed screen crop inside a card remains pixel-identical before
+and after wheel scrolling in Chrome 152 and 360/Chromium 132, in default and
+GPU-disabled modes, with both photo and gradient wallpapers. The surface spans
+receive no inline-style writes during the sweep. The same test checks the
+wrong-answer shake at rest and at its displaced keyframe: Chrome crops match
+exactly; 360 differs by at most 1/255 per channel. All 48 assertions passed.
+
+Twelve static visual comparisons at DPR 1.25 cover light/dark, photo/gradient,
+and scroll offsets 0/300/800. Mean channel differences against the previous
+coordinate-compensation implementation are below 0.0013/255, and no compared
+channel differs by more than 5/255. The texture generation and filter strengths
+are unchanged.
+
+New sequential production measurements use 20 and 30 actual cards and two
+90-frame samples per mode. Under default acceleration, median frame intervals
+remain about 16.7ms (one 20-card sample: 17ms). Style-recalculation work falls
+about 62-65%, while overall main-thread task time is approximately unchanged.
+The GPU-disabled results are mixed: 20-card task time improves, while the
+30-card median interval was 33.3ms versus 16.7ms in the preceding samples,
+despite almost identical total task time. Other repeated 20-card samples varied
+between 16.7 and 33.3ms. These short, sequential measurements establish reduced
+coordinate/style work, but do not establish a universal end-to-end performance
+improvement or a guarantee of zero frame-time regression.
+
+The final build also passes the 212-assertion desktop modal/navigation suite,
+21 mobile/answer-feedback checks, TypeScript, focused ESLint and diff whitespace
+checks. React Doctor remains 52/100 with the same 7 errors and 46 warnings.
