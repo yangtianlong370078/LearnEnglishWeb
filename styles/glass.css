@@ -127,6 +127,9 @@ html[data-glass-wallpaper-ready] :is(.glass-warp, .glass-border)::before {
 /* The browser keeps the cached wallpaper in viewport coordinates while its
    card clip scrolls. Do not promote these layers with transform or
    will-change: transform: that makes fixed backgrounds scroll with the card. */
+html[data-glass-wallpaper-ready] :is(.glass-warp, .glass-border)[data-glass-visible] {
+  will-change: opacity;
+}
 
 html[data-glass-wallpaper-ready] .glass-border::before {
   background-image: var(--glass-cached-border);

@@ -45,6 +45,20 @@ function createController(document: Document) {
   }));
   const releaseWallpaper = createGlassWallpaperCache(document);
   const surfaces = new Map<HTMLElement, Set<HTMLElement>>();
+  const visible = new WeakSet<HTMLElement>();
+  const intersection = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        const host = entry.target as HTMLElement;
+
+        if (entry.isIntersecting) visible.add(host);
+        else visible.delete(host);
+        for (const layer of Array.from(surfaces.get(host) ?? []))
+          layer.toggleAttribute("data-glass-visible", entry.isIntersecting);
+      }
+    },
+    { rootMargin: "64px" },
+  );
   let disposed = false;
   let viewport = "";
 
@@ -66,8 +80,8 @@ function createController(document: Document) {
     scheduleGlassFrame(view, measure);
   }
 
-  // CSS fixes the source to the viewport; scrolling requires no per-card
-  // measurements, style writes, or intersection/animation observation.
+  // CSS fixes the source to the viewport. Only visibility changes toggle
+  // layer caching; scrolling never measures or compensates card coordinates.
   view.addEventListener("resize", schedule);
 
   return {
@@ -78,8 +92,10 @@ function createController(document: Document) {
       if (!surface) {
         surface = new Set();
         surfaces.set(host, surface);
+        intersection.observe(host);
       }
       surface.add(layer);
+      layer.toggleAttribute("data-glass-visible", visible.has(host));
       schedule();
       notifySurfaceChanges(document);
 
@@ -87,12 +103,15 @@ function createController(document: Document) {
         surface.delete(layer);
         if (!surface.size) {
           surfaces.delete(host);
+          intersection.unobserve(host);
+          visible.delete(host);
         }
         notifySurfaceChanges(document);
         if (!surfaces.size) {
           disposed = true;
           cancelGlassFrame(view, measure);
           view.removeEventListener("resize", schedule);
+          intersection.disconnect();
           releaseWallpaper();
           for (const { name, value, priority } of previousViewport) {
             if (value) root.style.setProperty(name, value, priority);

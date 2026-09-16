@@ -37,14 +37,31 @@ controller's resources are released. While a texture is unavailable, the same
 wallpaper is painted with a normal CSS source filter. Login uses its own existing
 gradient source and tint.
 
-Scrolling updates only visible decorative layers' background coordinates in
-one shared frame for surfaces and navigation (`lib/glass-frame.ts`), batching
-all geometry reads before any controller writes styles. Intersection
-observation limits layer promotion to visible decorations. There is no mouse
-listener, per-mouse blur, React state update on scroll, or continuous animation
-loop. This is a wallpaper renderer: a future glass component overlapping
-arbitrary foreground content needs an explicit source arrangement, like the
-navigation implementation below.
+The cached textures and the uncached CSS fallback use native
+`background-attachment: fixed`. Their viewport alignment no longer depends on
+JavaScript scroll callbacks. The previous version measured each visible card
+and updated its negative background offset in requestAnimationFrame; compositor
+scrolling could move the card before that correction, producing the reported
+brief drift and snap-back. Sharing the bitmap was not the cause; synchronizing
+its coordinates through JavaScript was.
+
+The decorative spans no longer use `translateZ(0)`: any transform ancestor
+(including identity transforms and `will-change: transform`) makes a fixed
+background scroll with that ancestor in Chromium. Masks, paint containment,
+isolation and the navigation's SVG filter preserve fixed background alignment.
+The brief wrong-answer shake now uses equivalent relative `left` offsets, so
+the whole card still shakes without re-anchoring the wallpaper.
+
+Visible decorative spans use `will-change: opacity` to retain compositor
+caching without changing coordinates or opacity. An IntersectionObserver
+releases this hint for offscreen cards. Masks and rounded rims are unchanged.
+
+The surface controller manages registration, cache lifetime, viewport resize
+and visibility. It has no scroll/mouse/animation listener or per-card geometry
+queries. Navigation retains its content-filter geometry updates;
+they do not position the cached wallpaper. This is a wallpaper renderer: a
+future glass component overlapping arbitrary foreground content needs an
+explicit source arrangement, like the navigation implementation below.
 
 ## Sticky navigation
 
