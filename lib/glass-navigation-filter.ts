@@ -79,19 +79,40 @@ export function createGlassNavigationFilter(host: HTMLElement) {
     width: number,
     height: number,
   ) {
-    for (const [key, value] of Object.entries({ x, y, width, height }))
-      if (element.getAttribute(key) !== String(value))
-        element.setAttribute(key, String(value));
+    element.setAttribute("x", String(x));
+    element.setAttribute("y", String(y));
+    element.setAttribute("width", String(width));
+    element.setAttribute("height", String(height));
   }
+  let previousWidth = NaN;
+  let previousHeight = NaN;
+  let previousHeaderHeight = NaN;
+  let previousY = NaN;
 
   return {
     update(bounds: DOMRect, header: DOMRect) {
       const y = header.top - bounds.top;
 
-      rect(filter, -32, -32, bounds.width + 64, bounds.height + 64);
-      rect(input, -32, y - 32, bounds.width + 64, header.height + 64);
-      rect(output, -32, y, bounds.width + 64, header.height);
-      rect(mask, -32, y, bounds.width + 64, header.height);
+      if (
+        bounds.width !== previousWidth ||
+        bounds.height !== previousHeight ||
+        header.height !== previousHeaderHeight
+      ) {
+        rect(filter, -32, -32, bounds.width + 64, bounds.height + 64);
+        rect(input, -32, y - 32, bounds.width + 64, header.height + 64);
+        rect(output, -32, y, bounds.width + 64, header.height);
+        rect(mask, -32, y, bounds.width + 64, header.height);
+        previousWidth = bounds.width;
+        previousHeight = bounds.height;
+        previousHeaderHeight = header.height;
+      } else if (y !== previousY) {
+        // Ordinary scrolling changes only the strip's vertical coordinate.
+        // Keep invariant dimensions in JS instead of reading SVG attributes.
+        input.setAttribute("y", String(y - 32));
+        output.setAttribute("y", String(y));
+        mask.setAttribute("y", String(y));
+      }
+      previousY = y;
     },
     dispose() {
       host.removeAttribute("data-glass-navigation-card");

@@ -3,6 +3,8 @@
 import * as React from "react";
 import { Toast } from "@heroui/react";
 
+import { setGlassTheme } from "@/lib/glass-wallpaper-cache";
+
 export interface ProvidersProps {
   children: React.ReactNode;
   themeProps?: {
@@ -42,12 +44,11 @@ function getStoredTheme(defaultTheme: Theme): Theme {
     : defaultTheme;
 }
 
-function applyTheme(theme: Theme, enableSystem: boolean) {
-  const resolved =
-    theme === "system" && enableSystem ? getSystemTheme() : theme;
-
-  document.documentElement.classList.toggle("dark", resolved === "dark");
-  document.documentElement.style.colorScheme = resolved;
+function applyTheme(resolved: ResolvedTheme) {
+  return setGlassTheme(document, { dark: resolved === "dark" }, () => {
+    document.documentElement.classList.toggle("dark", resolved === "dark");
+    document.documentElement.style.colorScheme = resolved;
+  });
 }
 
 export function Providers({ children, themeProps }: ProvidersProps) {
@@ -58,6 +59,8 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   );
   const [systemTheme, setSystemTheme] =
     React.useState<ResolvedTheme>(getSystemTheme);
+  const resolvedTheme =
+    theme === "system" ? (enableSystem ? systemTheme : "light") : theme;
 
   React.useEffect(() => {
     const media = window.matchMedia("(prefers-color-scheme: dark)");
@@ -71,8 +74,9 @@ export function Providers({ children, themeProps }: ProvidersProps) {
 
   React.useEffect(() => {
     localStorage.setItem(STORAGE_KEY, theme);
-    applyTheme(theme, enableSystem);
-  }, [enableSystem, theme]);
+
+    return applyTheme(resolvedTheme);
+  }, [resolvedTheme, theme]);
 
   const setTheme = React.useCallback<
     React.Dispatch<React.SetStateAction<Theme>>
@@ -82,8 +86,6 @@ export function Providers({ children, themeProps }: ProvidersProps) {
     );
   }, []);
 
-  const resolvedTheme =
-    theme === "system" && enableSystem ? systemTheme : (theme as ResolvedTheme);
   const value = React.useMemo(
     () => ({ theme, resolvedTheme, setTheme }),
     [resolvedTheme, setTheme, theme],

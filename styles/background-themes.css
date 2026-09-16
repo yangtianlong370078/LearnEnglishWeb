@@ -2,11 +2,23 @@
 
 html,
 html[data-bg-theme="defalut"] {
-  --glass-ambient-base: oklch(0.95 0.006 240);
-  --glass-ambient-1: oklch(0.80 0.13 280 / 0.4);
-  --glass-ambient-2: oklch(0.83 0.12 190 / 0.35);
-  --glass-ambient-3: oklch(0.80 0.13 320 / 0.3);
-  --glass-ambient-4: oklch(0.86 0.11 55 / 0.3);
+  /* Both palettes remain readable while preparing a theme without changing
+     the live page. The selected aliases continue to drive normal surfaces. */
+  --glass-light-ambient-base: oklch(0.95 0.006 240);
+  --glass-light-ambient-1: oklch(0.80 0.13 280 / 0.4);
+  --glass-light-ambient-2: oklch(0.83 0.12 190 / 0.35);
+  --glass-light-ambient-3: oklch(0.80 0.13 320 / 0.3);
+  --glass-light-ambient-4: oklch(0.86 0.11 55 / 0.3);
+  --glass-dark-ambient-base: oklch(0.12 0.008 240);
+  --glass-dark-ambient-1: oklch(0.43 0.07 280 / 0.6);
+  --glass-dark-ambient-2: oklch(0.40 0.07 190 / 0.52);
+  --glass-dark-ambient-3: oklch(0.45 0.07 320 / 0.5);
+  --glass-dark-ambient-4: oklch(0.42 0.06 55 / 0.42);
+  --glass-ambient-base: var(--glass-light-ambient-base);
+  --glass-ambient-1: var(--glass-light-ambient-1);
+  --glass-ambient-2: var(--glass-light-ambient-2);
+  --glass-ambient-3: var(--glass-light-ambient-3);
+  --glass-ambient-4: var(--glass-light-ambient-4);
   --glass-viewport-width: 100vw;
   --glass-viewport-height: 100dvh;
   --glass-background-size: var(--glass-viewport-width) var(--glass-viewport-height);
@@ -22,11 +34,11 @@ html[data-bg-theme="defalut"] {
 
 html.dark,
 html.dark[data-bg-theme="defalut"] {
-  --glass-ambient-base: oklch(0.12 0.008 240);
-  --glass-ambient-1: oklch(0.43 0.07 280 / 0.6);
-  --glass-ambient-2: oklch(0.40 0.07 190 / 0.52);
-  --glass-ambient-3: oklch(0.45 0.07 320 / 0.5);
-  --glass-ambient-4: oklch(0.42 0.06 55 / 0.42);
+  --glass-ambient-base: var(--glass-dark-ambient-base);
+  --glass-ambient-1: var(--glass-dark-ambient-1);
+  --glass-ambient-2: var(--glass-dark-ambient-2);
+  --glass-ambient-3: var(--glass-dark-ambient-3);
+  --glass-ambient-4: var(--glass-dark-ambient-4);
   --app-background:
     radial-gradient(ellipse 90% 85% at 12% 18%, oklch(0.43 0.07 280 / 0.6) 0%, transparent 62%),
     radial-gradient(ellipse 80% 68% at 78% 14%, oklch(0.40 0.07 190 / 0.52) 0%, transparent 58%),

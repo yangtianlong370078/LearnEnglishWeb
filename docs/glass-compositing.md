@@ -31,11 +31,26 @@ Rendering uses the current device pixel ratio, theme colours and image cover
 geometry. The second texture includes the bright rim's saturation/brightness.
 
 The cache regenerates on theme/background or viewport changes, with a 100ms
-resize debounce and stale-generation guards. At most two theme/size entries
-are retained. Evicted object URLs are revoked; drawing buffers and the final
-controller's resources are released. While a texture is unavailable, the same
-wallpaper is painted with a normal CSS source filter. Login uses its own existing
-gradient source and tint.
+debounce for resize only. Theme controls prepare and decode both target textures
+before committing the root theme and texture URLs in the same task. The current
+decoded textures remain displayed during preparation; a normal refresh never
+removes the ready marker or temporarily enables per-card CSS blur. Concurrent
+requests for the same texture share one render, and superseded theme requests
+cannot commit. System-mode changes use the same path.
+
+At most two theme/size entries are retained, with the displayed entry protected
+from eviction. Evicted object URLs are revoked; drawing buffers and the final
+controller's resources are released. Initial use or a failed theme render can
+use the existing CSS source-filter fallback. A cached theme switch is immediate;
+an uncached switch retains the complete previous theme until preparation finishes.
+There is no background prewarming. Login uses its own existing gradient source
+and tint.
+
+The opaque textures use JPEG quality 0.98 to reduce encoding time and blob size.
+This changes encoding, not the filter strength or rendering resolution. The dark
+wallpaper was a 13,377,204-byte PNG with a `.jpeg` extension; it is now a real
+JPEG at quality 98 and 4:4:4 chroma, retaining its 4368 x 2448 dimensions, at
+5,168,984 bytes. These encodings are visually close rather than pixel-lossless.
 
 The cached textures and the uncached CSS fallback use native
 `background-attachment: fixed`. Their viewport alignment no longer depends on
@@ -77,6 +92,13 @@ The controller releases filters after cards leave the header or the route
 changes, and suspends them while the fullscreen modal source filter is active.
 Surface registration notifies navigation when React replaces equal-sized cards,
 so the old SVG is released even when no scroll or resize occurs.
+The controller caches its top-level candidate list until content changes instead
+of querying and comparing every pair of cards on each scroll frame. Live bounds
+are still read to handle layout shifts and fast jumps. Unchanged header styles
+are not rewritten; ordinary scrolling updates only three SVG `y` attributes.
+The filter's custom property is registered as non-inheriting, avoiding style
+invalidation throughout each card's descendants when the filter is attached.
+Older browsers without property registration retain the existing behavior.
 
 ## Fullscreen and nested modals
 
@@ -191,3 +213,60 @@ improvement or a guarantee of zero frame-time regression.
 The final build also passes the 212-assertion desktop modal/navigation suite,
 21 mobile/answer-feedback checks, TypeScript, focused ESLint and diff whitespace
 checks. React Doctor remains 52/100 with the same 7 errors and 46 warnings.
+
+## Theme-switch and scroll-work follow-up
+
+Frame sampling reproduced the old theme-switch flash: changing theme removed
+`data-glass-wallpaper-ready`, enabled `blur(8px) saturate(1.5)` on every card,
+and later restored a newly encoded cache image. Publishing before image decode
+also allowed an empty image frame. The new coordinated commit eliminates these
+intermediate states. Chrome 152 and 360/Chromium 132 checks cover first and
+cached theme changes, both wallpapers, rapid combined requests and OS theme
+changes in system mode. Every sampled transition retained ready, decoded
+textures and `filter: none` on the cached wallpaper pseudo-element. The 360
+profile still reports its unrelated injected-script `Identifier 'N'` error.
+
+Two focused lifecycle suites pass 20 scenarios, including cancellation, combined
+theme requests, viewport changes during preparation and disposal during encoding;
+all 26 created URLs are released. A 158-frame, 30-card navigation check covers
+same-height replacement, nested hosts, fast jumps, modal suspension and cleanup.
+The final production build again passes 212 desktop assertions, 21 mobile/answer
+assertions and 48 Chrome/360 fixed-background assertions. Wheel alignment remains
+pixel-identical even with scroll callbacks blocked; displaced shake crops differ
+by at most one channel level. TypeScript and focused ESLint pass.
+
+Four 1440 x 1000 screenshots compare the final encoding with the previous PNG
+cache and original wallpaper across light/dark and photo/gradient themes. Mean
+channel differences are 0.19-0.40/255; no more than 0.008% of channels differ by
+over 3/255. Blur, rim saturation/brightness, resolution and fixed positioning
+are unchanged. JPEG is a small lossy encoding change, not pixel-identical output.
+In one instrumented dark-photo sample using the same optimized source image,
+the two PNG encodes took 1045/1079ms versus 89/69ms for JPEG, and their combined
+blob size fell from 3.06MB to 0.50MB. These times include browser scheduling;
+they are not isolated encoder-throughput measurements. Decoded texture memory
+is still determined by viewport size and DPR rather than compressed blob size.
+
+First uncached photo changes still require image loading, decoding and filter
+preparation (about 1.5-1.7s in the final cold-browser samples). The old whole
+theme remains visible during that interval. Cached toggles commit without
+re-encoding. This is a deliberate preparation boundary to prevent mixed-theme
+frames, not a claim of instantaneous cold switches.
+
+Real mouse-wheel comparisons use 30 cards, a 1440 x 1000 viewport and three
+down/up sweeps per mode on isolated production servers. A repeat batch ran the
+previous and final versions consecutively after functional tests completed:
+
+| Chrome mode | Previous mean style work / sweep | Final | Median frame interval |
+| --- | --- | --- | --- |
+| Default | 60.4ms | 19.7ms | Both 16.7ms |
+| GPU disabled | 83.2ms | 19.4ms | Both 16.7ms |
+
+Main-content queries fell from 56-73 per sweep to one initial collection and
+zero thereafter. The repeat batch's mean total task time fell from 410 to 362ms
+(default) and 684 to 593ms (GPU disabled). Earlier batches had the reverse task
+time ordering despite the same reduction in style work, so the stable finding
+is less DOM/style work, not a universal CPU or frame-rate improvement. Default
+p95 was 16.8ms except for one final 33.3ms sample; software-mode p95 ranged from
+16.8 to 33.4ms in both versions. Final 360 samples also retain software-rendering
+tail latency (p95 50-66.6ms). These measurements do not establish that every
+browser's perceived wheel latency is eliminated.

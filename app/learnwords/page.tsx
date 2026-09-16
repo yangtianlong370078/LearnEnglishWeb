@@ -494,7 +494,7 @@ export default function LearnWordsPage() {
             <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
               <GlassWarp />
               <div
-                className="rounded-3xl relative overflow-hidden "
+                className="rounded-3xl relative z-[1]  overflow-hidden "
                 style={
                   {
                     "--summary-accent": "0.63 0.16 215",
@@ -526,10 +526,10 @@ export default function LearnWordsPage() {
 
             </div>
 
-            <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
+            <div className="  relative yinyinkuan  rounded-3xl cl-glass-idle">
               <GlassWarp />
               <div
-                className="rounded-3xl relative overflow-hidden "
+                className="rounded-3xl relative  z-[1] overflow-hidden "
                 style={
                   {
                     "--summary-accent": "0.65 0.19 32",
@@ -558,12 +558,12 @@ export default function LearnWordsPage() {
               </div>
                </div>
               <GlassBorder />
-
+ 
             </div>
-            <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
+            <div className="  relative yinyinkuan  rounded-3xl cl-glass-idle">
               <GlassWarp />
               <div
-                className="rounded-3xl  relative overflow-hidden "
+                className="rounded-3xl z-[1]  relative overflow-hidden "
                 style={
                   {
                     "--summary-accent": "0.58 0.2 285",

@@ -228,6 +228,12 @@ body[data-glass-modal-open] :is(.glass-warp, .glass-border)::before {
   isolation: isolate;
 }
 
+@property --glass-navigation-filter {
+  syntax: "*";
+  inherits: false;
+  initial-value: none;
+}
+
 [data-glass-navigation-card] {
   filter: var(--glass-navigation-filter);
 }
