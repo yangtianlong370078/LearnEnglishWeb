@@ -60,19 +60,57 @@ function loadImage(url: string) {
   return pending;
 }
 
-function canvasBlob(canvas: HTMLCanvasElement) {
+/**
+ * Cached wallpaper encoding mode.
+ * - true (lossless): every texture encodes as PNG. JPEG blockiness would be
+ *   baked into the cached wallpaper and tiled across every glass surface.
+ *   The blob size is negligible next to the decoded bitmaps kept alive
+ *   anyway, and the async encode runs once per cache miss off the main
+ *   thread.
+ * - false (lossy): photo wallpapers encode as high-quality JPEG to skip the
+ *   slower lossless encode; its artifacts hide in the photographic detail.
+ *   Gradient wallpapers still encode as PNG: smooth gradients expose JPEG's
+ *   8x8 chroma-subsampled blocks as ripples, and they deflate well.
+ */
+const LOSSLESS_WALLPAPER = true;
+
+function canvasBlob(canvas: HTMLCanvasElement, lossy: boolean) {
   return new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
       (blob) => {
         if (blob) resolve(blob);
         else reject(new Error("Cannot render glass wallpaper"));
       },
-      // Both cached textures are fully opaque. A high-quality JPEG avoids the
-      // expensive lossless encode that previously ran twice per cache miss.
-      "image/jpeg",
+      lossy ? "image/jpeg" : "image/png",
       0.98,
     ),
   );
+}
+
+/** Neutral-gray noise tile used to dither smooth gradients. */
+function ditherTile(document: Document) {
+  const tile = document.createElement("canvas");
+  const size = 128;
+
+  tile.width = size;
+  tile.height = size;
+  const context = tile.getContext("2d")!;
+  const pixels = context.createImageData(size, size);
+
+  for (let i = 0; i < pixels.data.length; i += 4) {
+    // ±3 levels around the overlay-neutral midpoint: invisible grain, yet
+    // enough to decorrelate 8-bit gradient steps the saturate filters would
+    // otherwise stretch into visible bands.
+    const value = 128 + Math.round((Math.random() * 2 - 1) * 3);
+
+    pixels.data[i] = value;
+    pixels.data[i + 1] = value;
+    pixels.data[i + 2] = value;
+    pixels.data[i + 3] = 255;
+  }
+  context.putImageData(pixels, 0, 0);
+
+  return tile;
 }
 
 /** One shared, viewport-sized wallpaper blur; never captures page content. */
@@ -207,6 +245,13 @@ export function createGlassWallpaperCache(document: Document) {
 
     paint.filter = `blur(${8 * scale}px) saturate(150%)`;
     paint.drawImage(expanded, -pad, -pad);
+    // Dither after the blur so its grain survives: 8-bit radial gradients
+    // band, and the saturate filters widen those steps into visible bands.
+    // Mid-gray noise under the overlay blend is neutral but breaks the steps.
+    paint.globalCompositeOperation = "overlay";
+    paint.fillStyle = paint.createPattern(ditherTile(document), "repeat")!;
+    paint.fillRect(0, 0, w, h);
+    paint.globalCompositeOperation = "source-over";
     const border = document.createElement("canvas");
 
     border.width = w;
@@ -219,9 +264,10 @@ export function createGlassWallpaperCache(document: Document) {
     // survive between updates. Do not create URLs until both encodes succeed.
     source.width = 0;
     expanded.width = 0;
+    const lossy = !LOSSLESS_WALLPAPER && photo;
     const [baseBlob, borderBlob] = await Promise.all([
-      canvasBlob(base),
-      canvasBlob(border),
+      canvasBlob(base, lossy),
+      canvasBlob(border, lossy),
     ]).finally(() => {
       base.width = 0;
       border.width = 0;

@@ -23,8 +23,8 @@ export default function GlassBorder() {
       className="glass-border"
       style={
         {
-          "--glass-border-saturation": "180%",
-          "--glass-border-brightness": "1.5",
+          // "--glass-border-saturation": "180%",
+          // "--glass-border-brightness": "1.3",
         } as CSSProperties
       }
     />
