@@ -5,11 +5,15 @@ export const glassConfig = {
   /** 模糊半径，单位 px，取非负数。卡片、导航栏和弹窗共用。 */
   blurPx: 8,
   /** 基础饱和度，单位 %，100 表示不增强。 */
-  saturation: 160,
+  saturation: 140,
   /** 边框额外饱和度，单位 %，叠加在基础饱和度上。 */
   borderSaturation: 180,
   /** 边框亮度倍数，1 表示原亮度，1.3 表示 130%。 */
-  borderBrightness: 1.3,
+  borderBrightness: 1.4,
+  /** 边框内发光强度，0–1 的透明度；发光颜色与边框色相同，圆角与四边一致。 */
+  borderGlow: 0.25,
+  /** 内发光从四条边各自向内扩散的距离，单位 px，可逐边调整；圆角取相邻两边的较大值。 */
+  borderGlowSizePx: { top: 6, right: 6, bottom: 6, left: 6 },
   /**
    * 缓存纹理是否使用无损压缩：
    * true：全部使用 PNG，避免 JPEG 压缩失真。
@@ -30,5 +34,10 @@ export const glassCssVariables: CSSProperties & Record<`--${string}`, string> =
     "--app-glass-saturation": `${glassConfig.saturation}%`,
     "--glass-border-saturation": `${glassConfig.borderSaturation}%`,
     "--glass-border-brightness": String(glassConfig.borderBrightness),
+    "--glass-border-glow": String(glassConfig.borderGlow),
+    "--glass-border-glow-size-top": `${glassConfig.borderGlowSizePx.top}px`,
+    "--glass-border-glow-size-right": `${glassConfig.borderGlowSizePx.right}px`,
+    "--glass-border-glow-size-bottom": `${glassConfig.borderGlowSizePx.bottom}px`,
+    "--glass-border-glow-size-left": `${glassConfig.borderGlowSizePx.left}px`,
     "--glass-blur-padding": `${glassBlurPadding}px`,
   };
