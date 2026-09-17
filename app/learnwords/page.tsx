@@ -494,7 +494,7 @@ export default function LearnWordsPage() {
             <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
               <GlassWarp />
               <div
-                className="rounded-3xl relative z-[1]  overflow-hidden "
+                className="rounded-3xl relative z-[1] overflow-hidden "
                 style={
                   {
                     "--summary-accent": "0.63 0.16 215",
@@ -508,7 +508,7 @@ export default function LearnWordsPage() {
                   } as React.CSSProperties
                 }
               >
-                 <div className="dark:bg-black/15   p-4 flex flex-col h-full  gap-4 ">
+                 <div className="dark:bg-black/15 m-[1px] rounded-3xl  p-4 flex flex-col h-full  gap-4 ">
                 <PieChartWithBreakdownDemo
                   courseId={data?.newWord.courseId}
                   courseName={data?.newWord.courseName ?? "生词本"}
@@ -543,7 +543,7 @@ export default function LearnWordsPage() {
                   } as React.CSSProperties
                 }
               >
-                 <div className="dark:bg-black/15  p-4 flex flex-col h-full  gap-4 ">
+                 <div className="dark:bg-black/15 m-[1px] rounded-3xl  p-4 flex flex-col h-full  gap-4 ">
                 <PieChartWithBreakdownDemo
                   courseId={data?.strengthenWord.courseId}
                   courseName={data?.strengthenWord.courseName ?? "强化区"}
@@ -563,7 +563,7 @@ export default function LearnWordsPage() {
             <div className="  relative yinyinkuan  rounded-3xl cl-glass-idle">
               <GlassWarp />
               <div
-                className="rounded-3xl z-[1]  relative overflow-hidden "
+                className="rounded-3xl z-[1] relative overflow-hidden "
                 style={
                   {
                     "--summary-accent": "0.58 0.2 285",
@@ -577,7 +577,7 @@ export default function LearnWordsPage() {
                   } as React.CSSProperties
                 }
               >
-                <div className="dark:bg-black/15 p-4 flex flex-col h-full  gap-4 ">
+                <div className="dark:bg-black/15 m-[1px] p-4 rounded-3xl  flex flex-col h-full  gap-4 ">
                 <PieChartWithBreakdownDemo
                   courseId={data?.lastCourse.courseId}
                   courseName={

@@ -5,7 +5,7 @@ export const glassConfig = {
   /** 模糊半径，单位 px，取非负数。卡片、导航栏和弹窗共用。 */
   blurPx: 8,
   /** 基础饱和度，单位 %，100 表示不增强。 */
-  saturation: 150,
+  saturation: 160,
   /** 边框额外饱和度，单位 %，叠加在基础饱和度上。 */
   borderSaturation: 180,
   /** 边框亮度倍数，1 表示原亮度，1.3 表示 130%。 */
