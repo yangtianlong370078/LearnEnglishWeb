@@ -9,6 +9,9 @@ additional **saturate(180%) brightness(1.3)**, specular gradient and inset shado
 Edit `config/glass.ts` to change the defaults: `blurPx` is in CSS pixels,
 `saturation` and `borderSaturation` are percentages, and `borderBrightness` is
 a multiplier. Border saturation is additional to the base saturation.
+`losslessWallpaper` controls cached texture encoding: `true` uses PNG for all
+backgrounds; `false` (default) uses JPEG quality 0.98 for photo backgrounds.
+Gradient backgrounds always use PNG to avoid visible JPEG blocks.
 `app/layout.tsx` emits the derived CSS variables on `<html>` during server
 rendering, so the CSS fallback has the correct settings before hydration.
 The wallpaper cache and both navigation/modal SVG filters import the same
@@ -62,7 +65,9 @@ an uncached switch retains the complete previous theme until preparation finishe
 There is no background prewarming. Login uses its own existing gradient source
 and tint.
 
-The opaque textures use JPEG quality 0.98 to reduce encoding time and blob size.
+By default, opaque photo textures use JPEG quality 0.98 to reduce encoding time
+and blob size; gradients use PNG. `glassConfig.losslessWallpaper` can select PNG
+for all cached textures.
 This changes encoding, not the filter strength or rendering resolution. The dark
 wallpaper was a 13,377,204-byte PNG with a `.jpeg` extension; it is now a real
 JPEG at quality 98 and 4:4:4 chroma, retaining its 4368 x 2448 dimensions, at

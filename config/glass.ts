@@ -10,6 +10,13 @@ export const glassConfig = {
   borderSaturation: 180,
   /** 边框亮度倍数，1 表示原亮度，1.3 表示 130%。 */
   borderBrightness: 1.3,
+  /**
+   * 缓存纹理是否使用无损压缩：
+   * true：全部使用 PNG，避免 JPEG 压缩失真。
+   * false：图片背景使用质量 0.98 的 JPEG，减少编码开销；
+   * 渐变背景仍使用 PNG，避免平滑渐变出现色块。
+   */
+  losslessWallpaper: false,
 } as const;
 
 // 为模糊核留出四倍半径，防止调整模糊值后产生透明边缘。

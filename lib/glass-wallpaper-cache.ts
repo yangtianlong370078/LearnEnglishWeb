@@ -62,20 +62,6 @@ function loadImage(url: string) {
   return pending;
 }
 
-/**
- * Cached wallpaper encoding mode.
- * - true (lossless): every texture encodes as PNG. JPEG blockiness would be
- *   baked into the cached wallpaper and tiled across every glass surface.
- *   The blob size is negligible next to the decoded bitmaps kept alive
- *   anyway, and the async encode runs once per cache miss off the main
- *   thread.
- * - false (lossy): photo wallpapers encode as high-quality JPEG to skip the
- *   slower lossless encode; its artifacts hide in the photographic detail.
- *   Gradient wallpapers still encode as PNG: smooth gradients expose JPEG's
- *   8x8 chroma-subsampled blocks as ripples, and they deflate well.
- */
-const LOSSLESS_WALLPAPER = false;
-
 function canvasBlob(canvas: HTMLCanvasElement, lossy: boolean) {
   return new Promise<Blob>((resolve, reject) =>
     canvas.toBlob(
@@ -266,7 +252,7 @@ export function createGlassWallpaperCache(document: Document) {
     // survive between updates. Do not create URLs until both encodes succeed.
     source.width = 0;
     expanded.width = 0;
-    const lossy = !LOSSLESS_WALLPAPER && photo;
+    const lossy = !glassConfig.losslessWallpaper && photo;
     const [baseBlob, borderBlob] = await Promise.all([
       canvasBlob(base, lossy),
       canvasBlob(border, lossy),
