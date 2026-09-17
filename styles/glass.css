@@ -1,8 +1,6 @@
 /* Glass paints its own background source. No component reads back lower
    compositor surfaces through backdrop-filter. Content stays unfiltered. */
-:root {
-  --app-glass-blur: 8px;
-}
+/* Glass defaults come from config/glass.ts via the root layout's CSS variables. */
 
 .login-scene {
   --app-background: linear-gradient(to bottom right, var(--color-blue-50), var(--color-indigo-50), var(--color-purple-50));
@@ -61,13 +59,13 @@
 .glass-border::before {
   content: "";
   position: absolute;
-  inset: -32px;
+  inset: calc(-1 * var(--glass-blur-padding));
   background: var(--app-background);
   background-size: var(--glass-background-size);
   background-position: top left;
   background-attachment: fixed;
   background-repeat: no-repeat;
-  filter: blur(var(--app-glass-blur)) saturate(150%);
+  filter: blur(var(--app-glass-blur)) saturate(var(--app-glass-saturation));
   pointer-events: none;
 }
 
@@ -103,7 +101,7 @@ html .login-scene .glass-warp::before {
 }
 
 .glass-border::before {
-  filter: blur(var(--app-glass-blur)) saturate(150%) saturate(var(--glass-border-saturation)) brightness(var(--glass-border-brightness));
+  filter: blur(var(--app-glass-blur)) saturate(var(--app-glass-saturation)) saturate(var(--glass-border-saturation)) brightness(var(--glass-border-brightness));
 }
 
 .glass-border::after {
@@ -143,7 +141,7 @@ html[data-glass-wallpaper-ready] .glass-border::before {
 
 
 html[data-glass-wallpaper-ready] .login-scene .glass-warp::before {
-  inset: -32px;
+  inset: calc(-1 * var(--glass-blur-padding));
   width: auto;
   height: auto;
   transform: none;
@@ -151,7 +149,7 @@ html[data-glass-wallpaper-ready] .login-scene .glass-warp::before {
   background-size: var(--glass-viewport-width) var(--glass-viewport-height);
   background-position: top left;
   background-attachment: fixed;
-  filter: blur(var(--app-glass-blur)) saturate(150%);
+  filter: blur(var(--app-glass-blur)) saturate(var(--app-glass-saturation));
 }
 
 .app-glass-dialog {
@@ -214,7 +212,7 @@ body[data-glass-source-blur] .app-shell::before {
 /* Each covered dialog is blurred once. Its constant scrim remains separate,
    so filtering a transparent fullscreen box cannot introduce pale edges. */
 body[data-glass-source-blur] .app-modal-backdrop:not([data-glass-backdrop-top]) > .modal__container {
-  filter: blur(var(--app-glass-blur)) saturate(150%);
+  filter: blur(var(--app-glass-blur)) saturate(var(--app-glass-saturation));
 }
 
 /* Do not blur the already blurred page a second time inside a dialog, or

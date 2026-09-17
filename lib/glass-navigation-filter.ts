@@ -1,3 +1,5 @@
+import { glassBlurPadding, glassConfig } from "@/config/glass";
+
 let sequence = 0;
 
 export function createGlassNavigationFilter(host: HTMLElement) {
@@ -49,13 +51,13 @@ export function createGlassNavigationFilter(host: HTMLElement) {
     input,
     node("feGaussianBlur", {
       in: "strip-input",
-      stdDeviation: "8",
+      stdDeviation: String(glassConfig.blurPx),
       result: "blur",
     }),
     node("feColorMatrix", {
       in: "blur",
       type: "saturate",
-      values: "1.5",
+      values: String(glassConfig.saturation / 100),
       result: "glass",
     }),
     output,
@@ -92,23 +94,36 @@ export function createGlassNavigationFilter(host: HTMLElement) {
   return {
     update(bounds: DOMRect, header: DOMRect) {
       const y = header.top - bounds.top;
+      const pad = glassBlurPadding;
 
       if (
         bounds.width !== previousWidth ||
         bounds.height !== previousHeight ||
         header.height !== previousHeaderHeight
       ) {
-        rect(filter, -32, -32, bounds.width + 64, bounds.height + 64);
-        rect(input, -32, y - 32, bounds.width + 64, header.height + 64);
-        rect(output, -32, y, bounds.width + 64, header.height);
-        rect(mask, -32, y, bounds.width + 64, header.height);
+        rect(
+          filter,
+          -pad,
+          -pad,
+          bounds.width + pad * 2,
+          bounds.height + pad * 2,
+        );
+        rect(
+          input,
+          -pad,
+          y - pad,
+          bounds.width + pad * 2,
+          header.height + pad * 2,
+        );
+        rect(output, -pad, y, bounds.width + pad * 2, header.height);
+        rect(mask, -pad, y, bounds.width + pad * 2, header.height);
         previousWidth = bounds.width;
         previousHeight = bounds.height;
         previousHeaderHeight = header.height;
       } else if (y !== previousY) {
         // Ordinary scrolling changes only the strip's vertical coordinate.
         // Keep invariant dimensions in JS instead of reading SVG attributes.
-        input.setAttribute("y", String(y - 32));
+        input.setAttribute("y", String(y - pad));
         output.setAttribute("y", String(y));
         mask.setAttribute("y", String(y));
       }

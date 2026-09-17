@@ -2,6 +2,8 @@
 import { subscribeGlassSurfaceChanges } from "./glass-surface-source";
 import { cancelGlassFrame, scheduleGlassFrame } from "./glass-frame";
 
+import { glassBlurPadding } from "@/config/glass";
+
 /** Filter only content currently crossing the sticky header. */
 export function registerGlassNavigation(nav: HTMLElement) {
   const document = nav.ownerDocument;
@@ -68,7 +70,10 @@ export function registerGlassNavigation(nav: HTMLElement) {
       for (const host of hosts) {
         const bounds = host.getBoundingClientRect();
 
-        if (bounds.top < header.bottom + 32 && bounds.bottom > header.top - 32)
+        if (
+          bounds.top < header.bottom + glassBlurPadding &&
+          bounds.bottom > header.top - glassBlurPadding
+        )
           candidates.push({ host, bounds });
       }
     }

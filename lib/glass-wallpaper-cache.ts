@@ -1,3 +1,5 @@
+import { glassBlurPadding, glassConfig } from "@/config/glass";
+
 type Wallpaper = {
   base: string;
   border: string;
@@ -72,7 +74,7 @@ function loadImage(url: string) {
  *   Gradient wallpapers still encode as PNG: smooth gradients expose JPEG's
  *   8x8 chroma-subsampled blocks as ripples, and they deflate well.
  */
-const LOSSLESS_WALLPAPER = true;
+const LOSSLESS_WALLPAPER = false;
 
 function canvasBlob(canvas: HTMLCanvasElement, lossy: boolean) {
   return new Promise<Blob>((resolve, reject) =>
@@ -215,7 +217,7 @@ export function createGlassWallpaperCache(document: Document) {
     }
 
     // Repeat edge pixels before convolution, as in the modal source filter.
-    const pad = Math.ceil(32 * scale);
+    const pad = Math.ceil(glassBlurPadding * scale);
     const expanded = document.createElement("canvas");
 
     expanded.width = source.width + 2 * pad;
@@ -243,7 +245,7 @@ export function createGlassWallpaperCache(document: Document) {
     base.height = h;
     const paint = base.getContext("2d")!;
 
-    paint.filter = `blur(${8 * scale}px) saturate(150%)`;
+    paint.filter = `blur(${glassConfig.blurPx * scale}px) saturate(${glassConfig.saturation}%)`;
     paint.drawImage(expanded, -pad, -pad);
     // Dither after the blur so its grain survives: 8-bit radial gradients
     // band, and the saturate filters widen those steps into visible bands.
@@ -258,7 +260,7 @@ export function createGlassWallpaperCache(document: Document) {
     border.height = h;
     const rim = border.getContext("2d")!;
 
-    rim.filter = "saturate(180%) brightness(1.5)";
+    rim.filter = `saturate(${glassConfig.borderSaturation}%) brightness(${glassConfig.borderBrightness})`;
     rim.drawImage(base, 0, 0);
     // Release drawing buffers promptly; only the completed image resources
     // survive between updates. Do not create URLs until both encodes succeed.

@@ -1,3 +1,5 @@
+import { glassBlurPadding, glassConfig } from "@/config/glass";
+
 const svgNamespace = "http://www.w3.org/2000/svg";
 let nextFilterId = 0;
 
@@ -53,8 +55,11 @@ export function createGlassSourceFilter(document: Document) {
   filter.prepend(source);
   filter.append(
     merge,
-    node("feGaussianBlur", { stdDeviation: "8" }),
-    node("feColorMatrix", { type: "saturate", values: "1.5" }),
+    node("feGaussianBlur", { stdDeviation: String(glassConfig.blurPx) }),
+    node("feColorMatrix", {
+      type: "saturate",
+      values: String(glassConfig.saturation / 100),
+    }),
   );
   svg.append(filter);
   // Keep SVG definitions outside the filtered source and the document flow.
@@ -108,8 +113,8 @@ export function createGlassSourceFilter(document: Document) {
 
     // CSS SVG filters do not reliably implement edgeMode="duplicate". Repeat
     // the outermost device pixel explicitly, so blur never samples transparent
-    // space outside the viewport. Only a 32px perimeter is added, not a clone.
-    const pad = 32;
+    // space outside the viewport. Padding follows the configured blur radius.
+    const pad = glassBlurPadding;
     const patches = [
       [x, y, width, pixel, x, y - pad, width, pad],
       [x, y + height - pixel, width, pixel, x, y + height, width, pad],

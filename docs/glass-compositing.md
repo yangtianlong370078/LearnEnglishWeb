@@ -2,7 +2,23 @@
 
 All application glass now uses source rendering instead of `backdrop-filter`.
 The base effect remains **blur(8px) saturate(150%)**. The rim retains its
-additional **saturate(180%) brightness(1.5)**, specular gradient and inset shadow.
+additional **saturate(180%) brightness(1.3)**, specular gradient and inset shadow.
+
+## Shared configuration
+
+Edit `config/glass.ts` to change the defaults: `blurPx` is in CSS pixels,
+`saturation` and `borderSaturation` are percentages, and `borderBrightness` is
+a multiplier. Border saturation is additional to the base saturation.
+`app/layout.tsx` emits the derived CSS variables on `<html>` during server
+rendering, so the CSS fallback has the correct settings before hydration.
+The wallpaper cache and both navigation/modal SVG filters import the same
+configuration directly. Blur padding follows four times the configured radius
+(minimum 1px), including the navigation's activation bounds.
+
+Refresh the page after editing the configuration to regenerate existing
+textures and filters; production deployments need a rebuild. There are no
+additional scroll-time style reads or configuration observers. Per-component
+CSS overrides do not reconfigure the shared cached textures.
 
 ## Why source rendering
 

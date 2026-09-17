@@ -6,6 +6,7 @@ import { Providers } from "./providers";
 
 import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
+import { glassCssVariables } from "@/config/glass";
 import ConditionalLayout from "@/components/conditional-layout";
 
 export const metadata: Metadata = {
@@ -32,7 +33,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html suppressHydrationWarning lang="zh-CN">
+    <html suppressHydrationWarning lang="zh-CN" style={glassCssVariables}>
       <head />
       <body
         suppressHydrationWarning
