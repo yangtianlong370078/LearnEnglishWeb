@@ -56,7 +56,7 @@
 }
 
 .glass-warp::before,
-.glass-border::before,
+.glass-border-glow::before,
 .glass-border::after {
   content: "";
   position: absolute;
@@ -70,7 +70,7 @@
   pointer-events: none;
 }
 
-html[data-bg-theme="magnificent"] :is(.glass-warp, .glass-border)::before,
+html[data-bg-theme="magnificent"] :is(.glass-warp, .glass-border-glow)::before,
 html[data-bg-theme="magnificent"] .glass-border::after {
   background-position:
     top left,
@@ -97,17 +97,38 @@ html .login-scene .glass-warp::before {
   contain: paint;
 }
 
-/* The glow reuses the border's own painted layer, so it always matches the
-   border colour (the saturated, brightened background). The mask unions
-   two shape families with the default add composite (no composite list):
-   - 4 side gradients fade the glow inward along each straight edge;
-   - 4 radial gradients bend the same falloff around the corner arcs. Each
-     is centred on the arc centre (--glass-border-radius is measured per
-     element) and lights the band between the arc and one side-width
-     inside it, so corners keep the same glow width as the sides.
-   The host's rounded paint containment clips the glow's outer edge. */
-.glass-border::before {
-  --glass-border-glow-color: rgb(0 0 0 / var(--glass-border-glow, 0.55));
+/* Separate angular intensity from inward falloff: multiplying these two
+   masks lets each edge flow through BOTH adjoining quarter-circle arcs.
+   Corner endpoints match their straight edges, including a fully dark edge.
+   Tiles meet without overlap at normal glow widths, avoiding bright seams. */
+.glass-border-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  --glass-glow-top: rgb(0 0 0 / var(--glass-border-glow-top, 0.42));
+  --glass-glow-right: rgb(0 0 0 / var(--glass-border-glow-right, 0.16));
+  --glass-glow-bottom: rgb(0 0 0 / var(--glass-border-glow-bottom, 0.22));
+  --glass-glow-left: rgb(0 0 0 / var(--glass-border-glow-left, 0.32));
+  --glass-glow-radius: var(--glass-border-radius, 24px);
+  --glass-glow-span: max(0px, calc(100% - var(--glass-glow-radius) * 2));
+  --glass-border-intensity-mask:
+    linear-gradient(var(--glass-glow-top) 0 0) 50% 0 / var(--glass-glow-span) max(var(--glass-glow-radius), var(--glass-border-glow-size-top, 3px)) no-repeat,
+    linear-gradient(var(--glass-glow-right) 0 0) 100% 50% / max(var(--glass-glow-radius), var(--glass-border-glow-size-right, 3px)) var(--glass-glow-span) no-repeat,
+    linear-gradient(var(--glass-glow-bottom) 0 0) 50% 100% / var(--glass-glow-span) max(var(--glass-glow-radius), var(--glass-border-glow-size-bottom, 3px)) no-repeat,
+    linear-gradient(var(--glass-glow-left) 0 0) 0 50% / max(var(--glass-glow-radius), var(--glass-border-glow-size-left, 3px)) var(--glass-glow-span) no-repeat,
+    conic-gradient(from 270deg at 100% 100%, var(--glass-glow-left) 0deg, var(--glass-glow-top) 90deg) 0 0 / var(--glass-glow-radius) var(--glass-glow-radius) no-repeat,
+    conic-gradient(at 0 100%, var(--glass-glow-top) 0deg, var(--glass-glow-right) 90deg) 100% 0 / var(--glass-glow-radius) var(--glass-glow-radius) no-repeat,
+    conic-gradient(from 90deg at 0 0, var(--glass-glow-right) 0deg, var(--glass-glow-bottom) 90deg) 100% 100% / var(--glass-glow-radius) var(--glass-glow-radius) no-repeat,
+    conic-gradient(from 180deg at 100% 0, var(--glass-glow-bottom) 0deg, var(--glass-glow-left) 90deg) 0 100% / var(--glass-glow-radius) var(--glass-glow-radius) no-repeat;
+  -webkit-mask: var(--glass-border-intensity-mask);
+  mask: var(--glass-border-intensity-mask);
+}
+
+/* Paint the same saturated wallpaper as the rim. The linear and radial
+   depth tiles fade inward; the parent mask supplies per-edge intensity.
+   Only the source extends by blur padding before the cache is ready. */
+.glass-border-glow::before {
   --glass-border-glow-start: var(--glass-blur-padding);
   /* Arc centres sit one blur padding inside the pseudo box; the cached
      state (inset: 0) overrides this to 0. */
@@ -120,30 +141,19 @@ html .login-scene .glass-warp::before {
   --glass-border-corner-size-tr: max(var(--glass-border-glow-size-top, 3px), var(--glass-border-glow-size-right, 3px));
   --glass-border-corner-size-br: max(var(--glass-border-glow-size-bottom, 3px), var(--glass-border-glow-size-right, 3px));
   --glass-border-corner-size-bl: max(var(--glass-border-glow-size-bottom, 3px), var(--glass-border-glow-size-left, 3px));
-  /* Each corner radial is clipped to the square between the pseudo corner
-     and the arc centre, and each side gradient is clipped to the segment
-     between the two corner squares, so the eight pieces tile the perimeter
-     without overlapping (no doubled brightness or seam lines). */
   --glass-border-arc-box: calc(var(--glass-border-arc-offset) + var(--glass-border-radius, 24px));
-  --glass-border-side-span: calc(100% - var(--glass-border-arc-box) * 2);
-  -webkit-mask:
-    linear-gradient(to right, var(--glass-border-glow-color) var(--glass-border-glow-start), transparent var(--glass-border-glow-end-left)) 0 50% / 100% var(--glass-border-side-span) no-repeat,
-    linear-gradient(to left, var(--glass-border-glow-color) var(--glass-border-glow-start), transparent var(--glass-border-glow-end-right)) 100% 50% / 100% var(--glass-border-side-span) no-repeat,
-    linear-gradient(to bottom, var(--glass-border-glow-color) var(--glass-border-glow-start), transparent var(--glass-border-glow-end-top)) 50% 0 / var(--glass-border-side-span) 100% no-repeat,
-    linear-gradient(to top, var(--glass-border-glow-color) var(--glass-border-glow-start), transparent var(--glass-border-glow-end-bottom)) 50% 100% / var(--glass-border-side-span) 100% no-repeat,
-    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at var(--glass-border-arc-box) var(--glass-border-arc-box), transparent calc(var(--glass-border-radius, 24px) - 1px - var(--glass-border-corner-size-tl)), var(--glass-border-glow-color) calc(var(--glass-border-radius, 24px) - 1px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 0 0 / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
-    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at 0px var(--glass-border-arc-box), transparent calc(var(--glass-border-radius, 24px) - 1px - var(--glass-border-corner-size-tr)), var(--glass-border-glow-color) calc(var(--glass-border-radius, 24px) - 1px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 100% 0 / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
-    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at 0px 0px, transparent calc(var(--glass-border-radius, 24px) - 1px - var(--glass-border-corner-size-br)), var(--glass-border-glow-color) calc(var(--glass-border-radius, 24px) - 1px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 100% 100% / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
-    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at var(--glass-border-arc-box) 0px, transparent calc(var(--glass-border-radius, 24px) - 1px - var(--glass-border-corner-size-bl)), var(--glass-border-glow-color) calc(var(--glass-border-radius, 24px) - 1px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 0 100% / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat;
-  mask:
-    linear-gradient(to right, var(--glass-border-glow-color) var(--glass-border-glow-start), transparent var(--glass-border-glow-end-left)) 0 50% / 100% var(--glass-border-side-span) no-repeat,
-    linear-gradient(to left, var(--glass-border-glow-color) var(--glass-border-glow-start), transparent var(--glass-border-glow-end-right)) 100% 50% / 100% var(--glass-border-side-span) no-repeat,
-    linear-gradient(to bottom, var(--glass-border-glow-color) var(--glass-border-glow-start), transparent var(--glass-border-glow-end-top)) 50% 0 / var(--glass-border-side-span) 100% no-repeat,
-    linear-gradient(to top, var(--glass-border-glow-color) var(--glass-border-glow-start), transparent var(--glass-border-glow-end-bottom)) 50% 100% / var(--glass-border-side-span) 100% no-repeat,
-    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at var(--glass-border-arc-box) var(--glass-border-arc-box), transparent calc(var(--glass-border-radius, 24px) - 1px - var(--glass-border-corner-size-tl)), var(--glass-border-glow-color) calc(var(--glass-border-radius, 24px) - 1px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 0 0 / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
-    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at 0px var(--glass-border-arc-box), transparent calc(var(--glass-border-radius, 24px) - 1px - var(--glass-border-corner-size-tr)), var(--glass-border-glow-color) calc(var(--glass-border-radius, 24px) - 1px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 100% 0 / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
-    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at 0px 0px, transparent calc(var(--glass-border-radius, 24px) - 1px - var(--glass-border-corner-size-br)), var(--glass-border-glow-color) calc(var(--glass-border-radius, 24px) - 1px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 100% 100% / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
-    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at var(--glass-border-arc-box) 0px, transparent calc(var(--glass-border-radius, 24px) - 1px - var(--glass-border-corner-size-bl)), var(--glass-border-glow-color) calc(var(--glass-border-radius, 24px) - 1px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 0 100% / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat;
+  --glass-border-side-span: max(0px, calc(100% - var(--glass-border-arc-box) * 2));
+  --glass-border-depth-mask:
+    linear-gradient(to right, #000 var(--glass-border-glow-start), transparent var(--glass-border-glow-end-left)) 0 50% / 100% var(--glass-border-side-span) no-repeat,
+    linear-gradient(to left, #000 var(--glass-border-glow-start), transparent var(--glass-border-glow-end-right)) 100% 50% / 100% var(--glass-border-side-span) no-repeat,
+    linear-gradient(to bottom, #000 var(--glass-border-glow-start), transparent var(--glass-border-glow-end-top)) 50% 0 / var(--glass-border-side-span) 100% no-repeat,
+    linear-gradient(to top, #000 var(--glass-border-glow-start), transparent var(--glass-border-glow-end-bottom)) 50% 100% / var(--glass-border-side-span) 100% no-repeat,
+    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at var(--glass-border-arc-box) var(--glass-border-arc-box), transparent calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-tl)), #000 var(--glass-border-radius, 24px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 0 0 / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
+    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at 0px var(--glass-border-arc-box), transparent calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-tr)), #000 var(--glass-border-radius, 24px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 100% 0 / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
+    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at 0px 0px, transparent calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-br)), #000 var(--glass-border-radius, 24px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 100% 100% / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
+    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at var(--glass-border-arc-box) 0px, transparent calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-bl)), #000 var(--glass-border-radius, 24px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 0 100% / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat;
+  -webkit-mask: var(--glass-border-depth-mask);
+  mask: var(--glass-border-depth-mask);
   filter: blur(var(--app-glass-blur)) saturate(var(--app-glass-saturation)) saturate(var(--glass-border-saturation)) brightness(var(--glass-border-brightness));
 }
 
@@ -153,19 +163,33 @@ html .login-scene .glass-warp::before {
    The ring skips blur; a 1px band cannot show it and an inset-0 blurred
    layer would starve its own edges. The cached border image has the blur
    baked in. */
+.glass-border::before,
 .glass-border::after {
+  content: "";
+  position: absolute;
   inset: 0;
+  pointer-events: none;
   border-radius: inherit;
   padding: 1px;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   mask-composite: exclude;
+}
+
+/* A narrow directional reflection gives the rim a polished glass edge. */
+.glass-border::before {
+  z-index: 1;
+  opacity: clamp(0, var(--glass-border-highlight-intensity, 1), 1);
+  background: linear-gradient(var(--glass-border-highlight-angle, 135deg), rgb(255 255 255 / 0.38), rgb(255 255 255 / 0.12) 28%, rgb(255 255 255 / 0.02) 52%, rgb(255 255 255 / 0.16) 78%, rgb(255 255 255 / 0.26));
+}
+
+.glass-border::after {
   filter: saturate(var(--app-glass-saturation)) saturate(var(--glass-border-saturation)) brightness(var(--glass-border-brightness));
   box-shadow: inset 0 0 0 0.5px rgb(255 255 255 / 0.12);
 }
 
-html[data-glass-wallpaper-ready] :is(.glass-warp, .glass-border)::before,
+html[data-glass-wallpaper-ready] :is(.glass-warp, .glass-border-glow)::before,
 html[data-glass-wallpaper-ready] .glass-border::after {
   inset: 0;
   background-image: var(--glass-cached-base);
@@ -188,7 +212,7 @@ html[data-glass-wallpaper-ready] .cl-shake :is(.glass-warp, .glass-border) {
   will-change: auto;
 }
 
-html[data-glass-wallpaper-ready] .glass-border::before {
+html[data-glass-wallpaper-ready] .glass-border-glow::before {
   /* inset is 0 in the cached state, so the glows start right at the edge. */
   --glass-border-glow-start: 0px;
   --glass-border-arc-offset: 0px;
@@ -277,7 +301,7 @@ body[data-glass-source-blur] .app-modal-backdrop:not([data-glass-backdrop-top]) 
 
 /* Do not blur the already blurred page a second time inside a dialog, or
    animate an opacity Backdrop Root containing another backdrop capture. */
-body[data-glass-modal-open] :is(.glass-warp, .glass-border)::before,
+body[data-glass-modal-open] :is(.glass-warp, .glass-border, .glass-border-glow)::before,
 body[data-glass-modal-open] .glass-border::after {
   display: none;
 }

@@ -45,7 +45,17 @@ function createController(document: Document) {
   }));
   const releaseWallpaper = createGlassWallpaperCache(document);
   const surfaces = new Map<HTMLElement, Set<HTMLElement>>();
+  const borderRadii = new Map<HTMLElement, string>();
+  const pendingBorders = new Set<HTMLElement>();
   const visible = new WeakSet<HTMLElement>();
+  const resize = new ResizeObserver((entries) => {
+    for (const entry of entries) {
+      const layer = entry.target as HTMLElement;
+
+      if (borderRadii.has(layer)) pendingBorders.add(layer);
+    }
+    schedule();
+  });
   const intersection = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
@@ -65,6 +75,22 @@ function createController(document: Document) {
   function measure() {
     const width = document.documentElement.clientWidth;
     const height = view.innerHeight;
+    const radii = Array.from(pendingBorders, (layer) => {
+      const styles = view.getComputedStyle(layer);
+      const radius = parseFloat(styles.borderTopLeftRadius) || 0;
+      // These absolute layers have no padding or border. Computed dimensions
+      // remain in local CSS pixels even when an ancestor is scaled.
+      const layerWidth = parseFloat(styles.width) || layer.clientWidth;
+      const layerHeight = parseFloat(styles.height) || layer.clientHeight;
+      const clamped = Math.max(
+        0,
+        Math.min(radius, layerWidth / 2, layerHeight / 2),
+      );
+
+      return { layer, value: `${clamped}px` };
+    });
+
+    pendingBorders.clear();
 
     return () => {
       if (disposed) return;
@@ -73,6 +99,12 @@ function createController(document: Document) {
         root.style.setProperty("--glass-viewport-width", `${width}px`);
         root.style.setProperty("--glass-viewport-height", `${height}px`);
       }
+      for (const { layer, value } of radii) {
+        if (!borderRadii.has(layer) || borderRadii.get(layer) === value)
+          continue;
+        borderRadii.set(layer, value);
+        layer.style.setProperty("--glass-border-radius", value);
+      }
     };
   }
 
@@ -80,9 +112,17 @@ function createController(document: Document) {
     scheduleGlassFrame(view, measure);
   }
 
+  function resizeViewport() {
+    // Responsive styles can change the radius without resizing a layer.
+    for (const layer of Array.from(borderRadii.keys()))
+      pendingBorders.add(layer);
+    schedule();
+  }
+
   // CSS fixes the source to the viewport. Only visibility changes toggle
-  // layer caching; scrolling never measures or compensates card coordinates.
-  view.addEventListener("resize", schedule);
+  // layer caching; radius geometry is read only on registration or resize,
+  // never on scrolling or pointer movement.
+  view.addEventListener("resize", resizeViewport);
 
   return {
     add(layer: HTMLElement) {
@@ -95,12 +135,22 @@ function createController(document: Document) {
         intersection.observe(host);
       }
       surface.add(layer);
+      if (layer.classList.contains("glass-border")) {
+        borderRadii.set(layer, "");
+        pendingBorders.add(layer);
+        resize.observe(layer);
+      }
       layer.toggleAttribute("data-glass-visible", visible.has(host));
       schedule();
       notifySurfaceChanges(document);
 
       return () => {
         surface.delete(layer);
+        if (borderRadii.delete(layer)) {
+          pendingBorders.delete(layer);
+          resize.unobserve(layer);
+          layer.style.removeProperty("--glass-border-radius");
+        }
         if (!surface.size) {
           surfaces.delete(host);
           intersection.unobserve(host);
@@ -110,7 +160,9 @@ function createController(document: Document) {
         if (!surfaces.size) {
           disposed = true;
           cancelGlassFrame(view, measure);
-          view.removeEventListener("resize", schedule);
+          view.removeEventListener("resize", resizeViewport);
+          resize.disconnect();
+          pendingBorders.clear();
           intersection.disconnect();
           releaseWallpaper();
           for (const { name, value, priority } of previousViewport) {

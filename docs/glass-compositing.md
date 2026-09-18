@@ -1,14 +1,25 @@
 ﻿# Glass compositing
 
 All application glass now uses source rendering instead of `backdrop-filter`.
-The base effect remains **blur(8px) saturate(150%)**. The rim retains its
-additional **saturate(180%) brightness(1.3)**, specular gradient and inset shadow.
+The base effect uses **blur(8px) saturate(140%)**. The rim adds
+**saturate(155%) brightness(1.28)**, a directional specular gradient and inset shadow.
 
 ## Shared configuration
 
 Edit `config/glass.ts` to change the defaults: `blurPx` is in CSS pixels,
 `saturation` and `borderSaturation` are percentages, and `borderBrightness` is
 a multiplier. Border saturation is additional to the base saturation.
+`borderGlow` sets independent `top`, `right`, `bottom` and `left` opacities
+between 0 and 1 (defaults: 0.42, 0.16, 0.22, 0.32). Each edge's strength
+continues through both adjoining corners, blending into its neighbours along
+the arcs. Setting all four to zero removes the inner glow while retaining the
+thin rim. `borderGlowSizePx` controls the inward spread per edge (default 6px);
+corners use the larger adjacent width. Equal widths give continuous falloff
+at the straight-to-curved joins.
+`borderHighlight` independently controls the thin white specular reflection:
+`angleDeg` is the CSS gradient angle (default 135, lit from the upper left;
+add 180 to reverse it), and `intensity` scales its opacity from 0 to 1
+(default 1 preserves the full original reflection; 0 disables it).
 `losslessWallpaper` controls cached texture encoding: `true` uses PNG for all
 backgrounds; `false` (default) uses JPEG quality 0.98 for photo backgrounds.
 Gradient backgrounds always use PNG to avoid visible JPEG blocks.
@@ -92,11 +103,17 @@ an old cached layer with the relative offset.
 
 Visible decorative spans use `will-change: opacity` to retain compositor
 caching without changing coordinates or opacity. An IntersectionObserver
-releases this hint for offscreen cards. Masks and rounded rims are unchanged.
+releases this hint for offscreen cards.
+
+The inner glow uses a nested decorative span: a conic mask interpolates corner
+intensity, while the source pseudo-element uses linear/radial masks for inward
+falloff. The thin rim and its white specular reflection remain separate.
 
 The surface controller manages registration, cache lifetime, viewport resize
-and visibility. It has no scroll/mouse/animation listener or per-card geometry
-queries. Navigation retains its content-filter geometry updates;
+and visibility. One shared ResizeObserver tracks border radii on registration
+and resize, with batched reads/writes and no unchanged style writes. It has no
+scroll/mouse/animation listener or scroll-time per-card geometry queries.
+Navigation retains its content-filter geometry updates;
 they do not position the cached wallpaper. This is a wallpaper renderer: a
 future glass component overlapping arbitrary foreground content needs an
 explicit source arrangement, like the navigation implementation below.
