@@ -16,6 +16,9 @@ the arcs. Setting all four to zero removes the inner glow while retaining the
 thin rim. `borderGlowSizePx` controls the inward spread per edge (default 6px);
 corners use the larger adjacent width. Equal widths give continuous falloff
 at the straight-to-curved joins.
+The inner glow fades immediately with a soft tail: its depth mask reaches 45%
+strength at 25% of the configured width, 14% at 55%, and zero at the full width.
+Straight edges and corner arcs share this falloff, multiplied by `borderGlow`.
 `borderHighlight` independently controls the thin white specular reflection:
 `angleDeg` is the CSS gradient angle (default 135, lit from the upper left;
 add 180 to reverse it), and `intensity` scales its opacity from 0 to 1

@@ -127,6 +127,8 @@ html .login-scene .glass-warp::before {
 
 /* Paint the same saturated wallpaper as the rim. The linear and radial
    depth tiles fade inward; the parent mask supplies per-edge intensity.
+   Falloff starts at the edge: 45% strength at 25% of the width, 14% at
+   55%, then transparent at full width. Corners use the same curve.
    Only the source extends by blur padding before the cache is ready. */
 .glass-border-glow::before {
   --glass-border-glow-start: var(--glass-blur-padding);
@@ -144,7 +146,10 @@ html .login-scene .glass-warp::before {
   --glass-border-arc-box: calc(var(--glass-border-arc-offset) + var(--glass-border-radius, 24px));
   --glass-border-side-span: max(0px, calc(100% - var(--glass-border-arc-box) * 2));
   --glass-border-depth-mask:
-    linear-gradient(to right, #000 var(--glass-border-glow-start), transparent var(--glass-border-glow-end-left)) 0 50% / 100% var(--glass-border-side-span) no-repeat,
+
+/*
+ 之前的
+   linear-gradient(to right, #000 var(--glass-border-glow-start), transparent var(--glass-border-glow-end-left)) 0 50% / 100% var(--glass-border-side-span) no-repeat,
     linear-gradient(to left, #000 var(--glass-border-glow-start), transparent var(--glass-border-glow-end-right)) 100% 50% / 100% var(--glass-border-side-span) no-repeat,
     linear-gradient(to bottom, #000 var(--glass-border-glow-start), transparent var(--glass-border-glow-end-top)) 50% 0 / var(--glass-border-side-span) 100% no-repeat,
     linear-gradient(to top, #000 var(--glass-border-glow-start), transparent var(--glass-border-glow-end-bottom)) 50% 100% / var(--glass-border-side-span) 100% no-repeat,
@@ -152,6 +157,17 @@ html .login-scene .glass-warp::before {
     radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at 0px var(--glass-border-arc-box), transparent calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-tr)), #000 var(--glass-border-radius, 24px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 100% 0 / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
     radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at 0px 0px, transparent calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-br)), #000 var(--glass-border-radius, 24px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 100% 100% / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
     radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at var(--glass-border-arc-box) 0px, transparent calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-bl)), #000 var(--glass-border-radius, 24px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 0 100% / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat;
+ 
+*/
+
+    linear-gradient(to right, #000 var(--glass-border-glow-start), rgb(0 0 0 / 0.45) calc(var(--glass-border-glow-start) + var(--glass-border-glow-size-left, 3px) * 0.25), rgb(0 0 0 / 0.14) calc(var(--glass-border-glow-start) + var(--glass-border-glow-size-left, 3px) * 0.55), transparent var(--glass-border-glow-end-left)) 0 50% / 100% var(--glass-border-side-span) no-repeat,
+    linear-gradient(to left, #000 var(--glass-border-glow-start), rgb(0 0 0 / 0.45) calc(var(--glass-border-glow-start) + var(--glass-border-glow-size-right, 3px) * 0.25), rgb(0 0 0 / 0.14) calc(var(--glass-border-glow-start) + var(--glass-border-glow-size-right, 3px) * 0.55), transparent var(--glass-border-glow-end-right)) 100% 50% / 100% var(--glass-border-side-span) no-repeat,
+    linear-gradient(to bottom, #000 var(--glass-border-glow-start), rgb(0 0 0 / 0.45) calc(var(--glass-border-glow-start) + var(--glass-border-glow-size-top, 3px) * 0.25), rgb(0 0 0 / 0.14) calc(var(--glass-border-glow-start) + var(--glass-border-glow-size-top, 3px) * 0.55), transparent var(--glass-border-glow-end-top)) 50% 0 / var(--glass-border-side-span) 100% no-repeat,
+    linear-gradient(to top, #000 var(--glass-border-glow-start), rgb(0 0 0 / 0.45) calc(var(--glass-border-glow-start) + var(--glass-border-glow-size-bottom, 3px) * 0.25), rgb(0 0 0 / 0.14) calc(var(--glass-border-glow-start) + var(--glass-border-glow-size-bottom, 3px) * 0.55), transparent var(--glass-border-glow-end-bottom)) 50% 100% / var(--glass-border-side-span) 100% no-repeat,
+    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at var(--glass-border-arc-box) var(--glass-border-arc-box), transparent calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-tl)), rgb(0 0 0 / 0.14) calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-tl) * 0.55), rgb(0 0 0 / 0.45) calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-tl) * 0.25), #000 var(--glass-border-radius, 24px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 0 0 / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
+    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at 0px var(--glass-border-arc-box), transparent calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-tr)), rgb(0 0 0 / 0.14) calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-tr) * 0.55), rgb(0 0 0 / 0.45) calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-tr) * 0.25), #000 var(--glass-border-radius, 24px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 100% 0 / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
+    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at 0px 0px, transparent calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-br)), rgb(0 0 0 / 0.14) calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-br) * 0.55), rgb(0 0 0 / 0.45) calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-br) * 0.25), #000 var(--glass-border-radius, 24px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 100% 100% / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat,
+    radial-gradient(circle calc(var(--glass-border-radius, 24px) + 1px) at var(--glass-border-arc-box) 0px, transparent calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-bl)), rgb(0 0 0 / 0.14) calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-bl) * 0.55), rgb(0 0 0 / 0.45) calc(var(--glass-border-radius, 24px) - var(--glass-border-corner-size-bl) * 0.25), #000 var(--glass-border-radius, 24px), transparent calc(var(--glass-border-radius, 24px) + 1px)) 0 100% / var(--glass-border-arc-box) var(--glass-border-arc-box) no-repeat;
   -webkit-mask: var(--glass-border-depth-mask);
   mask: var(--glass-border-depth-mask);
   filter: blur(var(--app-glass-blur)) saturate(var(--app-glass-saturation)) saturate(var(--glass-border-saturation)) brightness(var(--glass-border-brightness));
