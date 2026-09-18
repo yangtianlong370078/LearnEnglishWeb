@@ -140,13 +140,13 @@
     inset 0 0 0 1px rgb(255 255 255 / 0.03),
     0 1px 6px rgb(0 0 0 / 0.3) !important;
 }
-
+  /* border-bottom: 1px solid rgb(255 255 255 / 0.3) !important; */
 .navbar-root {
   position: sticky;
   top: 0;
   z-index: 50;
   border: none !important;
-  border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;
+
   box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
   isolation: isolate;
   --glass-tint: rgb(255 255 255 / 0.55);
@@ -313,7 +313,7 @@
   border-radius: inherit;
   pointer-events: none;
 }
-
+ 
 .yinyinkuan{
   box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
  --border-bottom-width: 1px;
@@ -323,6 +323,15 @@
   --border-style: solid;
   --border-top-width: 1px;
   border: none !important;
+  --card-radius-zdy: calc(var(--radius) * 3);
+}
+ 
+.yinyinkuan span.yyk {
+  box-shadow: inset 0 10px 16px -10px rgba(0,0,0,0.15), inset 0 -10px 16px -10px rgba(255,255,255,0.25);
+}
+
+.dark .yinyinkuan span.yyk {
+  box-shadow: inset 0 3px 5px -3px rgba(255,255,255,0.1), inset 0 -3px 5px -3px rgba(255,255,255,0.2);
 }
 
 .yinyinkuan:after {
@@ -344,7 +353,8 @@
     content: "";
   /* 暗色：极轻描边， 只比卡片背景略亮一点*/
   border-width: var(--border-top-width, 0) var(--border-right-width, 0) var(--border-bottom-width, 0) var(--border-left-width, 0);
-  border-color: rgb(255 255 255 / 0.1);
+
+  border-color: rgba(255,255,255,0.1);
   border-style: solid;
   width: 100%;
   height: 100%;
@@ -651,33 +661,26 @@ input:-webkit-autofill:active {
 }
 
 /* 正确/错误卡片着色（叠加在毛玻璃卡片之上） */
-.cl-card-correct,
-.dark .cl-card-correct {
-  border-color: color-mix(in srgb, var(--success, #16a34a) 55%, transparent) !important;
-  box-shadow:
-     0 0 0 1px color-mix(in srgb, var(--success, #16a34a) 70%, transparent), 0 4px 16px color-mix(in srgb, var(--success, #16a34a) 38%, transparent) !important;
-  --glass-tint: color-mix(
-    in srgb,
-    var(--success, #16a34a) 22%,
-    transparent
-  ) !important;
+.cl-card-correct{
+  background-color: rgba(79, 250, 141, 0.35) !important;
 }
 
-.cl-card-wrong,
-.dark .cl-card-wrong {
-  border-color: color-mix(in srgb, var(--danger, #dc2626) 55%, transparent) !important;
-  box-shadow:
-    0 0 0 1px color-mix(in srgb, var(--danger, #dc2626) 70%, transparent), 0 4px 16px color-mix(in srgb, var(--danger, #dc2626) 38%, transparent) !important;
-  --glass-tint: color-mix(
-    in srgb,
-    var(--danger, #dc2626) 22%,
-    transparent
-  ) !important;
+.cl-card-wrong {
+  background-color: rgba(255, 101, 101, 0.35) !important;
 }
+
+.dark .cl-card-correct {
+  background-color: rgba(30, 100, 56, 0.35) !important;
+}
+
+.dark .cl-card-wrong {
+  background-color: rgba(194, 69, 69, 0.35) !important;
+}
+
 
 /* ── 校验结果角标：右上圆形徽章 ── */
 
-/* 弹性入场：从缩放过冲到回弹定格，带轻微旋转 */
+/* 弹性入场：从缩放过冲到回弹定格，带轻微旋转  */
 @keyframes cl-badge-pop {
   0% {
     opacity: 0;
@@ -1268,13 +1271,12 @@ input:-webkit-autofill:active {
   box-shadow: inset 0 0 0 1px oklch(var(--summary-chart-4) / 0.08);
 }
 
-/* 课程学习顶部导航吸顶容器（复用 navbar 毛玻璃观感） */
+/* 课程学习顶部导航吸顶容器（复用 navbar 毛玻璃观感）  border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;*/
 .cl-navbar {
   position: sticky;
   top: 0;
   z-index: 40;
   border: none !important;
-  border-bottom: 1px solid rgb(255 255 255 / 0.3) !important;
   box-shadow: 0 4px 10px #1e1e1e1a, 0 4px 4px #1e1e1e0d, 0 1px #1e1e1e0d;
   isolation: isolate;
   --glass-tint: rgb(255 255 255 / 0.55);

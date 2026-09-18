@@ -576,10 +576,10 @@ function WordCardInner(
 
   const cardStateClass =
     resultState === "correct"
-      ? "cl-glass-idle cl-card-correct"
+      ? "cl-card-correct"
       : resultState === "wrong"
-        ? "cl-glass-idle cl-card-wrong"
-        : "cl-glass-idle";
+        ? "cl-card-wrong"
+        : "";
 
   const showSecondary = effectiveTranslationOn;
 
@@ -592,13 +592,13 @@ function WordCardInner(
 
   return (
     <div
-      className={`yinyinkuan rounded-3xl p-0 group relative overflow-visible ${
+      className={`yinyinkuan cl-glass-idle rounded-3xl p-0 group relative overflow-visible ${
         shaking ? "cl-shake" : ""
       } ${
         colorTransition
           ? "transition-[background-color,border-color,box-shadow] duration-500 ease-out"
           : ""
-      } ${cardStateClass}`}
+      } `}
       onAnimationEnd={() => setShaking(false)}
     >
       <ConfettiBurst fireKey={confettiKey} />
@@ -606,24 +606,16 @@ function WordCardInner(
       {/* Keep the same blur layer mounted when the answer tint changes. */}
       <GlassWarp />
 
+
       {/* 内容层奶白底色：内缩 1.5px 避开描边环区，light:bg-white/15  dark:bg-black/10 dark:bg-white/5 dark:bg-[hsla(0,0%,50%,0.05)]!
           让边框环直接透出 warp 玻璃（更"裸透"的液态玻璃边框） */}
-      {resultState === "idle" && (
+    
         <span
           aria-hidden="true"
-          className="pointer-events-none absolute light:bg-white/15 "
-          style={{ inset: "1px", borderRadius: "calc(1.5rem - 1px)" }}
-        />
-      )}
-
-      {/* 校验结果角标：左上徽章（对勾 / 叉号描边绘制动画），避开右上角的翻译/练习按钮 */}
-      {resultState !== "idle" && (
-        <span
-          aria-hidden="true"
-          className={`cl-result-badge ${
-            resultState === "correct" ? "is-correct" : "is-wrong"
-          }`}
+          className={`pointer-events-none absolute !absolute !-left-[10px] !-top-[10px] ${resultState !== "idle"?"cl-result-badge":"" }  ${resultState === "correct" ? "is-correct" : "is-wrong"}  ` }
         >
+
+       {resultState !== "idle" && (
           <svg fill="none" viewBox="0 0 24 24">
             {resultState === "correct" ? (
               <path
@@ -651,11 +643,17 @@ function WordCardInner(
               </>
             )}
           </svg>
-        </span>
       )}
 
+         </span>
+
+      {/* 校验结果角标：左上徽章（对勾 / 叉号描边绘制动画），避开右上角的翻译/练习按钮 */}
       {/* 内容层需 relative z-[1]：absolute 定位的 warp 玻璃层会盖住 static 内容 */}
-      <div className="relative z-[1] rounded-3xl">
+
+      
+
+      {/* 内容层需 relative z-[1]：absolute 定位的 warp 玻璃层会盖住 static 内容 */}
+      <div className={`rounded-3xl relative z-[1] overflow-hidden  ${cardStateClass} `}>
         {/* 无学习按钮激活时：右上角显示【编辑/修改】与【详情】图标按钮 */}
         {!effectiveMode && (
           <div className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1.5">
@@ -812,7 +810,7 @@ function WordCardInner(
       </div>
 
       {/* 液态玻璃描边层（位于内容之上）：源码的 screen/overlay 两层渐变描边 */}
-      {resultState === "idle" && <GlassBorder />}
+     <GlassBorder />
     </div>
   );
 

@@ -15,15 +15,15 @@ export const glassConfig = {
    * 每条边的强度延伸至两端圆角，沿圆弧平滑过渡到相邻边的强度。
    * 发光沿用边框色；上、左略亮，形成柔和的迎光面。
    */
-  borderGlow: { top: 0.42, right: 0.16, bottom: 0.22, left: 0.32 },
+  borderGlow: { top: 0.12, right: 0.16, bottom: 0.42, left: 0.32 },
   /** 内发光从四条边各自向内扩散的距离，单位 px，可逐边调整；圆角取相邻两边的较大值。 */
-  borderGlowSizePx: { top: 6, right: 6, bottom: 6, left: 6 },
+  borderGlowSizePx: { top: 20, right: 20, bottom: 20, left: 20 },
   /**
    * 细薄的白色方向性高光，独立于四边内发光。
    * angleDeg：渐变角度（deg），135 为左上迎光，增加 180 可翻转方向。180为正上往下扫光
    * intensity：整体强度，0–1；0 关闭高光，1 保持完整的默认高光。
    */
-  borderHighlight: { angleDeg: 180, intensity: 0.3},
+  borderHighlight: { angleDeg: 360, intensity: 0.3},
   /**
    * 缓存纹理是否使用无损压缩：
    * true：全部使用 PNG，避免 JPEG 压缩失真。
