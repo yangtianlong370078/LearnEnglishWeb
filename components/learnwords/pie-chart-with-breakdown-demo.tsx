@@ -244,7 +244,7 @@ export default function PieChartWithBreakdownDemo({
 
         <div className=" p-2">
           <dl
-            className="flex justify-evenly w-full kctj gap-1  rounded-2xl p-1"
+            className="flex justify-evenly w-full kctj gap-1  rounded-2xl "
           >
             {rawData.map((entry, idx) => (
               <Fragment key={entry.name}>
@@ -252,7 +252,7 @@ export default function PieChartWithBreakdownDemo({
                   type="button"
                   aria-label={`${entry.name} - 进入学习`}
                   onClick={() => openCourseLearn(entry.name)}
-                 className="relative isolate flex min-w-0 cursor-pointer flex-col items-center justify-center bg-transparent p-2 transition-transform duration-300 ease-out before:pointer-events-none before:absolute before:-inset-x-5 before:-inset-y-3 before:-z-10 before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,oklch(var(--summary-accent)/0.72)_0%,oklch(var(--summary-accent)/0.3)_42%,transparent_74%)] before:opacity-0 before:blur-md before:transition-opacity before:duration-300 hover:-translate-y-1 hover:scale-[1.04] hover:!bg-transparent hover:before:opacity-100"
+                 className="relative isolate flex min-w-0 cursor-pointer flex-col items-center justify-center bg-transparent p-3 transition-transform duration-300 ease-out before:pointer-events-none before:absolute before:-inset-x-5 before:-inset-y-3 before:-z-10 before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,oklch(var(--summary-accent)/0.72)_0%,oklch(var(--summary-accent)/0.3)_42%,transparent_74%)] before:opacity-0 before:blur-md before:transition-opacity before:duration-300 hover:-translate-y-1 hover:scale-[1.04] hover:!bg-transparent hover:before:opacity-100"
                  >
                   <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
                     <span
@@ -389,7 +389,7 @@ export default function PieChartWithBreakdownDemo({
 
       <div className="p-2">
         <dl
-          className="flex justify-evenly w-full rounded-2xl p-1"
+          className="flex justify-evenly w-full rounded-2xl "
           style={{
             backgroundColor:
               "color-mix(in srgb, var(--foreground) 4%, transparent)",
@@ -407,7 +407,7 @@ export default function PieChartWithBreakdownDemo({
                   type="button"
                   aria-label={`${entry.name} - 进入学习`}
                   onClick={() => openCourseLearn(entry.name)}
-                  className="relative isolate flex min-w-0 cursor-pointer flex-col items-center justify-center overflow-visible rounded-xl bg-transparent p-2 transition-transform duration-300 ease-out before:pointer-events-none before:absolute before:-inset-x-5 before:-inset-y-3 before:z-0 before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,rgba(0,200,255,0.8)_0%,rgba(55,125,255,0.34)_42%,transparent_74%)] before:opacity-0 before:blur-md before:transition-opacity before:duration-300 before:content-[''] hover:-translate-y-1 hover:scale-[1.04] hover:!bg-transparent hover:before:opacity-100 [&>*]:relative [&>*]:z-[1]"
+                  className="relative isolate flex min-w-0 cursor-pointer flex-col items-center justify-center overflow-visible rounded-xl bg-transparent p-3 transition-transform duration-300 ease-out before:pointer-events-none before:absolute before:-inset-x-5 before:-inset-y-3 before:z-0 before:rounded-[50%] before:bg-[radial-gradient(ellipse_at_center,rgba(0,200,255,0.8)_0%,rgba(55,125,255,0.34)_42%,transparent_74%)] before:opacity-0 before:blur-md before:transition-opacity before:duration-300 before:content-[''] hover:-translate-y-1 hover:scale-[1.04] hover:!bg-transparent hover:before:opacity-100 [&>*]:relative [&>*]:z-[1]"
                 >
                   <dt className="flex items-center gap-1.5 whitespace-nowrap text-[11px] text-muted">
                     <span

@@ -327,9 +327,9 @@
 }
  
 .yinyinkuan span.yyk {
-  box-shadow: inset 0 10px 16px -10px rgba(0,0,0,0.15), inset 0 -10px 16px -10px rgba(255,255,255,0.25);
+  box-shadow: inset 0 10px 16px -10px rgba(0,0,0,0.15), inset 0 -10px 16px -10px rgba(255,255,255,0.55);
 }
-
+ 
 .dark .yinyinkuan span.yyk {
   box-shadow: inset 0 3px 5px -3px rgba(255,255,255,0.1), inset 0 -3px 5px -3px rgba(255,255,255,0.2);
 }
@@ -660,21 +660,23 @@ input:-webkit-autofill:active {
   animation: cl-confetti 0.9s ease-out forwards;
 }
 
-/* 正确/错误卡片着色（叠加在毛玻璃卡片之上） */
+/* 正确/错误卡片着色（叠加在毛玻璃卡片之上）  background-color: rgba(79, 250, 141, 0.35) !important; */
 .cl-card-correct{
-  background-color: rgba(79, 250, 141, 0.35) !important;
+ 
+  background-image: linear-gradient(145deg, oklch(71.378% 0.24015 142.851 / 0.24) 0%, oklch(71.378% 0.24015 142.851 / 0.09) 52%, transparent 78%), linear-gradient(315deg, oklch(76.689% 0.18057 144.529 / 0.12), transparent 46%);
 }
 
 .cl-card-wrong {
-  background-color: rgba(255, 101, 101, 0.35) !important;
+ background-image: linear-gradient(145deg, oklch(0.65 0.19 32 / 0.24) 0%, oklch(0.65 0.19 32 / 0.09) 52%, transparent 78%), linear-gradient(315deg, oklch(0.79 0.13 58 / 0.12), transparent 46%);
 }
 
 .dark .cl-card-correct {
-  background-color: rgba(30, 100, 56, 0.35) !important;
+  background-image: linear-gradient(145deg, oklch(71.378% 0.24015 142.851 / 0.24) 0%, oklch(71.378% 0.24015 142.851 / 0.09) 52%, transparent 78%), linear-gradient(315deg, oklch(76.689% 0.18057 144.529 / 0.12), transparent 46%);
+
 }
 
 .dark .cl-card-wrong {
-  background-color: rgba(194, 69, 69, 0.35) !important;
+background-image: linear-gradient(145deg, oklch(0.65 0.19 32 / 0.24) 0%, oklch(0.65 0.19 32 / 0.09) 52%, transparent 78%), linear-gradient(315deg, oklch(0.79 0.13 58 / 0.12), transparent 46%);
 }
 
 

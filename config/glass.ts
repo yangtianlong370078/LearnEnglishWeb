@@ -7,7 +7,7 @@ export const glassConfig = {
   /** 基础饱和度，单位 %，100 表示不增强。 */
   saturation: 140,
   /** 边框额外饱和度，单位 %，叠加在基础饱和度上。 */
-  borderSaturation: 155,
+  borderSaturation: 165,
   /** 边框亮度倍数，1 表示原亮度，1.3 表示 130%。 */
   borderBrightness: 1.28,
   /**
@@ -15,7 +15,7 @@ export const glassConfig = {
    * 每条边的强度延伸至两端圆角，沿圆弧平滑过渡到相邻边的强度。
    * 发光沿用边框色；上、左略亮，形成柔和的迎光面。
    */
-  borderGlow: { top: 0.12, right: 0.16, bottom: 0.42, left: 0.32 },
+  borderGlow: { top: 0.12, right: 0.16, bottom: 0.32, left: 0.32 },
   /** 内发光从四条边各自向内扩散的距离，单位 px，可逐边调整；圆角取相邻两边的较大值。 */
   borderGlowSizePx: { top: 20, right: 20, bottom: 20, left: 20 },
   /**

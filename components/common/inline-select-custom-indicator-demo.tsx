@@ -3,11 +3,15 @@
 import type { Key } from "@heroui/react";
 
 import { ChevronRight } from "@gravity-ui/icons";
-import { ListBox } from "@heroui/react";
+import { ListBox, Separator, Switch } from "@heroui/react";
 import { useEffect, useRef, useState } from "react";
 import { InlineSelect } from "@heroui-pro/react";
 
 import { setGlassTheme } from "@/lib/glass-wallpaper-cache";
+import {
+  getGlassEnhance,
+  setGlassEnhance,
+} from "@/lib/glass-enhance";
 
 const STORAGE_KEY = "background-theme";
 const DEFAULT_THEME_ID = "magnificent";
@@ -22,6 +26,7 @@ function applyBackgroundTheme(themeId: string) {
 
 export default function InlineSelectCustomIndicatorDemo() {
   const [role, setRole] = useState<Key | null>(DEFAULT_THEME_ID);
+  const [glassEnhance, setGlassEnhanceState] = useState(true);
   const cancelTheme = useRef<(() => void) | undefined>(undefined);
 
   useEffect(() => {
@@ -29,6 +34,10 @@ export default function InlineSelectCustomIndicatorDemo() {
 
     setRole(storedTheme);
     cancelTheme.current = applyBackgroundTheme(storedTheme);
+    const enhance = getGlassEnhance();
+
+    setGlassEnhanceState(enhance);
+    setGlassEnhance(enhance);
 
     return () => cancelTheme.current?.();
   }, []);
@@ -39,6 +48,11 @@ export default function InlineSelectCustomIndicatorDemo() {
     setRole(themeId);
     cancelTheme.current?.();
     cancelTheme.current = applyBackgroundTheme(themeId);
+  };
+
+  const handleGlassEnhanceChange = (enabled: boolean) => {
+    setGlassEnhanceState(enabled);
+    setGlassEnhance(enabled);
   };
 
   return (
@@ -57,7 +71,21 @@ export default function InlineSelectCustomIndicatorDemo() {
       </InlineSelect.Trigger>
       <div aria-hidden="true" className="glass-overlay" />
 
-      <InlineSelect.Popover className="w-[124px]">
+      <InlineSelect.Popover className="w-[180px]">
+        <div className="flex items-center justify-between gap-2 p-4">
+          <span className="text-sm text-foreground">玻璃加强</span>
+          <Switch
+            aria-label="玻璃加强"
+            isSelected={glassEnhance}
+            
+            onChange={handleGlassEnhanceChange}
+          >
+            <Switch.Control>
+              <Switch.Thumb />
+            </Switch.Control>
+          </Switch>
+        </div>
+        <Separator />
         <ListBox>
           <ListBox.Item id="defalut" textValue="光影">
             光影
