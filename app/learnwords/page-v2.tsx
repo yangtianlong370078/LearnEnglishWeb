@@ -18,7 +18,7 @@ import {
 } from "@heroui/react";
 
 import ModalBackdrop from "@/components/common/modal-backdrop";
-import { GlassWarp } from "@/components/courselearn/glass-border";
+import GlassBorder, { GlassWarp } from "@/components/courselearn/glass-border";
 import PieChartWithBreakdownDemo from "@/components/learnwords/pie-chart-with-breakdown-demo";
 import { courseApi } from "@/lib/api";
 import { useMediaQuery } from "@/hooks/useMediaQuery";
@@ -378,6 +378,8 @@ export default function LearnWordsPage() {
                 {saving ? "保存中..." : "保存"}
               </Button>
             </Modal.Footer>
+            {/* 液态玻璃描边层（位于内容之上） */}
+            <GlassBorder />
           </Modal.Dialog>
         </Modal.Container>
       </ModalBackdrop>
@@ -408,6 +410,8 @@ export default function LearnWordsPage() {
                 {deleting ? "移除中..." : "确定"}
               </Button>
             </Modal.Footer>
+            {/* 液态玻璃描边层（位于内容之上） */}
+            <GlassBorder />
           </Modal.Dialog>
         </Modal.Container>
       </ModalBackdrop>

@@ -66,9 +66,9 @@ export default function FullWidth() {
         onChange={setValue}
         onSubmit={handleSearch}
       >
-         <div className="yinyinkuan !px-3 cl-glass-idle !h-11 rounded-[100px] !bg-transparent flex flex-row items-center justify-between w-full ">
-            <GlassWarp /> 
-        
+        <div className="yinyinkuan !px-3 cl-glass-idle !h-11 rounded-[100px] !bg-transparent flex flex-row items-center justify-between w-full ">
+          <GlassWarp />
+
           <SearchField.Input
             autoComplete="off"
             className="word-search-input z-[1] !bg-transparent rounded-[100px] p-1 text-[14px]"
@@ -100,45 +100,51 @@ export default function FullWidth() {
             <SearchField.SearchIcon className="mx-3" />
           </Button>
 
-         
-  <GlassBorder /> 
-       </div>
+          <GlassBorder />
+        </div>
       </SearchField>
       <ModalBackdrop isOpen={isOpen} onOpenChange={setIsOpen}>
-        <Modal.Container className="w-full max-w-lg rounded-2xl">
-          <Modal.Dialog className="app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-            <Modal.CloseTrigger />
-            <Modal.Header>
-              <Modal.Heading className="text-2xl font-semibold">
-                {searchedWord}
-              </Modal.Heading>
-            </Modal.Header>
+        <Modal.Container className="w-full max-w-lg rounded-3xl">
+          <Modal.Dialog className=" yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+            <GlassWarp />
 
-            <div className="m-0 py-4">
-              <WordDetail
-                key={searchedWord}
-                word={searchedWord}
-                onDataLoaded={setWordDetailResult}
-              />
+            <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
+              <Modal.CloseTrigger />
+              <Modal.Header>
+                <Modal.Heading className="text-2xl font-semibold">
+                  {searchedWord}
+                </Modal.Heading>
+              </Modal.Header>
+
+              <div className="m-0 py-4">
+                <WordDetail
+                  key={searchedWord}
+                  word={searchedWord}
+                  onDataLoaded={setWordDetailResult}
+                />
+              </div>
+
+              {wordDetailResult === true && !isChecking && !wordExists && (
+                <Modal.Footer>
+                  <Button
+                    isPending={isSaving}
+                    variant="primary"
+                    onPress={handleAddToVocab}
+                  >
+                    {isSaving ? <Spinner color="current" size="sm" /> : null}
+                    加入生词本
+                  </Button>
+                </Modal.Footer>
+              )}
+
             </div>
-
-            {wordDetailResult === true && !isChecking && !wordExists && (
-              <Modal.Footer>
-                <Button
-                  isPending={isSaving}
-                  variant="primary"
-                  onPress={handleAddToVocab}
-                >
-                  {isSaving ? <Spinner color="current" size="sm" /> : null}
-                  加入生词本
-                </Button>
-              </Modal.Footer>
-            )}
+            {/* 液态玻璃描边层（位于内容之上） */}
+            <GlassBorder />
           </Modal.Dialog>
         </Modal.Container>
       </ModalBackdrop>
 
-      
+
     </div>
   );
 }

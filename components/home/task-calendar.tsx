@@ -29,9 +29,9 @@ import {
 } from "@gravity-ui/icons";
 
 import ModalBackdrop from "@/components/common/modal-backdrop";
+import GlassBorder, { GlassWarp } from "@/components/courselearn/glass-border";
 import RadialChartWithLegend from "@/components/home/radial-chart-with-legend";
 import { saveLearntask } from "@/lib/api/modules/statistics";
-
 type DayStatus = "pending" | "weekend" | "done" | "missed" | "warn" | "empty";
 
 interface DayInfo {
@@ -370,8 +370,12 @@ function CreateTaskButton({
 
       <Modal state={state}>
         <ModalBackdrop isDismissable={false}>
-          <Modal.Container placement="center" size="md">
-            <Modal.Dialog>
+          <Modal.Container placement="center" size="md" >
+
+             <Modal.Dialog className=" yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+              <GlassWarp /> 
+            <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
+
               <Modal.Header>
                 <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
                   <Gear className="size-5" />
@@ -478,6 +482,9 @@ function CreateTaskButton({
                   {isSaving ? "保存中..." : "保存"}
                 </Button>
               </Modal.Footer>
+              </div>
+              {/* 液态玻璃描边层（位于内容之上） */}
+              <GlassBorder />
             </Modal.Dialog>
           </Modal.Container>
         </ModalBackdrop>

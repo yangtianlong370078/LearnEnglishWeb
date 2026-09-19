@@ -264,7 +264,7 @@ html[data-glass-wallpaper-ready] .login-scene .glass-warp::before {
 /* React Aria supplies only portal/focus/scroll-lock behavior. The viewport
    scrim and its blur are ours, separate from the animated dialog container. */
 .app-modal-backdrop {
-  --glass-tint: rgb(0 0 0 / 0.24);
+  --glass-tint: rgb(0 0 0 / 0.05); 
   position: fixed;
   inset: 0;
   /* Match the overlay stack so portaled selects/tooltips can appear above us. */
@@ -278,7 +278,7 @@ html[data-glass-wallpaper-ready] .login-scene .glass-warp::before {
 }
 
 .dark .app-modal-backdrop {
-  --glass-tint: rgb(0 0 0 / 0.4);
+   --glass-tint: rgb(0 0 0 / 0.4); 
 }
 
 /* Keep the uniform tint below the dialog with explicit sibling levels,
@@ -320,6 +320,14 @@ body[data-glass-source-blur] .app-modal-backdrop:not([data-glass-backdrop-top]) 
 body[data-glass-modal-open] :is(.glass-warp, .glass-border, .glass-border-glow)::before,
 body[data-glass-modal-open] .glass-border::after {
   display: none;
+}
+
+/* The dialog's own rim is the glass surface the user sees above the scrim:
+   keep its highlight ring, saturated rim and edge glow painted even while
+   the backdrop stack hides the page's rims below it. */
+body[data-glass-modal-open] .modal__dialog :is(.glass-border, .glass-border-glow)::before,
+body[data-glass-modal-open] .modal__dialog .glass-border::after {
+  display: block;
 }
 
 [data-glass-navigation-source] {

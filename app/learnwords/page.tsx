@@ -617,7 +617,9 @@ export default function LearnWordsPage() {
         onOpenChange={setAvailableCourseModalOpen}
       >
         <Modal.Container placement="center" size="lg">
-          <Modal.Dialog className="app-glass-dialog p-2 shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+          <Modal.Dialog className="yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+          <GlassWarp /> 
+          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
             <Modal.Header className="p-3">
               <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
                 <Books className="size-5" />
@@ -627,7 +629,7 @@ export default function LearnWordsPage() {
                 按分类查看课程，并将需要学习的课程加入列表
               </p> */}
             </Modal.Header>
-            <Modal.Body className="p-3">
+            <Modal.Body className="p-3 ">
               {availableCoursesLoading ? (
                 <div className="flex min-h-40 items-center justify-center">
                   <Spinner aria-label="课程加载中" />
@@ -645,16 +647,16 @@ export default function LearnWordsPage() {
                 <div className="flex min-h-40 items-center justify-center text-sm text-muted">
                   暂无可添加的课程
                 </div>
-              ) : (
+              ) : (             
                 <Accordion
-                  className="w-full overflow-hidden rounded-3xl card p-0 !bg-transparent"
+                  className="w-full p-0 overflow-hidden rounded-3xl card !bg-transparent"
                   allowsMultipleExpanded
                   expandedKeys={availableExpandedKeys}
                   onExpandedChange={(keys) =>
                     setAvailableExpandedKeys(keys as Set<Key>)
                   }
                 >
-                  <ScrollShadow className="max-h-[40vh]  overflow-y-auto pr-1">
+                   <ScrollShadow className="max-h-[40vh]  overflow-y-auto ">
                     {availableCategories
                       .filter((category) => category.courseInfos.length > 0)
                       .map((category, index) => (
@@ -722,8 +724,9 @@ export default function LearnWordsPage() {
                           </Accordion.Item>
                         </div>
                       ))}
-                  </ScrollShadow>
+                   </ScrollShadow>
                 </Accordion>
+               
               )}
             </Modal.Body>
             <Modal.Footer className="p-0 m-2">
@@ -731,6 +734,10 @@ export default function LearnWordsPage() {
                 关闭
               </Button>
             </Modal.Footer>
+
+</div>
+            {/* 液态玻璃描边层（位于内容之上） */}
+            <GlassBorder />
           </Modal.Dialog>
         </Modal.Container>
       </ModalBackdrop>
@@ -748,7 +755,10 @@ export default function LearnWordsPage() {
         }}
       >
         <Modal.Container placement="center" size="md">
-          <Modal.Dialog>
+          <Modal.Dialog className="yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+          <GlassWarp /> 
+          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
+            
             <Modal.Header>
               <Modal.Heading>添加课程</Modal.Heading>
               <p className="mt-1.5 text-sm leading-5 text-muted">
@@ -766,6 +776,9 @@ export default function LearnWordsPage() {
               </Button>
               <Button onPress={handleAddCourse}>确定</Button>
             </Modal.Footer>
+            </div>
+            {/* 液态玻璃描边层（位于内容之上） */}
+            <GlassBorder />
           </Modal.Dialog>
         </Modal.Container>
       </ModalBackdrop>
@@ -777,7 +790,10 @@ export default function LearnWordsPage() {
         onOpenChange={setCourseModalOpen}
       >
         <Modal.Container placement="center" size="md">
-          <Modal.Dialog>
+           <Modal.Dialog className="yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+          <GlassWarp /> 
+          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
+           
             <Modal.Header>
               <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
                 <Gear className="size-5" />
@@ -855,6 +871,9 @@ export default function LearnWordsPage() {
                 {saving ? "保存中..." : "保存"}
               </Button>
             </Modal.Footer>
+            </div>
+            {/* 液态玻璃描边层（位于内容之上） */}
+            <GlassBorder />
           </Modal.Dialog>
         </Modal.Container>
       </ModalBackdrop>
@@ -866,7 +885,10 @@ export default function LearnWordsPage() {
         onOpenChange={setDeleteModalOpen}
       >
         <Modal.Container placement="center" size="md">
-          <Modal.Dialog>
+           <Modal.Dialog className="yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+          <GlassWarp /> 
+          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
+           
             <Modal.Header>
               <Modal.Heading>移除课程</Modal.Heading>
               <p className="mt-1.5 text-sm leading-5 text-muted">
@@ -885,6 +907,9 @@ export default function LearnWordsPage() {
                 {deleting ? "移除中..." : "确定"}
               </Button>
             </Modal.Footer>
+            </div>
+            {/* 液态玻璃描边层（位于内容之上） */}
+            <GlassBorder />
           </Modal.Dialog>
         </Modal.Container>
       </ModalBackdrop>

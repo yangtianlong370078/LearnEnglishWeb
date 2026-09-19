@@ -8,6 +8,7 @@ import { Xmark } from "@gravity-ui/icons";
 
 import WordDetail from "@/components/common/word-detail";
 import { post } from "@/lib/api";
+import GlassBorder, { GlassWarp } from "./glass-border";
 import { CnEnIcon, EditIcon, EnCnIcon } from "./mode-icons";
 
 import ModalBackdrop from "@/components/common/modal-backdrop";
@@ -34,19 +35,24 @@ export function WordDetailModal({
   return (
     <ModalBackdrop isOpen={open} onOpenChange={onOpenChange}>
       <Modal.Container className="w-full max-w-lg rounded-2xl">
-        <Modal.Dialog className="app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-          <Modal.CloseTrigger />
-          <Modal.Header>
-            <Modal.Heading className="text-2xl font-semibold">
-              {displayWord?.en ?? ""}
-            </Modal.Heading>
-          </Modal.Header>
-          {/* 仅展示详情，不包含「加入生词本」逻辑 */}
-          <div className="m-0 py-4">
-            {displayWord && (
-              <WordDetail key={displayWord.en} word={displayWord.en} />
-            )}
+        <Modal.Dialog className=" yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+          <GlassWarp />
+          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
+            <Modal.CloseTrigger />
+            <Modal.Header>
+              <Modal.Heading className="text-2xl font-semibold">
+                {displayWord?.en ?? ""}
+              </Modal.Heading>
+            </Modal.Header>
+            {/* 仅展示详情，不包含「加入生词本」逻辑 */}
+            <div className="m-0 py-4">
+              {displayWord && (
+                <WordDetail key={displayWord.en} word={displayWord.en} />
+              )}
+            </div>
           </div>
+          {/* 液态玻璃描边层（位于内容之上） */}
+          <GlassBorder />
         </Modal.Dialog>
       </Modal.Container>
     </ModalBackdrop>
@@ -112,7 +118,10 @@ export function WordEditModal({
       onOpenChange={onOpenChange}
     >
       <Modal.Container placement="center" size="md">
-        <Modal.Dialog>
+        <Modal.Dialog className=" yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
+          <GlassWarp />
+          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
+           
           <Modal.Header>
             <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
               <EditIcon className="size-5" />
@@ -213,6 +222,9 @@ export function WordEditModal({
               {editSaving ? "保存中..." : "保存"}
             </Button>
           </Modal.Footer>
+           </div>
+          {/* 液态玻璃描边层（位于内容之上） */}
+          <GlassBorder />
         </Modal.Dialog>
       </Modal.Container>
     </ModalBackdrop>
