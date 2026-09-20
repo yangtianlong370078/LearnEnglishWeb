@@ -8,7 +8,6 @@ import { Xmark } from "@gravity-ui/icons";
 
 import WordDetail from "@/components/common/word-detail";
 import { post } from "@/lib/api";
-import GlassBorder, { GlassWarp } from "./glass-border";
 import { CnEnIcon, EditIcon, EnCnIcon } from "./mode-icons";
 
 import ModalBackdrop from "@/components/common/modal-backdrop";
@@ -33,28 +32,23 @@ export function WordDetailModal({
   }, [word]);
 
   return (
-    <ModalBackdrop isOpen={open} onOpenChange={onOpenChange}>
-      <Modal.Container className="w-full max-w-lg rounded-2xl">
-        <Modal.Dialog className=" yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-          <GlassWarp />
-          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
-            <Modal.CloseTrigger />
-            <Modal.Header>
-              <Modal.Heading className="text-2xl font-semibold">
-                {displayWord?.en ?? ""}
-              </Modal.Heading>
-            </Modal.Header>
-            {/* 仅展示详情，不包含「加入生词本」逻辑 */}
-            <div className="m-0 py-4">
-              {displayWord && (
-                <WordDetail key={displayWord.en} word={displayWord.en} />
-              )}
-            </div>
-          </div>
-          {/* 液态玻璃描边层（位于内容之上） */}
-          <GlassBorder />
-        </Modal.Dialog>
-      </Modal.Container>
+    <ModalBackdrop
+      isOpen={open}
+      onOpenChange={onOpenChange}
+      containerClassName="w-full max-w-lg rounded-3xl"
+    >
+      <Modal.CloseTrigger />
+      <Modal.Header>
+        <Modal.Heading className="text-2xl font-semibold">
+          {displayWord?.en ?? ""}
+        </Modal.Heading>
+      </Modal.Header>
+      {/* 仅展示详情，不包含「加入生词本」逻辑 */}
+      <div className="m-0 py-4">
+        {displayWord && (
+          <WordDetail key={displayWord.en} word={displayWord.en} />
+        )}
+      </div>
     </ModalBackdrop>
   );
 }
@@ -116,117 +110,103 @@ export function WordEditModal({
       isDismissable={false}
       isOpen={open}
       onOpenChange={onOpenChange}
+      placement="center"
+      size="md"
     >
-      <Modal.Container placement="center" size="md">
-        <Modal.Dialog className=" yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-          <GlassWarp />
-          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
-           
-          <Modal.Header>
-            <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
-              <EditIcon className="size-5" />
-            </Modal.Icon>
-            <Modal.Heading>编辑/修改单词</Modal.Heading>
-            <p className="mt-1.5 text-sm leading-5 text-muted">
-              修改单词的英文与中文释义后保存即可生效
-            </p>
-          </Modal.Header>
-          <Modal.Body className="flex flex-col gap-5 py-2">
-            <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
-              <label
-                className="text-sm text-foreground"
-                htmlFor="word-en-input"
+      <Modal.Header>
+        <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+          <EditIcon className="size-5" />
+        </Modal.Icon>
+        <Modal.Heading>编辑/修改单词</Modal.Heading>
+        <p className="mt-1.5 text-sm leading-5 text-muted">
+          修改单词的英文与中文释义后保存即可生效
+        </p>
+      </Modal.Header>
+      <Modal.Body className="flex flex-col gap-5 py-2">
+        <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
+          <label className="text-sm text-foreground" htmlFor="word-en-input">
+            英文单词
+          </label>
+          <InputGroup
+            style={
+              {
+                "--field-border": "var(--border)",
+              } as React.CSSProperties
+            }
+            variant="secondary"
+          >
+            <InputGroup.Prefix>
+              <EnCnIcon className="size-4 text-muted" />
+            </InputGroup.Prefix>
+            <InputGroup.Input
+              className="w-full max-w-[280px]"
+              id="word-en-input"
+              placeholder="输入英文单词"
+              value={editEn}
+              onChange={(e) => setEditEn(e.target.value)}
+            />
+            {editEn.length > 0 && (
+              <button
+                aria-label="清空内容"
+                className="inline-flex items-center justify-center px-2 hover:opacity-70"
+                type="button"
+                onClick={() => setEditEn("")}
               >
-                英文单词
-              </label>
-              <InputGroup
-                style={
-                  {
-                    "--field-border": "var(--border)",
-                  } as React.CSSProperties
-                }
-                variant="secondary"
+                <Xmark className="size-4" />
+              </button>
+            )}
+          </InputGroup>
+        </div>
+        <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
+          <label className="text-sm text-foreground" htmlFor="word-cn-input">
+            中文释义
+          </label>
+          <InputGroup
+            style={
+              {
+                "--field-border": "var(--border)",
+              } as React.CSSProperties
+            }
+            variant="secondary"
+          >
+            <InputGroup.Prefix>
+              <CnEnIcon className="size-4 text-muted" />
+            </InputGroup.Prefix>
+            <InputGroup.Input
+              className="w-full max-w-[280px]"
+              id="word-cn-input"
+              placeholder="输入中文释义"
+              value={editCn}
+              onChange={(e) => setEditCn(e.target.value)}
+            />
+            {editCn.length > 0 && (
+              <button
+                aria-label="清空内容"
+                className="inline-flex items-center justify-center px-2 hover:opacity-70"
+                type="button"
+                onClick={() => setEditCn("")}
               >
-                <InputGroup.Prefix>
-                  <EnCnIcon className="size-4 text-muted" />
-                </InputGroup.Prefix>
-                <InputGroup.Input
-                  className="w-full max-w-[280px]"
-                  id="word-en-input"
-                  placeholder="输入英文单词"
-                  value={editEn}
-                  onChange={(e) => setEditEn(e.target.value)}
-                />
-                {editEn.length > 0 && (
-                  <button
-                    aria-label="清空内容"
-                    className="inline-flex items-center justify-center px-2 hover:opacity-70"
-                    type="button"
-                    onClick={() => setEditEn("")}
-                  >
-                    <Xmark className="size-4" />
-                  </button>
-                )}
-              </InputGroup>
-            </div>
-            <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
-              <label
-                className="text-sm text-foreground"
-                htmlFor="word-cn-input"
-              >
-                中文释义
-              </label>
-              <InputGroup
-                style={
-                  {
-                    "--field-border": "var(--border)",
-                  } as React.CSSProperties
-                }
-                variant="secondary"
-              >
-                <InputGroup.Prefix>
-                  <CnEnIcon className="size-4 text-muted" />
-                </InputGroup.Prefix>
-                <InputGroup.Input
-                  className="w-full max-w-[280px]"
-                  id="word-cn-input"
-                  placeholder="输入中文释义"
-                  value={editCn}
-                  onChange={(e) => setEditCn(e.target.value)}
-                />
-                {editCn.length > 0 && (
-                  <button
-                    aria-label="清空内容"
-                    className="inline-flex items-center justify-center px-2 hover:opacity-70"
-                    type="button"
-                    onClick={() => setEditCn("")}
-                  >
-                    <Xmark className="size-4" />
-                  </button>
-                )}
-              </InputGroup>
-            </div>
-          </Modal.Body>
-          <Modal.Footer>
-            <Button slot="close" variant="secondary">
-              取消
-            </Button>
-            <Button
-              isDisabled={
-                editSaving ||
-                editEn.trim().length === 0 ||
-                editCn.trim().length === 0
-              }
-              onPress={handleSaveEdit}
-            >
-              {editSaving ? "保存中..." : "保存"}
-            </Button>
-          </Modal.Footer>
-           </div>
-          {/* 液态玻璃描边层（位于内容之上） */}
-          <GlassBorder />
-        </Modal.Dialog>
-      </Modal.Container>
+                <Xmark className="size-4" />
+              </button>
+            )}
+          </InputGroup>
+        </div>
+      </Modal.Body>
+      <Modal.Footer>
+        <Button slot="close" variant="secondary">
+          取消
+        </Button>
+        <Button
+          isDisabled={
+            editSaving ||
+            editEn.trim().length === 0 ||
+            editCn.trim().length === 0
+          }
+          onPress={handleSaveEdit}
+        >
+          {editSaving ? "保存中..." : "保存"}
+        </Button>
+      </Modal.Footer>
     </ModalBackdrop>
   );
 }

@@ -8,7 +8,6 @@ import { get, post } from "@/lib/api/request";
 
 import GlassBorder, { GlassWarp } from "@/components/courselearn/glass-border";
 
-
 export default function FullWidth() {
   const [value, setValue] = React.useState("");
   const [searchedWord, setSearchedWord] = React.useState("");
@@ -75,7 +74,6 @@ export default function FullWidth() {
             placeholder="查询单词…"
           />
 
-
           <SearchField.ClearButton className="mr-2">
             <svg
               height="16"
@@ -103,48 +101,39 @@ export default function FullWidth() {
           <GlassBorder />
         </div>
       </SearchField>
-      <ModalBackdrop isOpen={isOpen} onOpenChange={setIsOpen}>
-        <Modal.Container className="w-full max-w-lg rounded-3xl">
-          <Modal.Dialog className=" yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-            <GlassWarp />
+      <ModalBackdrop
+        isOpen={isOpen}
+        onOpenChange={setIsOpen}
+        containerClassName="w-full max-w-lg rounded-3xl"
+      >
+        <Modal.CloseTrigger />
+        <Modal.Header>
+          <Modal.Heading className="text-2xl font-semibold">
+            {searchedWord}
+          </Modal.Heading>
+        </Modal.Header>
 
-            <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
-              <Modal.CloseTrigger />
-              <Modal.Header>
-                <Modal.Heading className="text-2xl font-semibold">
-                  {searchedWord}
-                </Modal.Heading>
-              </Modal.Header>
+        <div className="m-0 py-4">
+          <WordDetail
+            key={searchedWord}
+            word={searchedWord}
+            onDataLoaded={setWordDetailResult}
+          />
+        </div>
 
-              <div className="m-0 py-4">
-                <WordDetail
-                  key={searchedWord}
-                  word={searchedWord}
-                  onDataLoaded={setWordDetailResult}
-                />
-              </div>
-
-              {wordDetailResult === true && !isChecking && !wordExists && (
-                <Modal.Footer>
-                  <Button
-                    isPending={isSaving}
-                    variant="primary"
-                    onPress={handleAddToVocab}
-                  >
-                    {isSaving ? <Spinner color="current" size="sm" /> : null}
-                    加入生词本
-                  </Button>
-                </Modal.Footer>
-              )}
-
-            </div>
-            {/* 液态玻璃描边层（位于内容之上） */}
-            <GlassBorder />
-          </Modal.Dialog>
-        </Modal.Container>
+        {wordDetailResult === true && !isChecking && !wordExists && (
+          <Modal.Footer>
+            <Button
+              isPending={isSaving}
+              variant="primary"
+              onPress={handleAddToVocab}
+            >
+              {isSaving ? <Spinner color="current" size="sm" /> : null}
+              加入生词本
+            </Button>
+          </Modal.Footer>
+        )}
       </ModalBackdrop>
-
-
     </div>
   );
 }

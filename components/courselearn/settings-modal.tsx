@@ -19,7 +19,6 @@ import {
 } from "@heroui/react";
 
 import ModalBackdrop from "@/components/common/modal-backdrop";
-import GlassBorder, { GlassWarp } from "./glass-border";
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -43,172 +42,164 @@ export default function SettingsModal({
   onAsrModelChange,
 }: SettingsModalProps) {
   return (
-    <ModalBackdrop isOpen={isOpen} onOpenChange={onOpenChange}>
-      <Modal.Container placement="center" size="md">
-        <Modal.Dialog className=" yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-          <GlassWarp />
-          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
-            <Modal.CloseTrigger />
-            <Modal.Header>
-              <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
-                <Gear className="size-5" />
-              </Modal.Icon>
-              <Modal.Heading>学习设置</Modal.Heading>
-            </Modal.Header>
+    <ModalBackdrop
+      isOpen={isOpen}
+      onOpenChange={onOpenChange}
+      placement="center"
+      size="md"
+    >
+      <Modal.CloseTrigger />
+      <Modal.Header>
+        <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+          <Gear className="size-5" />
+        </Modal.Icon>
+        <Modal.Heading>学习设置</Modal.Heading>
+      </Modal.Header>
 
-            <Modal.Body className="flex flex-col gap-5 py-2">
-              {/* 自动发音 */}
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-foreground">
-                    自动发音
-                  </span>
-                  <span className="text-xs text-muted">单词详情自动播放</span>
-                </div>
-                <Switch
-                  aria-label="自动发音"
-                  isSelected={settings.autoSpeak}
-                  onChange={onAutoSpeakChange}
-                >
-                  <Switch.Control>
-                    <Switch.Thumb />
-                  </Switch.Control>
-                </Switch>
-              </div>
-
-              {/* 隐藏释义 */}
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-foreground">
-                    隐藏释义
-                  </span>
-                  <span className="text-xs text-muted">单词详情隐藏中文释义</span>
-                </div>
-                <Switch
-                  aria-label="隐藏释义"
-                  isSelected={settings.hideMeaning}
-                  onChange={onHideMeaningChange}
-                >
-                  <Switch.Control>
-                    <Switch.Thumb />
-                  </Switch.Control>
-                </Switch>
-              </div>
-
-              {/* 首选口音 */}
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-sm font-medium text-foreground">
-                  首选口音
-                </span>
-                <Select
-                  aria-label="首选口音"
-                  className="w-[150px]"
-                  selectedKey={settings.accent}
-                  onSelectionChange={(k: Key | null) =>
-                    onAccentChange((k as AccentType) ?? "Speech_US")
-                  }
-                >
-                  <Select.Trigger>
-                    <Select.Value />
-                    <Select.Indicator>
-                      <ChevronDown />
-                    </Select.Indicator>
-                  </Select.Trigger>
-                  <Select.Popover className="w-[150px]">
-                    <ListBox>
-                      <ListBox.Item id="Speech_US" textValue="美式发音">
-                        美式发音
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                      <ListBox.Item id="Speech_EN" textValue="英式发音">
-                        英式发音
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                    </ListBox>
-                  </Select.Popover>
-                </Select>
-              </div>
-
-              {/* 听写次数 */}
-              <div className="flex items-center justify-between gap-4">
-                <div className="flex flex-col">
-                  <span className="text-sm font-medium text-foreground">
-                    听写次数
-                  </span>
-                  <span className="text-xs text-muted">听写时循环播放次数</span>
-                </div>
-                <NumberField
-                  aria-label="听写次数"
-                  className="w-[130px]"
-                  maxValue={10}
-                  minValue={1}
-                  value={settings.dictationCount}
-                  variant="secondary"
-                  onChange={(v) =>
-                    onDictationCountChange(Number.isNaN(v) ? 1 : v)
-                  }
-                >
-                  <NumberField.Group className="flex w-full">
-                    <NumberField.DecrementButton className="px-[10px]" />
-                    <NumberField.Input className="w-full text-center" />
-                    <NumberField.IncrementButton className="px-[10px]" />
-                  </NumberField.Group>
-                </NumberField>
-              </div>
-
-              {/* 语音识别模型 */}
-              <div className="flex items-center justify-between gap-4">
-                <span className="text-sm font-medium text-foreground">
-                  语音识别模型
-                </span>
-                <Select
-                  aria-label="语音识别模型"
-                  className="w-[150px]"
-                  selectedKey={settings.asrModelType}
-                  onSelectionChange={(k: Key | null) =>
-                    onAsrModelChange((k as AsrModelType) ?? "2")
-                  }
-                >
-                  <Select.Trigger>
-                    <Select.Value />
-                    <Select.Indicator>
-                      <ChevronDown />
-                    </Select.Indicator>
-                  </Select.Trigger>
-                  <Select.Popover className="w-[150px]">
-                    <ListBox>
-                      <ListBox.Item id="2" textValue="讯飞语音">
-                        讯飞语音
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                      <ListBox.Item id="3" textValue="百度语音">
-                        百度语音
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                      <ListBox.Item id="1" textValue="本地模型">
-                        本地模型
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                      <ListBox.Item id="4" textValue="本地模型2">
-                        本地模型2
-                        <ListBox.ItemIndicator />
-                      </ListBox.Item>
-                    </ListBox>
-                  </Select.Popover>
-                </Select>
-              </div>
-            </Modal.Body>
-
-            <Modal.Footer>
-              <Button slot="close" variant="primary">
-                完成
-              </Button>
-            </Modal.Footer>
+      <Modal.Body className="flex flex-col gap-5 py-2">
+        {/* 自动发音 */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-foreground">
+              自动发音
+            </span>
+            <span className="text-xs text-muted">单词详情自动播放</span>
           </div>
-          {/* 液态玻璃描边层（位于内容之上） */}
-          <GlassBorder />
-        </Modal.Dialog>
-      </Modal.Container>
+          <Switch
+            aria-label="自动发音"
+            isSelected={settings.autoSpeak}
+            onChange={onAutoSpeakChange}
+          >
+            <Switch.Control>
+              <Switch.Thumb />
+            </Switch.Control>
+          </Switch>
+        </div>
+
+        {/* 隐藏释义 */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-foreground">
+              隐藏释义
+            </span>
+            <span className="text-xs text-muted">单词详情隐藏中文释义</span>
+          </div>
+          <Switch
+            aria-label="隐藏释义"
+            isSelected={settings.hideMeaning}
+            onChange={onHideMeaningChange}
+          >
+            <Switch.Control>
+              <Switch.Thumb />
+            </Switch.Control>
+          </Switch>
+        </div>
+
+        {/* 首选口音 */}
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-sm font-medium text-foreground">首选口音</span>
+          <Select
+            aria-label="首选口音"
+            className="w-[150px]"
+            selectedKey={settings.accent}
+            onSelectionChange={(k: Key | null) =>
+              onAccentChange((k as AccentType) ?? "Speech_US")
+            }
+          >
+            <Select.Trigger>
+              <Select.Value />
+              <Select.Indicator>
+                <ChevronDown />
+              </Select.Indicator>
+            </Select.Trigger>
+            <Select.Popover className="w-[150px]">
+              <ListBox>
+                <ListBox.Item id="Speech_US" textValue="美式发音">
+                  美式发音
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+                <ListBox.Item id="Speech_EN" textValue="英式发音">
+                  英式发音
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+              </ListBox>
+            </Select.Popover>
+          </Select>
+        </div>
+
+        {/* 听写次数 */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-foreground">
+              听写次数
+            </span>
+            <span className="text-xs text-muted">听写时循环播放次数</span>
+          </div>
+          <NumberField
+            aria-label="听写次数"
+            className="w-[130px]"
+            maxValue={10}
+            minValue={1}
+            value={settings.dictationCount}
+            variant="secondary"
+            onChange={(v) => onDictationCountChange(Number.isNaN(v) ? 1 : v)}
+          >
+            <NumberField.Group className="flex w-full">
+              <NumberField.DecrementButton className="px-[10px]" />
+              <NumberField.Input className="w-full text-center" />
+              <NumberField.IncrementButton className="px-[10px]" />
+            </NumberField.Group>
+          </NumberField>
+        </div>
+
+        {/* 语音识别模型 */}
+        <div className="flex items-center justify-between gap-4">
+          <span className="text-sm font-medium text-foreground">
+            语音识别模型
+          </span>
+          <Select
+            aria-label="语音识别模型"
+            className="w-[150px]"
+            selectedKey={settings.asrModelType}
+            onSelectionChange={(k: Key | null) =>
+              onAsrModelChange((k as AsrModelType) ?? "2")
+            }
+          >
+            <Select.Trigger>
+              <Select.Value />
+              <Select.Indicator>
+                <ChevronDown />
+              </Select.Indicator>
+            </Select.Trigger>
+            <Select.Popover className="w-[150px]">
+              <ListBox>
+                <ListBox.Item id="2" textValue="讯飞语音">
+                  讯飞语音
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+                <ListBox.Item id="3" textValue="百度语音">
+                  百度语音
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+                <ListBox.Item id="1" textValue="本地模型">
+                  本地模型
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+                <ListBox.Item id="4" textValue="本地模型2">
+                  本地模型2
+                  <ListBox.ItemIndicator />
+                </ListBox.Item>
+              </ListBox>
+            </Select.Popover>
+          </Select>
+        </div>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button slot="close" variant="primary">
+          完成
+        </Button>
+      </Modal.Footer>
     </ModalBackdrop>
   );
 }

@@ -29,7 +29,6 @@ import {
 } from "@gravity-ui/icons";
 
 import ModalBackdrop from "@/components/common/modal-backdrop";
-import GlassBorder, { GlassWarp } from "@/components/courselearn/glass-border";
 import RadialChartWithLegend from "@/components/home/radial-chart-with-legend";
 import { saveLearntask } from "@/lib/api/modules/statistics";
 type DayStatus = "pending" | "weekend" | "done" | "missed" | "warn" | "empty";
@@ -231,13 +230,13 @@ function DayCell({ cell, isToday }: { cell: DayInfo; isToday: boolean }) {
         </span>
       </div>
       {showBar ? (
-        <div 
+        <div
           className={`flex h-6 items-center  justify-center rounded-2xl px-1 text-[12px] font-medium tabular-nums taytask transition-transform hover:scale-[1.03] ${STATUS_BAR[cell.status]}`}
           title={`学习:${cell.doneCount} / 任务:${cell.taskCount}`}
         >
           {cell.label}
         </div>
-
+      ) : (
         // <Chip
         //   color={STATUS_Type[cell.status]}
         //   size="md"
@@ -246,7 +245,6 @@ function DayCell({ cell, isToday }: { cell: DayInfo; isToday: boolean }) {
         // >
         //   {cell.label}
         // </Chip>
-      ) : (
         <div className="h-5" />
       )}
     </div>
@@ -369,124 +367,113 @@ function CreateTaskButton({
       </ButtonGroup>
 
       <Modal state={state}>
-        <ModalBackdrop isDismissable={false}>
-          <Modal.Container placement="center" size="md" >
+        <ModalBackdrop isDismissable={false} placement="center" size="md">
+          <Modal.Header>
+            <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+              <Gear className="size-5" />
+            </Modal.Icon>
+            <Modal.Heading>设置任务</Modal.Heading>
+            <p className="mt-1.5 text-sm leading-5 text-muted">
+              填写任务单词数量，平均分配至本月任务天数，存在余数时，从首日开始逐日顺次补加
+              1，直至任务全部分配完成。
+            </p>
+          </Modal.Header>
+          <Modal.Body className="flex flex-col gap-5 py-2">
+            <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
+              <label
+                className="text-sm text-foreground"
+                htmlFor="task-word-count"
+              >
+                单词数量
+              </label>
 
-             <Modal.Dialog className=" yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-              <GlassWarp /> 
-            <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
-
-              <Modal.Header>
-                <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
-                  <Gear className="size-5" />
-                </Modal.Icon>
-                <Modal.Heading>设置任务</Modal.Heading>
-                <p className="mt-1.5 text-sm leading-5 text-muted">
-                  填写任务单词数量，平均分配至本月任务天数，存在余数时，从首日开始逐日顺次补加
-                  1，直至任务全部分配完成。
-                </p>
-              </Modal.Header>
-              <Modal.Body className="flex flex-col gap-5 py-2">
-                <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
-                  <label
-                    className="text-sm text-foreground"
-                    htmlFor="task-word-count"
-                  >
-                    单词数量
-                  </label>
-
-                  <NumberField
-                    fullWidth
-                    aria-label="单词数量"
-                    maxValue={999}
-                    minValue={0}
-                    style={
-                      {
-                        "--field-border": "var(--border)",
-                      } as React.CSSProperties
+              <NumberField
+                fullWidth
+                aria-label="单词数量"
+                maxValue={999}
+                minValue={0}
+                style={
+                  {
+                    "--field-border": "var(--border)",
+                  } as React.CSSProperties
+                }
+                value={wordCount ?? NaN}
+                variant="secondary"
+                onChange={(v) => setWordCount(Number.isNaN(v) ? null : v)}
+              >
+                <NumberField.Group className="w-full flex">
+                  <NumberField.Input
+                    className="w-full"
+                    id="task-word-count"
+                    placeholder="输入任务单词数量"
+                    onInput={(e) =>
+                      setHasInput(e.currentTarget.value.length > 0)
                     }
-                    value={wordCount ?? NaN}
-                    variant="secondary"
-                    onChange={(v) => setWordCount(Number.isNaN(v) ? null : v)}
-                  >
-                    <NumberField.Group className="w-full flex">
-                      <NumberField.Input
-                        className="w-full"
-                        id="task-word-count"
-                        placeholder="输入任务单词数量"
-                        onInput={(e) =>
-                          setHasInput(e.currentTarget.value.length > 0)
-                        }
-                      />
+                  />
 
-                      {hasInput && (
-                        <button
-                          aria-label="清空任务单词数量"
-                          className="inline-flex items-center justify-center px-2 hover:opacity-70"
-                          type="button"
-                          onClick={() => {
-                            setWordCount(null);
-                            setHasInput(false);
-                          }}
-                        >
-                          <svg
-                            height="16"
-                            viewBox="0 0 16 16"
-                            width="16"
-                            xmlns="http://www.w3.org/2000/svg"
-                          >
-                            <path
-                              clipRule="evenodd"
-                              d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
-                              fill="currentColor"
-                              fillRule="evenodd"
-                            />
-                          </svg>
-                        </button>
-                      )}
-                    </NumberField.Group>
-                  </NumberField>
-                </div>
-                <div className="grid grid-cols-[80px_1fr] items-center gap-3">
-                  <span className="text-sm text-foreground">排除周末</span>
-                  <CheckboxGroup
-                    aria-label="排除周末"
-                    className="flex flex-row gap-4"
-                    value={weekend}
-                    onChange={setWeekend}
-                  >
-                    <Checkbox className="m-0" value="sat" variant="secondary">
-                      <Checkbox.Control className="size-5 rounded-full before:rounded-full">
-                        <Checkbox.Indicator />
-                      </Checkbox.Control>
-                      <Checkbox.Content>
-                        <Label>周六</Label>
-                      </Checkbox.Content>
-                    </Checkbox>
-                    <Checkbox className="m-0" value="sun" variant="secondary">
-                      <Checkbox.Control className="size-5 rounded-full before:rounded-full">
-                        <Checkbox.Indicator />
-                      </Checkbox.Control>
-                      <Checkbox.Content>
-                        <Label>周日</Label>
-                      </Checkbox.Content>
-                    </Checkbox>
-                  </CheckboxGroup>
-                </div>
-              </Modal.Body>
-              <Modal.Footer>
-                <Button slot="close" variant="secondary">
-                  取消
-                </Button>
-                <Button isDisabled={isSaving} onPress={handleSave}>
-                  {isSaving ? "保存中..." : "保存"}
-                </Button>
-              </Modal.Footer>
-              </div>
-              {/* 液态玻璃描边层（位于内容之上） */}
-              <GlassBorder />
-            </Modal.Dialog>
-          </Modal.Container>
+                  {hasInput && (
+                    <button
+                      aria-label="清空任务单词数量"
+                      className="inline-flex items-center justify-center px-2 hover:opacity-70"
+                      type="button"
+                      onClick={() => {
+                        setWordCount(null);
+                        setHasInput(false);
+                      }}
+                    >
+                      <svg
+                        height="16"
+                        viewBox="0 0 16 16"
+                        width="16"
+                        xmlns="http://www.w3.org/2000/svg"
+                      >
+                        <path
+                          clipRule="evenodd"
+                          d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
+                          fill="currentColor"
+                          fillRule="evenodd"
+                        />
+                      </svg>
+                    </button>
+                  )}
+                </NumberField.Group>
+              </NumberField>
+            </div>
+            <div className="grid grid-cols-[80px_1fr] items-center gap-3">
+              <span className="text-sm text-foreground">排除周末</span>
+              <CheckboxGroup
+                aria-label="排除周末"
+                className="flex flex-row gap-4"
+                value={weekend}
+                onChange={setWeekend}
+              >
+                <Checkbox className="m-0" value="sat" variant="secondary">
+                  <Checkbox.Control className="size-5 rounded-full before:rounded-full">
+                    <Checkbox.Indicator />
+                  </Checkbox.Control>
+                  <Checkbox.Content>
+                    <Label>周六</Label>
+                  </Checkbox.Content>
+                </Checkbox>
+                <Checkbox className="m-0" value="sun" variant="secondary">
+                  <Checkbox.Control className="size-5 rounded-full before:rounded-full">
+                    <Checkbox.Indicator />
+                  </Checkbox.Control>
+                  <Checkbox.Content>
+                    <Label>周日</Label>
+                  </Checkbox.Content>
+                </Checkbox>
+              </CheckboxGroup>
+            </div>
+          </Modal.Body>
+          <Modal.Footer>
+            <Button slot="close" variant="secondary">
+              取消
+            </Button>
+            <Button isDisabled={isSaving} onPress={handleSave}>
+              {isSaving ? "保存中..." : "保存"}
+            </Button>
+          </Modal.Footer>
         </ModalBackdrop>
       </Modal>
     </>

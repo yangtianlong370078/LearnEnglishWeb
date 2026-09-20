@@ -358,7 +358,6 @@ export default function LearnWordsPage() {
           setExpandedMap((prev) => ({ ...prev, [menuMode]: keys as Set<Key> }))
         }
       >
-
         <div
           className="flex items-center relative z-[1]  gap-1.5 px-6 py-3 bg-white/15 dark:bg-white/5"
           onClick={() => collapseCategoryAccordion(menuMode)}
@@ -408,8 +407,6 @@ export default function LearnWordsPage() {
           )}
         </div>
 
-
-
         {categories.every((cat) => cat.courseInfos.length === 0) ? (
           <div className="px-6 py-5 text-center text-sm text-muted">
             暂无课程，请先添加课程
@@ -419,7 +416,7 @@ export default function LearnWordsPage() {
         {categories
           .filter((cat) => cat.courseInfos.length > 0)
           .map((cat) => (
-            <div key={cat.id} >
+            <div key={cat.id}>
               <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
 
               <Accordion.Item id={cat.id}>
@@ -470,8 +467,6 @@ export default function LearnWordsPage() {
               </Accordion.Item>
             </div>
           ))}
-
-
       </Accordion>
       <GlassBorder />
     </div>
@@ -494,7 +489,7 @@ export default function LearnWordsPage() {
             <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
               <GlassWarp />
               <div
-                className="rounded-3xl relative z-[1] overflow-hidden "
+                className="rounded-3xl relative z-[1] h-full overflow-hidden "
                 style={
                   {
                     "--summary-accent": "0.63 0.16 215",
@@ -508,28 +503,27 @@ export default function LearnWordsPage() {
                   } as React.CSSProperties
                 }
               >
-                 <div className="dark:bg-black/15 m-[1px] rounded-3xl  p-4 flex flex-col h-full  gap-4 ">
-                <PieChartWithBreakdownDemo
-                  courseId={data?.newWord.courseId}
-                  courseName={data?.newWord.courseName ?? "生词本"}
-                  doneCount={data?.newWord.doneCount}
-                  notDoneCount={data?.newWord.notDoneCount}
-                  notLearned={data?.newWord.notLearned}
-                  eyebrow="日常积累"
-                  leadingIcon={<BookOpen className="size-6" />}
-                  menuMode="none"
-                  variant="overview"
-                />
+                <div className="dark:bg-black/15 m-[1px] rounded-3xl  p-4 flex flex-col h-full  gap-4 ">
+                  <PieChartWithBreakdownDemo
+                    courseId={data?.newWord.courseId}
+                    courseName={data?.newWord.courseName ?? "生词本"}
+                    doneCount={data?.newWord.doneCount}
+                    notDoneCount={data?.newWord.notDoneCount}
+                    notLearned={data?.newWord.notLearned}
+                    eyebrow="日常积累"
+                    leadingIcon={<BookOpen className="size-6" />}
+                    menuMode="none"
+                    variant="overview"
+                  />
                 </div>
               </div>
               <GlassBorder />
-
             </div>
 
             <div className="  relative yinyinkuan  rounded-3xl cl-glass-idle">
               <GlassWarp />
               <div
-                className="rounded-3xl relative  z-[1] overflow-hidden "
+                className="rounded-3xl relative  h-full z-[1] overflow-hidden "
                 style={
                   {
                     "--summary-accent": "0.65 0.19 32",
@@ -543,27 +537,26 @@ export default function LearnWordsPage() {
                   } as React.CSSProperties
                 }
               >
-                 <div className="dark:bg-black/15 m-[1px] rounded-3xl  p-4 flex flex-col h-full  gap-4 ">
-                <PieChartWithBreakdownDemo
-                  courseId={data?.strengthenWord.courseId}
-                  courseName={data?.strengthenWord.courseName ?? "强化区"}
-                  doneCount={data?.strengthenWord.doneCount}
-                  notDoneCount={data?.strengthenWord.notDoneCount}
-                  notLearned={data?.strengthenWord.notLearned}
-                  eyebrow="重点复习"
-                  leadingIcon={<Flame className="size-6" />}
-                  menuMode="none"
-                  variant="overview"
-                />
+                <div className="dark:bg-black/15 m-[1px] rounded-3xl  p-4 flex flex-col h-full  gap-4 ">
+                  <PieChartWithBreakdownDemo
+                    courseId={data?.strengthenWord.courseId}
+                    courseName={data?.strengthenWord.courseName ?? "强化区"}
+                    doneCount={data?.strengthenWord.doneCount}
+                    notDoneCount={data?.strengthenWord.notDoneCount}
+                    notLearned={data?.strengthenWord.notLearned}
+                    eyebrow="重点复习"
+                    leadingIcon={<Flame className="size-6" />}
+                    menuMode="none"
+                    variant="overview"
+                  />
+                </div>
               </div>
-               </div>
               <GlassBorder />
- 
             </div>
             <div className="  relative yinyinkuan  rounded-3xl cl-glass-idle">
               <GlassWarp />
               <div
-                className="rounded-3xl z-[1] relative overflow-hidden "
+                className="rounded-3xl z-[1] relative h-full overflow-hidden "
                 style={
                   {
                     "--summary-accent": "0.58 0.2 285",
@@ -578,36 +571,33 @@ export default function LearnWordsPage() {
                 }
               >
                 <div className="dark:bg-black/15 m-[1px] p-4 rounded-3xl  flex flex-col h-full  gap-4 ">
-                <PieChartWithBreakdownDemo
-                  courseId={data?.lastCourse.courseId}
-                  courseName={
-                    data?.lastCourse.courseId
-                      ? data.lastCourse.courseName
-                      : "暂无学习记录"
-                  }
-                  doneCount={data?.lastCourse.doneCount}
-                  notDoneCount={data?.lastCourse.notDoneCount}
-                  notLearned={data?.lastCourse.notLearned}
-                  emptyLabel="暂无记录"
-                  emptyHint="暂无学习记录，请先去学习具体的课程"
-                  eyebrow="正在学习"
-                  leadingIcon={<ClockArrowRotateLeft className="size-6" />}
-                  menuMode="none"
-                  variant="overview"
-                />
+                  <PieChartWithBreakdownDemo
+                    courseId={data?.lastCourse.courseId}
+                    courseName={
+                      data?.lastCourse.courseId
+                        ? data.lastCourse.courseName
+                        : "暂无学习记录"
+                    }
+                    doneCount={data?.lastCourse.doneCount}
+                    notDoneCount={data?.lastCourse.notDoneCount}
+                    notLearned={data?.lastCourse.notLearned}
+                    emptyLabel="暂无记录"
+                    emptyHint="暂无学习记录，请先去学习具体的课程"
+                    eyebrow="正在学习"
+                    leadingIcon={<ClockArrowRotateLeft className="size-6" />}
+                    menuMode="none"
+                    variant="overview"
+                  />
                 </div>
               </div>
               <GlassBorder />
-
             </div>
           </div>
 
           {data && data.myCategoryInfos.length > 0
             ? renderCategoryAccordion(data.myCategoryInfos, "full")
             : null}
-          {data
-            ? renderCategoryAccordion(data.categoryInfos, "remove")
-            : null}
+          {data ? renderCategoryAccordion(data.categoryInfos, "remove") : null}
         </>
       )}
 
@@ -615,131 +605,121 @@ export default function LearnWordsPage() {
       <ModalBackdrop
         isOpen={availableCourseModalOpen}
         onOpenChange={setAvailableCourseModalOpen}
+        placement="center"
+        size="lg"
+        contentClassName="p-2"
       >
-        <Modal.Container placement="center" size="lg">
-          <Modal.Dialog className="yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-          <GlassWarp /> 
-          <div className={`rounded-3xl relative z-[1] overflow-hidden p-2 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
-            <Modal.Header className="p-3">
-              <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
-                <Books className="size-5" />
-              </Modal.Icon>
-              <Modal.Heading>添加精选课程</Modal.Heading>
-              {/* <p className="mt-1.5 text-sm leading-5 text-muted">
+        <Modal.Header className="p-3">
+          <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+            <Books className="size-5" />
+          </Modal.Icon>
+          <Modal.Heading>添加精选课程</Modal.Heading>
+          {/* <p className="mt-1.5 text-sm leading-5 text-muted">
                 按分类查看课程，并将需要学习的课程加入列表
               </p> */}
-            </Modal.Header>
-            <Modal.Body className="p-3 ">
-              {availableCoursesLoading ? (
-                <div className="flex min-h-40 items-center justify-center">
-                  <Spinner aria-label="课程加载中" />
-                </div>
-              ) : availableCoursesError ? (
-                <div className="flex min-h-40 flex-col items-center justify-center gap-3 text-center">
-                  <p className="text-sm text-danger">{availableCoursesError}</p>
-                  <Button variant="secondary" onPress={loadAvailableCourses}>
-                    重新加载
-                  </Button>
-                </div>
-              ) : availableCategories.every(
-                (category) => category.courseInfos.length === 0,
-              ) ? (
-                <div className="flex min-h-40 items-center justify-center text-sm text-muted">
-                  暂无可添加的课程
-                </div>
-              ) : (             
-                <Accordion
-                  className="w-full p-0 overflow-hidden rounded-3xl card !bg-transparent"
-                  allowsMultipleExpanded
-                  expandedKeys={availableExpandedKeys}
-                  onExpandedChange={(keys) =>
-                    setAvailableExpandedKeys(keys as Set<Key>)
-                  }
-                >
-                   <ScrollShadow className="max-h-[40vh]  overflow-y-auto ">
-                    {availableCategories
-                      .filter((category) => category.courseInfos.length > 0)
-                      .map((category, index) => (
-
-                        <div key={category.id} >
-
-                          {index > 0 && (
-                            <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
-                          )}
-
-                          <Accordion.Item id={category.id}>
-                            <Accordion.Heading>
-                              <Accordion.Trigger>
-                                <div className="flex items-center gap-2">
-                                  <GraduationCap className="size-4 text-muted" />
-                                  <span className="font-medium">
-                                    {category.name}
-                                  </span>
-                                  <Chip color="accent" size="sm" variant="soft">
-                                    {category.courseInfos.length}
-                                  </Chip>
-                                </div>
-                                <Accordion.Indicator />
-                              </Accordion.Trigger>
-                            </Accordion.Heading>
-                            <Accordion.Panel>
-                              <Accordion.Body>
-                                <div className="flex flex-col gap-1">
-                                  {category.courseInfos.map((course) => (
-                                    <Card
-                                      key={course.courseId}
-                                      className="rounded-2xl mt-2 p-1"
-                                    >
-                                      <ItemCard variant="transparent">
-                                        <ItemCard.Icon>
-                                          <Book />
-                                        </ItemCard.Icon>
-                                        <ItemCard.Content>
-                                          <ItemCard.Title>
-                                            {course.courseName}
-                                          </ItemCard.Title>
-                                          <ItemCard.Description>
-                                            {course.wordsCount} 个单词
-                                          </ItemCard.Description>
-                                        </ItemCard.Content>
-                                        <ItemCard.Action>
-                                          <Button
-                                            size="sm"
-                                            variant="outline"
-                                            className="inline-flex items-center gap-0.5 rounded-full wordfy bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300"
-                                            onPress={() =>
-                                              openAddCourseConfirm(course)
-                                            }
-                                          >
-                                            <Plus className="size-4" />
-                                            添加
-                                          </Button>
-                                        </ItemCard.Action>
-                                      </ItemCard>
-                                    </Card>
-                                  ))}
-                                </div>
-                              </Accordion.Body>
-                            </Accordion.Panel>
-                          </Accordion.Item>
-                        </div>
-                      ))}
-                   </ScrollShadow>
-                </Accordion>
-               
-              )}
-            </Modal.Body>
-            <Modal.Footer className="p-0 m-2">
-              <Button slot="close" variant="secondary">
-                关闭
+        </Modal.Header>
+        <Modal.Body className="p-3 ">
+          {availableCoursesLoading ? (
+            <div className="flex min-h-40 items-center justify-center">
+              <Spinner aria-label="课程加载中" />
+            </div>
+          ) : availableCoursesError ? (
+            <div className="flex min-h-40 flex-col items-center justify-center gap-3 text-center">
+              <p className="text-sm text-danger">{availableCoursesError}</p>
+              <Button variant="secondary" onPress={loadAvailableCourses}>
+                重新加载
               </Button>
-            </Modal.Footer>
+            </div>
+          ) : availableCategories.every(
+              (category) => category.courseInfos.length === 0,
+            ) ? (
+            <div className="flex min-h-40 items-center justify-center text-sm text-muted">
+              暂无可添加的课程
+            </div>
+          ) : (
+            <Accordion
+              className="w-full p-0 overflow-hidden rounded-3xl card !bg-transparent"
+              allowsMultipleExpanded
+              expandedKeys={availableExpandedKeys}
+              onExpandedChange={(keys) =>
+                setAvailableExpandedKeys(keys as Set<Key>)
+              }
+            >
+              <ScrollShadow className="max-h-[40vh]  overflow-y-auto ">
+                {availableCategories
+                  .filter((category) => category.courseInfos.length > 0)
+                  .map((category, index) => (
+                    <div key={category.id}>
+                      {index > 0 && (
+                        <hr className="border-t border-[rgba(0,0,0,0.05)] dark:border-[rgba(255,255,255,0.05)]" />
+                      )}
 
-</div>
-            {/* 液态玻璃描边层（位于内容之上） */}
-            <GlassBorder />
-          </Modal.Dialog>
-        </Modal.Container>
+                      <Accordion.Item id={category.id}>
+                        <Accordion.Heading>
+                          <Accordion.Trigger>
+                            <div className="flex items-center gap-2">
+                              <GraduationCap className="size-4 text-muted" />
+                              <span className="font-medium">
+                                {category.name}
+                              </span>
+                              <Chip color="accent" size="sm" variant="soft">
+                                {category.courseInfos.length}
+                              </Chip>
+                            </div>
+                            <Accordion.Indicator />
+                          </Accordion.Trigger>
+                        </Accordion.Heading>
+                        <Accordion.Panel>
+                          <Accordion.Body>
+                            <div className="flex flex-col gap-1">
+                              {category.courseInfos.map((course) => (
+                                <Card
+                                  key={course.courseId}
+                                  className="rounded-2xl mt-2 p-1"
+                                >
+                                  <ItemCard variant="transparent">
+                                    <ItemCard.Icon>
+                                      <Book />
+                                    </ItemCard.Icon>
+                                    <ItemCard.Content>
+                                      <ItemCard.Title>
+                                        {course.courseName}
+                                      </ItemCard.Title>
+                                      <ItemCard.Description>
+                                        {course.wordsCount} 个单词
+                                      </ItemCard.Description>
+                                    </ItemCard.Content>
+                                    <ItemCard.Action>
+                                      <Button
+                                        size="sm"
+                                        variant="outline"
+                                        className="inline-flex items-center gap-0.5 rounded-full wordfy bg-transparent px-3 py-2 text-sm text-default-700 dark:border-default-700 dark:text-default-300"
+                                        onPress={() =>
+                                          openAddCourseConfirm(course)
+                                        }
+                                      >
+                                        <Plus className="size-4" />
+                                        添加
+                                      </Button>
+                                    </ItemCard.Action>
+                                  </ItemCard>
+                                </Card>
+                              ))}
+                            </div>
+                          </Accordion.Body>
+                        </Accordion.Panel>
+                      </Accordion.Item>
+                    </div>
+                  ))}
+              </ScrollShadow>
+            </Accordion>
+          )}
+        </Modal.Body>
+        <Modal.Footer className="p-0 m-2">
+          <Button slot="close" variant="secondary">
+            关闭
+          </Button>
+        </Modal.Footer>
       </ModalBackdrop>
 
       {/* 加入学习列表确认弹框 */}
@@ -753,34 +733,26 @@ export default function LearnWordsPage() {
             setAddCourseError(null);
           }
         }}
+        placement="center"
+        size="md"
       >
-        <Modal.Container placement="center" size="md">
-          <Modal.Dialog className="yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-          <GlassWarp /> 
-          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
-            
-            <Modal.Header>
-              <Modal.Heading>添加课程</Modal.Heading>
-              <p className="mt-1.5 text-sm leading-5 text-muted">
-                是否将课程【{selectedCourse?.courseName}】加入学习列表
-              </p>
-            </Modal.Header>
-            {addCourseError ? (
-              <Modal.Body>
-                <p className="text-sm text-danger">{addCourseError}</p>
-              </Modal.Body>
-            ) : null}
-            <Modal.Footer>
-              <Button slot="close" variant="secondary">
-                取消
-              </Button>
-              <Button onPress={handleAddCourse}>确定</Button>
-            </Modal.Footer>
-            </div>
-            {/* 液态玻璃描边层（位于内容之上） */}
-            <GlassBorder />
-          </Modal.Dialog>
-        </Modal.Container>
+        <Modal.Header>
+          <Modal.Heading>添加课程</Modal.Heading>
+          <p className="mt-1.5 text-sm leading-5 text-muted">
+            是否将课程【{selectedCourse?.courseName}】加入学习列表
+          </p>
+        </Modal.Header>
+        {addCourseError ? (
+          <Modal.Body>
+            <p className="text-sm text-danger">{addCourseError}</p>
+          </Modal.Body>
+        ) : null}
+        <Modal.Footer>
+          <Button slot="close" variant="secondary">
+            取消
+          </Button>
+          <Button onPress={handleAddCourse}>确定</Button>
+        </Modal.Footer>
       </ModalBackdrop>
 
       {/* 添加/编辑课程弹框（受控） */}
@@ -788,94 +760,86 @@ export default function LearnWordsPage() {
         isDismissable={false}
         isOpen={courseModalOpen}
         onOpenChange={setCourseModalOpen}
+        placement="center"
+        size="md"
       >
-        <Modal.Container placement="center" size="md">
-           <Modal.Dialog className="yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-          <GlassWarp /> 
-          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
-           
-            <Modal.Header>
-              <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
-                <Gear className="size-5" />
-              </Modal.Icon>
-              <Modal.Heading>
-                {editCourseId === 0 ? "添加课程" : "编辑课程"}
-              </Modal.Heading>
-              <p className="mt-1.5 text-sm leading-5 text-muted">
-                {editCourseId === 0
-                  ? "添加课程后，在课程中录入单词便可开始学习"
-                  : "修改课程名称后保存即可生效"}
-              </p>
-            </Modal.Header>
-            <Modal.Body className="flex flex-col gap-5 py-2">
-              <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
-                <label
-                  className="text-sm text-foreground"
-                  htmlFor="course-name-input"
-                >
-                  课程名称
-                </label>
+        <Modal.Header>
+          <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+            <Gear className="size-5" />
+          </Modal.Icon>
+          <Modal.Heading>
+            {editCourseId === 0 ? "添加课程" : "编辑课程"}
+          </Modal.Heading>
+          <p className="mt-1.5 text-sm leading-5 text-muted">
+            {editCourseId === 0
+              ? "添加课程后，在课程中录入单词便可开始学习"
+              : "修改课程名称后保存即可生效"}
+          </p>
+        </Modal.Header>
+        <Modal.Body className="flex flex-col gap-5 py-2">
+          <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
+            <label
+              className="text-sm text-foreground"
+              htmlFor="course-name-input"
+            >
+              课程名称
+            </label>
 
-                <InputGroup
-                  style={
-                    {
-                      "--field-border": "var(--border)",
-                    } as React.CSSProperties
-                  }
-                  variant="secondary"
-                >
-                  <InputGroup.Prefix>
-                    <GraduationCap className="size-4 text-muted" />
-                  </InputGroup.Prefix>
-                  <InputGroup.Input
-                    className="w-full max-w-[280px]"
-                    id="course-name-input"
-                    placeholder="输入课程名称"
-                    value={courseName}
-                    onChange={(e) => setCourseName(e.target.value)}
-                  />
+            <InputGroup
+              style={
+                {
+                  "--field-border": "var(--border)",
+                } as React.CSSProperties
+              }
+              variant="secondary"
+            >
+              <InputGroup.Prefix>
+                <GraduationCap className="size-4 text-muted" />
+              </InputGroup.Prefix>
+              <InputGroup.Input
+                className="w-full max-w-[280px]"
+                id="course-name-input"
+                placeholder="输入课程名称"
+                value={courseName}
+                onChange={(e) => setCourseName(e.target.value)}
+              />
 
-                  {courseName.length > 0 && (
-                    <button
-                      aria-label="清空内容"
-                      className="inline-flex items-center justify-center px-2 hover:opacity-70"
-                      type="button"
-                      onClick={() => setCourseName("")}
-                    >
-                      <svg
-                        height="16"
-                        viewBox="0 0 16 16"
-                        width="16"
-                        xmlns="http://www.w3.org/2000/svg"
-                      >
-                        <path
-                          clipRule="evenodd"
-                          d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
-                          fill="currentColor"
-                          fillRule="evenodd"
-                        />
-                      </svg>
-                    </button>
-                  )}
-                </InputGroup>
-              </div>
-            </Modal.Body>
-            <Modal.Footer>
-              <Button slot="close" variant="secondary">
-                取消
-              </Button>
-              <Button
-                isDisabled={saving || courseName.trim().length === 0}
-                onPress={handleSaveCourse}
-              >
-                {saving ? "保存中..." : "保存"}
-              </Button>
-            </Modal.Footer>
-            </div>
-            {/* 液态玻璃描边层（位于内容之上） */}
-            <GlassBorder />
-          </Modal.Dialog>
-        </Modal.Container>
+              {courseName.length > 0 && (
+                <button
+                  aria-label="清空内容"
+                  className="inline-flex items-center justify-center px-2 hover:opacity-70"
+                  type="button"
+                  onClick={() => setCourseName("")}
+                >
+                  <svg
+                    height="16"
+                    viewBox="0 0 16 16"
+                    width="16"
+                    xmlns="http://www.w3.org/2000/svg"
+                  >
+                    <path
+                      clipRule="evenodd"
+                      d="M8 15A7 7 0 1 0 8 1a7 7 0 0 0 0 14M6.53 5.47a.75.75 0 0 0-1.06 1.06L6.94 8L5.47 9.47a.75.75 0 1 0 1.06 1.06L8 9.06l1.47 1.47a.75.75 0 1 0 1.06-1.06L9.06 8l1.47-1.47a.75.75 0 1 0-1.06-1.06L8 6.94z"
+                      fill="currentColor"
+                      fillRule="evenodd"
+                    />
+                  </svg>
+                </button>
+              )}
+            </InputGroup>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button slot="close" variant="secondary">
+            取消
+          </Button>
+          <Button
+            isDisabled={saving || courseName.trim().length === 0}
+            onPress={handleSaveCourse}
+          >
+            {saving ? "保存中..." : "保存"}
+          </Button>
+        </Modal.Footer>
       </ModalBackdrop>
 
       {/* 删除课程确认弹框（受控） */}
@@ -883,35 +847,27 @@ export default function LearnWordsPage() {
         isDismissable={false}
         isOpen={deleteModalOpen}
         onOpenChange={setDeleteModalOpen}
+        placement="center"
+        size="md"
       >
-        <Modal.Container placement="center" size="md">
-           <Modal.Dialog className="yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
-          <GlassWarp /> 
-          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
-           
-            <Modal.Header>
-              <Modal.Heading>移除课程</Modal.Heading>
-              <p className="mt-1.5 text-sm leading-5 text-muted">
-                将课程【{deleteCourseName}】在学习列表中移除
-              </p>
-            </Modal.Header>
-            <Modal.Footer>
-              <Button slot="close" variant="secondary">
-                取消
-              </Button>
-              <Button
-                isDisabled={deleting}
-                variant="danger"
-                onPress={handleDeleteCourse}
-              >
-                {deleting ? "移除中..." : "确定"}
-              </Button>
-            </Modal.Footer>
-            </div>
-            {/* 液态玻璃描边层（位于内容之上） */}
-            <GlassBorder />
-          </Modal.Dialog>
-        </Modal.Container>
+        <Modal.Header>
+          <Modal.Heading>移除课程</Modal.Heading>
+          <p className="mt-1.5 text-sm leading-5 text-muted">
+            将课程【{deleteCourseName}】在学习列表中移除
+          </p>
+        </Modal.Header>
+        <Modal.Footer>
+          <Button slot="close" variant="secondary">
+            取消
+          </Button>
+          <Button
+            isDisabled={deleting}
+            variant="danger"
+            onPress={handleDeleteCourse}
+          >
+            {deleting ? "移除中..." : "确定"}
+          </Button>
+        </Modal.Footer>
       </ModalBackdrop>
     </div>
   );
