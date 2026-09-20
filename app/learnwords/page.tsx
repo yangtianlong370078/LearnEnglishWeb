@@ -619,7 +619,7 @@ export default function LearnWordsPage() {
         <Modal.Container placement="center" size="lg">
           <Modal.Dialog className="yinyinkuan cl-glass-idle p-0 app-glass-dialog shadow-[inset_0_1px_0_rgb(255_255_255/0.3),0_8px_32px_rgb(0_0_0/0.12)] dark:shadow-[inset_0_1px_0_rgb(255_255_255/0.07),0_8px_32px_rgb(0_0_0/0.4)]">
           <GlassWarp /> 
-          <div className={`rounded-3xl relative z-[1] overflow-hidden p-5 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
+          <div className={`rounded-3xl relative z-[1] overflow-hidden p-2 !bg-white/[0.3] dark:!bg-black/[0.15]`}>
             <Modal.Header className="p-3">
               <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
                 <Books className="size-5" />

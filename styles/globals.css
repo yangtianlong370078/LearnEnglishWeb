@@ -81,7 +81,7 @@
     animation-fill-mode: var(--tw-animation-fill-mode, none) !important;
   }
 
-  /* 2) 恢复被 motion-reduce:transition-none 关闭的微交互过渡
+  /* 2) 恢复被 motion-reduce:transition-none 关闭的微交互过渡  
         （按钮按压、手风琴指示器旋转、hover 变色等）。
         仅恢复 transition-property；具体时长/缓动仍由各组件自身的 transition-duration 决定。 */
   *,
@@ -91,7 +91,7 @@
   }
 }
 
-/* ── 毛玻璃：覆盖 HeroUI v3 的 --surface* 变量为半透明 ──
+/* ── 毛玻璃：覆盖 HeroUI v3 的 --surface* 变量为半透明 ──  
    HeroUI v3 Card/Accordion 等用 .surface--default 类，背景来自 var(--surface) */
 :root {
   --surface: oklch(1 0 0 / 0.42) !important;
@@ -1320,21 +1320,39 @@ input::-moz-placeholder {
   color: rgba(255, 255, 255, 0.5);
 }
 
+.modal__dialog .select__trigger {
+  border: 1px solid rgba(0, 0, 0, 0.1) !important;
+  background-color: rgba(255, 255, 255, 0.4) !important;
+  color: var(--foreground);
+  outline: none;
+  box-shadow: none !important;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+}
+.dark .modal__dialog .select__trigger {
+   border-color: rgba(255, 255, 255, 0.1) !important;
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  box-shadow: none !important;
+}
 
 .modal__dialog .number-field__group,
-.modal__dialog .input-group{
+.modal__dialog .input-group,
+.modal__dialog .checkbox__control {
   border: 1px solid rgba(0, 0, 0, 0.1) !important;
   background-color: rgba(255, 255, 255, 0.4) !important;
   color: var(--foreground);
   outline: none;
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
 }
-
+ 
 .dark .modal__dialog .number-field__group,
-.dark .modal__dialog .input-group{
+.dark .modal__dialog .input-group,
+.dark .modal__dialog .checkbox__control{
   border-color: rgba(255, 255, 255, 0.1) !important;
   background-color: rgba(255, 255, 255, 0.05) !important;
 }
+
+
+
 
 .button--secondary {
     border: 1px solid rgba(0, 0, 0, 0.1) !important;
@@ -1345,4 +1363,28 @@ input::-moz-placeholder {
     background-color: rgba(255, 255, 255, 0.05) !important;
     border-color: rgba(255, 255, 255, 0.1) !important; 
 }
- 
+  
+.close-button--default{
+  border: 1px solid rgba(0, 0, 0, 0.151) !important;
+  background-color: rgba(255, 255, 255, 0.808) !important;
+  color: var(--foreground);
+  outline: none;
+  transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+}
+   
+.dark .close-button--default {
+  border-color: rgba(255, 255, 255, 0.205) !important;
+  background-color: rgba(0, 0, 0, 0.089) !important;
+}
+  
+.switch {
+    --default:rgba(0, 0, 0, 0.2) ;
+   
+    --switch-control-bg: var(--default);
+    
+}
+
+.dark .switch {
+ --default:rgba(255, 255, 255, 0.2)  ;
+ --switch-control-bg: var(--default);
+}
