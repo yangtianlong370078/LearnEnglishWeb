@@ -348,7 +348,10 @@ export default function LearnWordsPage() {
     categories: CategoryInfo[],
     menuMode: "full" | "remove",
   ) => (
-    <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
+    <div
+      className="  relative yinyinkuan rounded-3xl cl-glass-idle"
+      data-glass-no-promotion=""
+    >
       <GlassWarp />
       <Accordion
         allowsMultipleExpanded

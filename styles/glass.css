@@ -222,6 +222,15 @@ html[data-glass-wallpaper-ready] :is(.glass-warp, .glass-border)[data-glass-visi
   will-change: opacity;
 }
 
+/* Accordion containers can move a registered surface out of the viewport and
+   back during collapse. Keep their fixed wallpaper under normal paint
+   management so the browser does not reuse a stale promoted raster. */
+html[data-glass-wallpaper-ready]
+  [data-glass-no-promotion]
+  > :is(.glass-warp, .glass-border) {
+  will-change: auto;
+}
+
 /* Repaint the brief relative-position shake instead of translating an old
    cached layer, so its wallpaper remains fixed while the card moves. */
 html[data-glass-wallpaper-ready] .cl-shake :is(.glass-warp, .glass-border) {

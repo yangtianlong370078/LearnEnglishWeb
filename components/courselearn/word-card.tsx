@@ -252,9 +252,9 @@ function WordCardInner(
       // 按空格不再校验，仅清空输入并淡出为默认色，光标留在本卡
       if (
         (!effectiveTranslationOn &&
-        !effectivePracticeOn &&
-        resultStateRef.current !== "idle")||
-        (!effectivePracticeOn&&effectiveTranslationOn&&resultStateRef.current !== "idle")
+          !effectivePracticeOn &&
+          resultStateRef.current !== "idle") ||
+        (!effectivePracticeOn && effectiveTranslationOn && resultStateRef.current !== "idle")
       ) {
         clearInputAndFade();
         requestAnimationFrame(() => inputRef.current?.focus());
@@ -263,10 +263,10 @@ function WordCardInner(
 
       if (!runValidation(mode)) return;
 
-      if (effectivePracticeOn ) {
+      if (effectivePracticeOn) {
         // 练习：空格校验后清空输入，光标留在本卡
         setInputValue("");
-          requestAnimationFrame(() => inputRef.current?.focus());
+        requestAnimationFrame(() => inputRef.current?.focus());
 
       } else {
         // 非练习：不清空本卡输入，直接切换到下一张
@@ -592,30 +592,23 @@ function WordCardInner(
 
   return (
     <div
-      className={`yinyinkuan cl-glass-idle rounded-3xl p-0 group relative overflow-visible ${
-        shaking ? "cl-shake" : ""
-      } ${
-        colorTransition
+      className={`yinyinkuan cl-glass-idle rounded-3xl p-0 group relative overflow-visible ${shaking ? "cl-shake" : ""
+        } ${colorTransition
           ? "transition-[background-color,border-color,box-shadow] duration-500 ease-out"
           : ""
-      } `}
+        } `}
       onAnimationEnd={() => setShaking(false)}
     >
+      <GlassWarp />
+      {/* Keep the same blur layer mounted when the answer tint changes. */}
       <ConfettiBurst fireKey={confettiKey} />
 
-      {/* Keep the same blur layer mounted when the answer tint changes. */}
-      <GlassWarp />
+      <span
+        aria-hidden="true"
+        className={`pointer-events-none absolute !absolute !-left-[10px] !-top-[10px] ${resultState !== "idle" ? "cl-result-badge" : ""}  ${resultState === "correct" ? "is-correct" : "is-wrong"}  `}
+      >
 
-
-      {/* 内容层奶白底色：内缩 1.5px 避开描边环区，light:bg-white/15  dark:bg-black/10 dark:bg-white/5 dark:bg-[hsla(0,0%,50%,0.05)]!
-          让边框环直接透出 warp 玻璃（更"裸透"的液态玻璃边框） */}
-    
-        <span
-          aria-hidden="true"
-          className={`pointer-events-none absolute !absolute !-left-[10px] !-top-[10px] ${resultState !== "idle"?"cl-result-badge":"" }  ${resultState === "correct" ? "is-correct" : "is-wrong"}  ` }
-        >
-
-       {resultState !== "idle" && (
+        {resultState !== "idle" && (
           <svg fill="none" viewBox="0 0 24 24">
             {resultState === "correct" ? (
               <path
@@ -643,14 +636,12 @@ function WordCardInner(
               </>
             )}
           </svg>
-      )}
+        )}
 
-         </span>
+      </span>
 
       {/* 校验结果角标：左上徽章（对勾 / 叉号描边绘制动画），避开右上角的翻译/练习按钮 */}
       {/* 内容层需 relative z-[1]：absolute 定位的 warp 玻璃层会盖住 static 内容 */}
-
-      
 
       {/* 内容层需 relative z-[1]：absolute 定位的 warp 玻璃层会盖住 static 内容 */}
       <div className={`rounded-3xl relative z-[1] overflow-hidden  ${cardStateClass} `}>
@@ -686,17 +677,15 @@ function WordCardInner(
               <button
                 aria-label="翻译"
                 aria-pressed={effectiveTranslationOn}
-                className={`inline-flex size-7 items-center justify-center rounded-full transition-all duration-300 ${
-                  effectiveTranslationOn
-                    ? `bg-white text-foreground shadow-md ring-1 ring-black/5 dark:bg-white/35 dark:text-white dark:shadow-none dark:ring-white/40 ${
-                        cardTranslationDisabled
-                          ? "cursor-not-allowed"
-                          : "hover:shadow-lg"
-                      }`
-                    : cardTranslationDisabled
-                      ? "cursor-not-allowed bg-white/40 text-muted opacity-60 dark:bg-white/5"
-                      : "bg-white/60 text-foreground/75 hover:-translate-y-px hover:bg-white/80 hover:shadow-sm dark:bg-white/10 dark:text-foreground/90 dark:hover:bg-white/15 dark:hover:shadow-none"
-                }`}
+                className={`inline-flex size-7 items-center justify-center rounded-full transition-all duration-300 ${effectiveTranslationOn
+                  ? `bg-white text-foreground shadow-md ring-1 ring-black/5 dark:bg-white/35 dark:text-white dark:shadow-none dark:ring-white/40 ${cardTranslationDisabled
+                    ? "cursor-not-allowed"
+                    : "hover:shadow-lg"
+                  }`
+                  : cardTranslationDisabled
+                    ? "cursor-not-allowed bg-white/40 text-muted opacity-60 dark:bg-white/5"
+                    : "bg-white/60 text-foreground/75 hover:-translate-y-px hover:bg-white/80 hover:shadow-sm dark:bg-white/10 dark:text-foreground/90 dark:hover:bg-white/15 dark:hover:shadow-none"
+                  }`}
                 disabled={cardTranslationDisabled}
                 title={
                   globalMode
@@ -714,17 +703,15 @@ function WordCardInner(
             <button
               aria-label="练习"
               aria-pressed={effectivePracticeOn}
-              className={`inline-flex size-7 items-center justify-center rounded-full transition-all duration-300 ${
-                effectivePracticeOn
-                  ? `bg-white text-foreground shadow-md ring-1 ring-black/5 dark:bg-white/35 dark:text-white dark:shadow-none dark:ring-white/40 ${
-                      cardPracticeDisabled
-                        ? "cursor-not-allowed"
-                        : "hover:shadow-lg"
-                    }`
-                  : cardPracticeDisabled
-                    ? "cursor-not-allowed bg-white/40 text-muted opacity-60 dark:bg-white/5"
-                    : "bg-white/60 text-foreground/75 hover:-translate-y-px hover:bg-white/80 hover:shadow-sm dark:bg-white/10 dark:text-foreground/90 dark:hover:bg-white/15 dark:hover:shadow-none"
-              }`}
+              className={`inline-flex size-7 items-center justify-center rounded-full transition-all duration-300 ${effectivePracticeOn
+                ? `bg-white text-foreground shadow-md ring-1 ring-black/5 dark:bg-white/35 dark:text-white dark:shadow-none dark:ring-white/40 ${cardPracticeDisabled
+                  ? "cursor-not-allowed"
+                  : "hover:shadow-lg"
+                }`
+                : cardPracticeDisabled
+                  ? "cursor-not-allowed bg-white/40 text-muted opacity-60 dark:bg-white/5"
+                  : "bg-white/60 text-foreground/75 hover:-translate-y-px hover:bg-white/80 hover:shadow-sm dark:bg-white/10 dark:text-foreground/90 dark:hover:bg-white/15 dark:hover:shadow-none"
+                }`}
               disabled={cardPracticeDisabled}
               title={globalMode ? "全局学习模式下跟随全局【练习】开关" : "练习"}
               type="button"
@@ -736,12 +723,9 @@ function WordCardInner(
         )}
         <Card.Content className="flex flex-col h-[220px]! rounded-3xl p-[20px] justify-between ">
           {/* 主体：按模式渲染 */}
-
-
-<div className={`flex flex-col justify-center ${effectiveTranslationOn ? "mt-2 gap-0.5 " : "gap-2"} ${ !effectiveMode ?"mt-2":  effectiveMode !== "en-cn" && effectiveMode !== "cn-en" ? "mb-3 mt-1 " : ""}   h-full items-center text-center`}>
-
-  {renderBody()}
-</div>
+          <div className={`flex flex-col justify-center ${effectiveTranslationOn ? "mt-2 gap-0.5 " : "gap-2"} ${!effectiveMode ? "mt-2" : effectiveMode !== "en-cn" && effectiveMode !== "cn-en" ? "mb-3 mt-1 " : ""}   h-full items-center text-center`}>
+            {renderBody()}
+          </div>
 
           {/* <div className="flex flex-col justify-center gap-2 mb-3 h-full items-center text-center">
             {renderBody()}
@@ -760,28 +744,26 @@ function WordCardInner(
                   key={mode}
                   aria-label={MODE_LABEL[mode]}
                   aria-pressed={active}
-                  className={`cl-mode-btn inline-flex flex-col items-center gap-1 transition-all duration-300 ${
-                    globalMode
-                      ? `cursor-not-allowed ${globalMode === mode ? "" : "opacity-40"}`
-                      : "cursor-pointer"
-                  }`}
+                  className={`cl-mode-btn inline-flex flex-col items-center gap-1 transition-all duration-300 ${globalMode
+                    ? `cursor-not-allowed ${globalMode === mode ? "" : "opacity-40"}`
+                    : "cursor-pointer"
+                    }`}
                   disabled={!!globalMode}
                   style={
                     {
-                  "--cl-ring0": theme.light,
-                  "--cl-ring": theme.from,
-                  "--cl-ring2": theme.to,
-                  "--cl-soft": theme.soft,
-                  "--cl-ring3": theme.dark,
+                      "--cl-ring0": theme.light,
+                      "--cl-ring": theme.from,
+                      "--cl-ring2": theme.to,
+                      "--cl-soft": theme.soft,
+                      "--cl-ring3": theme.dark,
                     } as React.CSSProperties
                   }
                   type="button"
                   onClick={() => handleModeButton(mode)}
                 >
                   <RingProgress
-                    className={`transition-transform duration-300 ${
-                      active ? "scale-105" : ""
-                    }`}
+                    className={`transition-transform duration-300 ${active ? "scale-105" : ""
+                      }`}
                     color="var(--cl-ring)"
                     colorTo="var(--cl-ring2)"
                     percent={percent}
@@ -810,7 +792,7 @@ function WordCardInner(
       </div>
 
       {/* 液态玻璃描边层（位于内容之上）：源码的 screen/overlay 两层渐变描边 */}
-     <GlassBorder />
+      <GlassBorder />
     </div>
   );
 
@@ -858,20 +840,18 @@ function WordCardInner(
             aria-label={
               speakerState === "idle" ? "播放发音" : "停止播放"
             }
-            className={`cl-mic-btn mb-1 ${
-              speakerState === "playing"
-                ? "is-playing"
-                : speakerState === "waiting"
-                  ? "is-waiting"
-                  : ""
-            }`}
+            className={`cl-mic-btn mb-1 ${speakerState === "playing"
+              ? "is-playing"
+              : speakerState === "waiting"
+                ? "is-waiting"
+                : ""
+              }`}
             type="button"
             onClick={toggleDictation}
           >
             <SpeakerIcon
-              className={`size-6 ${
-                speakerState === "playing"? "cl-speaker-playing": speakerState === "waiting" ? "cl-speaker-waiting": ""
-              }`}
+              className={`size-6 ${speakerState === "playing" ? "cl-speaker-playing" : speakerState === "waiting" ? "cl-speaker-waiting" : ""
+                }`}
             />
           </button>
           {/* <span
@@ -901,35 +881,34 @@ function WordCardInner(
         {/* {showSecondary && <span className="text-sm text-muted">{word.cn}</span>} */}
 
 
-        
+
         <button
           aria-label={
             micState === "recording" ? "结束录音" : "开始语音识别"
           }
-          className={` mt-[10px]!  ${
-            micState === "recording" ? " cl-mic-btn is-recording" : "cl-mic-btn"
-          }`}
+          className={` mt-[10px]!  ${micState === "recording" ? " cl-mic-btn is-recording" : "cl-mic-btn"
+            }`}
           type="button"
           onClick={toggleSpeech}
         >
-          
 
 
-  {micState === "recording" ? (
-          <span aria-hidden="true" className="cl-wave">
-            <span />
-            <span />
-            <span />
-            <span />
-            <span />
-          </span>
-        ) : <MicrophoneIcon className="size-6 " />}
+
+          {micState === "recording" ? (
+            <span aria-hidden="true" className="cl-wave">
+              <span />
+              <span />
+              <span />
+              <span />
+              <span />
+            </span>
+          ) : <MicrophoneIcon className="size-6 " />}
 
 
         </button>
 
 
-       
+
 
 
         {/* <span

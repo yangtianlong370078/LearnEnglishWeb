@@ -100,13 +100,15 @@ The decorative spans no longer use `translateZ(0)`: any transform ancestor
 background scroll with that ancestor in Chromium. Masks, paint containment,
 isolation and the navigation's SVG filter preserve fixed background alignment.
 The brief wrong-answer shake now uses equivalent relative `left` offsets, so
-the whole card still shakes without re-anchoring the wallpaper. Its decorations
-temporarily drop the compositor hint during that 0.5s animation to avoid moving
-an old cached layer with the relative offset.
+the whole card still shakes without re-anchoring the wallpaper. Its decorative
+layers temporarily use `will-change: auto` for the duration of that animation.
 
-Visible decorative spans use `will-change: opacity` to retain compositor
-caching without changing coordinates or opacity. An IntersectionObserver
-releases this hint for offscreen cards.
+Decorative spans use visibility-based `will-change: opacity` promotion for
+ordinary glass surfaces. The two course accordion containers on `/learnwords`
+opt out with `data-glass-no-promotion`: layout changes can move their fixed
+wallpaper out of the viewport and back, and an explicitly promoted layer can
+retain an empty or stale raster in that case. The shared pre-blurred wallpaper
+textures are still cached and reused.
 
 The inner glow uses a nested decorative span: a conic mask interpolates corner
 intensity, while the source pseudo-element uses linear/radial masks for inward
@@ -114,8 +116,10 @@ falloff. The thin rim and its white specular reflection remain separate.
 
 The surface controller manages registration, cache lifetime, viewport resize
 and visibility. One shared ResizeObserver tracks border radii on registration
-and resize, with batched reads/writes and no unchanged style writes. It has no
-scroll/mouse/animation listener or scroll-time per-card geometry queries.
+and resize, with batched reads/writes and no unchanged style writes. One shared
+IntersectionObserver tracks registered hosts' visibility; CSS keeps promotion
+disabled for the two opted-out containers. The controller has no scroll, mouse
+or animation listener or scroll-time per-card geometry queries.
 Navigation retains its content-filter geometry updates;
 they do not position the cached wallpaper. This is a wallpaper renderer: a
 future glass component overlapping arbitrary foreground content needs an
@@ -311,3 +315,47 @@ p95 was 16.8ms except for one final 33.3ms sample; software-mode p95 ranged from
 16.8 to 33.4ms in both versions. Final 360 samples also retain software-rendering
 tail latency (p95 50-66.6ms). These measurements do not establish that every
 browser's perceived wheel latency is eliminated.
+
+## Accordion layout follow-up (2026-09-21)
+
+A minimal fixed-background case reproduces the blank returning surface with
+`will-change: opacity` in Chrome 153, Chromium 145 and 360/Chromium 132,
+without React or navigation filters. Removing that hint makes all seven
+offscreen/onscreen cycles match the initial surface pixel for pixel.
+
+The actual `/learnwords` page was checked with 18 fictional courses, desktop
+and mobile viewports, light/dark themes and photo/gradient wallpapers in Chrome.
+All 24 expand/collapse cycles restore the featured-course glass without scrolling,
+including collapsing through the section heading. Screenshot differences are
+zero except for one mobile gradient sample with mean channel difference below
+0.00005/255; no channel differs by more than 3/255. No page exceptions occurred.
+TypeScript and focused ESLint pass; React Doctor remains 52/100 with the same
+7 existing errors and 46 warnings.
+
+A real-wheel check with scroll callbacks blocked retains fixed wallpaper
+alignment (maximum channel difference 1/255). Four short development/headless
+scroll samples varied between 16.9 and 33.3ms median frame intervals; they do
+not establish performance equivalence between automatic layer allocation and
+the removed compositor hint.
+
+A subsequent [production performance assessment](glass-performance-2026-09-21.md)
+found that globally removing promotion lowered renderer main-thread work but
+worsened scroll cadence, particularly on the twelve-card learning page. The
+current implementation keeps promotion for other glass surfaces and limits the
+opt-out to these two course accordion containers.
+
+## Scoped accordion fix (2026-09-22)
+
+`renderCategoryAccordion` marks just the My Courses and Featured Courses hosts
+with `data-glass-no-promotion`. The override targets their direct warp/border
+children, leaving summary cards, navigation, nested glass and other routes on
+the original strategy. The surface controller is restored without changes.
+
+Production Chrome checks cover eight desktop/mobile, light/dark, photo/gradient
+combinations with three expansion/collapse cycles each. All 24 cropped images
+match their pre-expansion baseline exactly, without scrolling to restore glass.
+Computed-style assertions confirm that exactly four layers opt out and other
+visible glass remains promoted. Both isolated production builds and TypeScript
+pass. React Doctor remains 52/100 with the same diagnostics; focused ESLint
+retains the page's existing static-element click-handler error and formatting
+warnings, with no new error from this change.
