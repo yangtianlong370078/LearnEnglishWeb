@@ -1,7 +1,7 @@
 "use client";
 
 import type { LearnMode } from "@/types/courselearn";
-import GlassBorder, { GlassWarp } from "./glass-border";
+import GlassCard from "@/components/common/glass-card";
 import { MODE_LABEL, MODE_ORDER, MODE_THEME, isAudioMode } from "./lib";
 import {
   CnEnIcon,
@@ -47,9 +47,7 @@ export default function GlobalToolbar({
       : undefined;
 
   return (
-    <div className="yinyinkuan flex p-2  cl-glass-idle rounded-3xl  flex-col gap-3  sm:flex-row sm:items-center sm:justify-between">
-
-      <GlassWarp />
+    <GlassCard className="flex p-2 flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
       {/* 左侧：4 个学习模式（单选） */}
       <div className="flex flex-wrap items-center z-[1] justify-center gap-2">
         {MODE_ORDER.map((mode) => {
@@ -132,7 +130,6 @@ export default function GlobalToolbar({
         </button>
       </div>
 
-       <GlassBorder />
-    </div>
+    </GlassCard>
   );
 }

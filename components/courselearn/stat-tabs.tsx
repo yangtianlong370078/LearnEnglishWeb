@@ -1,7 +1,7 @@
 "use client";
 
 import type { LearnStatus } from "@/types/courselearn";
-import GlassBorder, { GlassWarp } from "./glass-border";
+import GlassCard from "@/components/common/glass-card";
 interface StatTabsProps {
   active: LearnStatus;
   brs: number;
@@ -30,9 +30,7 @@ export default function StatTabs({
 
   return (
     <div className="flex justify-center">
-      <div className="yinyinkuan  flex flex-row p-2   cl-glass-idle rounded-full flex-col gap-3  sm:flex-row sm:items-center sm:justify-between">
-
-        <GlassWarp />
+      <GlassCard className="flex flex-row p-2 rounded-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         {TABS.map((tab) => {
           const isActive = active === tab.zt;
 
@@ -61,9 +59,7 @@ export default function StatTabs({
             </button>
           );
         })}
-<GlassBorder />
-
-      </div>
+      </GlassCard>
     </div>
   );
 }

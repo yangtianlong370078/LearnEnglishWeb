@@ -7,6 +7,7 @@ import type {
   MyCategoryContent,
 } from "@/types/course";
 import GlassBorder, { GlassWarp } from "@/components/courselearn/glass-border";
+import GlassCard from "@/components/common/glass-card";
 import type { Key } from "@heroui/react";
 import {
   Books,
@@ -348,11 +349,7 @@ export default function LearnWordsPage() {
     categories: CategoryInfo[],
     menuMode: "full" | "remove",
   ) => (
-    <div
-      className="  relative yinyinkuan rounded-3xl cl-glass-idle"
-      data-glass-no-promotion=""
-    >
-      <GlassWarp />
+    <GlassCard data-glass-no-promotion="">
       <Accordion
         allowsMultipleExpanded
         className="w-full rounded-3xl overflow-hidden  "
@@ -471,8 +468,7 @@ export default function LearnWordsPage() {
             </div>
           ))}
       </Accordion>
-      <GlassBorder />
-    </div>
+    </GlassCard>
   );
 
   return (
@@ -489,8 +485,7 @@ export default function LearnWordsPage() {
       ) : (
         <>
           <div className="grid w-full grid-cols-1 items-stretch gap-3 sm:grid-cols-3">
-            <div className="  relative yinyinkuan rounded-3xl cl-glass-idle">
-              <GlassWarp />
+            <GlassCard>
               <div
                 className="rounded-3xl relative z-[1] h-full overflow-hidden "
                 style={
@@ -520,11 +515,9 @@ export default function LearnWordsPage() {
                   />
                 </div>
               </div>
-              <GlassBorder />
-            </div>
+            </GlassCard>
 
-            <div className="  relative yinyinkuan  rounded-3xl cl-glass-idle">
-              <GlassWarp />
+            <GlassCard>
               <div
                 className="rounded-3xl relative  h-full z-[1] overflow-hidden "
                 style={
@@ -554,10 +547,8 @@ export default function LearnWordsPage() {
                   />
                 </div>
               </div>
-              <GlassBorder />
-            </div>
-            <div className="  relative yinyinkuan  rounded-3xl cl-glass-idle">
-              <GlassWarp />
+            </GlassCard>
+            <GlassCard>
               <div
                 className="rounded-3xl z-[1] relative h-full overflow-hidden "
                 style={
@@ -593,8 +584,7 @@ export default function LearnWordsPage() {
                   />
                 </div>
               </div>
-              <GlassBorder />
-            </div>
+            </GlassCard>
           </div>
 
           {data && data.myCategoryInfos.length > 0

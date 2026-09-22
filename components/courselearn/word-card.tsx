@@ -18,7 +18,7 @@ import { Card } from "@heroui/react";
 import { Xmark } from "@gravity-ui/icons";
 
 import ConfettiBurst from "./confetti";
-import GlassBorder, { GlassWarp } from "./glass-border";
+import GlassCard from "@/components/common/glass-card";
 import RingProgress from "./ring-progress";
 import {
   CnEnIcon,
@@ -591,15 +591,14 @@ function WordCardInner(
   const hideCardTranslation = isAudioMode(effectiveMode);
 
   return (
-    <div
-      className={`yinyinkuan cl-glass-idle rounded-3xl p-0 group relative overflow-visible ${shaking ? "cl-shake" : ""
+    <GlassCard
+      className={`p-0 group overflow-visible ${shaking ? "cl-shake" : ""
         } ${colorTransition
           ? "transition-[background-color,border-color,box-shadow] duration-500 ease-out"
           : ""
         } `}
       onAnimationEnd={() => setShaking(false)}
     >
-      <GlassWarp />
       {/* Keep the same blur layer mounted when the answer tint changes. */}
       <ConfettiBurst fireKey={confettiKey} />
 
@@ -791,9 +790,8 @@ function WordCardInner(
         </Card.Content>
       </div>
 
-      {/* 液态玻璃描边层（位于内容之上）：源码的 screen/overlay 两层渐变描边 */}
-      <GlassBorder />
-    </div>
+      {/* 液态玻璃描边层（位于内容之上）：源码的 screen/overlay 两层渐变描边（由 GlassCard 内部渲染） */}
+    </GlassCard>
   );
 
   // ── 主体渲染 ─────────────────────────────────────────────

@@ -6,7 +6,7 @@ import {
   ChevronsLeft,
   ChevronsRight,
 } from "@gravity-ui/icons";
-import GlassBorder, { GlassWarp } from "./glass-border";
+import GlassCard from "@/components/common/glass-card";
 interface PaginationBarProps {
   pageIndex: number;
   totalPages: number;
@@ -33,13 +33,11 @@ export default function PaginationBar({
 
   return (
     <div className="flex justify-center">
-    <nav
+    <GlassCard
+      as="nav"
       aria-label="分页"
-      className="yinyinkuan align-center flex flex-row p-2  cl-glass-idle rounded-full   gap-2  "
+      className="align-center flex flex-row p-2 rounded-full gap-2"
     >
-
-<GlassWarp />
-
       <button
         aria-label="首页"
         className={`${btn} ${idle} relative z-[1]`}
@@ -83,8 +81,7 @@ export default function PaginationBar({
       </button>
 
 
-      <GlassBorder />
-    </nav>
+    </GlassCard>
     </div>
   );
 }

@@ -2,17 +2,17 @@
 import type { ReactNode } from "react";
 import type { WordStats } from "@/types";
 import type { MonthlyData } from "@/types/task";
-import GlassBorder, { GlassWarp } from "@/components/courselearn/glass-border";
 import { useMemo, useState } from "react";
 import { SquareChartBar, Target } from "@gravity-ui/icons";
 import {
-  KPI,
   TrendChip,
   ChartTooltip,
   PieChart,
   Segment,
 } from "@heroui-pro/react";
 import { Skeleton } from "@heroui/react";
+
+import KPI from "@/components/common/glass-kpi";
 
 const CHART_COLORS = [
   "var(--chart-4)",
@@ -152,150 +152,146 @@ export default function KpiWithChartInline({
 
   return (
     <div className="  grid w-full grid-cols-1 gap-3 sm:grid-cols-2">
-        <KPI className="yinyinkuan rounded-3xl  cl-glass-idle" >
-            <GlassWarp />
-          <KPI.Content className="grid-cols-[1fr_1fr] items-end relative z-[1] "  >
-            <div className="flex flex-col justify-between relative z-[1]  h-full gap-2 ">
-              <KPI.Header className="w-max">
-                <SquareChartBar className="text-muted size-4" />
-                <KPI.Title>学习统计图</KPI.Title>
-              </KPI.Header>
+      <KPI>
+        <KPI.Content className="grid-cols-[1fr_1fr] items-end relative z-[1] "  >
+          <div className="flex flex-col justify-between relative z-[1]  h-full gap-2 ">
+            <KPI.Header className="w-max">
+              <SquareChartBar className="text-muted size-4" />
+              <KPI.Title>学习统计图</KPI.Title>
+            </KPI.Header>
 
-              <div className="flex flex-col gap-1">
-                <KPI.Value
-                  className="text-3xl"
-                  maximumFractionDigits={0}
-                  value={s.masteredCount + s.unskilledCount}
-                />
-
-                <div className="flex items-center ">
-                  <span
-                    className="trend-chip__suffix text-xs min-w-fit"
-                    data-slot="trend-chip-suffix"
-                  >
-                    日均增长
-                  </span>
-
-                  <TrendChip
-                    trend={isTodayUp ? "up" : "down"}
-                    variant="tertiary"
-                  >
-                    {Math.abs(s.growthRate).toFixed(1)}%
-                    {/* <TrendChip.Suffix>今天学习{s.todayCount}</TrendChip.Suffix> */}
-                    {/* <TrendChip.Suffix>日均增长率</TrendChip.Suffix> */}
-                  </TrendChip>
-                </div>
-              </div>
-            </div>
-
-            <div className="flex items-center justify-end w-full">
-              <div className="flex items-center justify-center w-full gap-2 sm:gap-6">
-                <PieChart
-                  className="flex items-center justify-center w-1/2 "
-                  height={104}
-                  width={104}
-                >
-                  <PieChart.Pie
-                    cx="50%"
-                    cy="50%"
-                    data={pieData}
-                    dataKey="value"
-                    nameKey="name"
-                    outerRadius={50}
-                  >
-                    {pieData.map((entry, idx) => (
-                      <PieChart.Cell
-                        key={entry.name}
-                        fill={CHART_COLORS[idx % CHART_COLORS.length]}
-                      />
-                    ))}
-                  </PieChart.Pie>
-                  <PieChart.Tooltip content={<PieTooltip total={pieTotal} />} />
-                </PieChart>
-
-                <div className="flex flex-1 flex-col gap-3 w-max max-w-[100px]">
-                  {pieData.map((entry, idx) => {
-                    return (
-                      <div key={entry.name} className="flex items-center gap-1">
-                        <span
-                          className="size-3 shrink-0 rounded-full"
-                          style={{
-                            backgroundColor:
-                              CHART_COLORS[idx % CHART_COLORS.length],
-                          }}
-                        />
-                        <div className="flex flex-1 items-center justify-between">
-                          <span className="text-foreground text-sm">
-                            {entry.name}
-                          </span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-foreground text-sm font-semibold">
-                              {entry.value}
-                            </span>
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })}
-                </div>
-              </div>
-            </div>
-          </KPI.Content>
-          <GlassBorder />
-        </KPI>
-
-        <KPI className=" yinyinkuan rounded-3xl  cl-glass-idle ">
-         <GlassWarp />
-          <KPI.Header className="justify-between relative z-[1] ">
-            <div className="flex items-center gap-2 pb-2 relative z-[1] ">
-              <Target className="text-muted size-4" />
-              <KPI.Title>学习趋势图</KPI.Title>
-            </div>
-            {/* 
-bg-[var(--background)] */}
-
-            <Segment
-              className="absolute relative z-[1]  bg-white/50 dark:bg-black/30 "
-              selectedKey={selectedPeriod}
-              size="sm"
-              onSelectionChange={(value) => {
-                setSelectedPeriod(value as "7D" | "15D" | "30D");
-              }}
-            >
-              <Segment.Item id="7D">7天</Segment.Item>
-              <Segment.Item id="15D">15天</Segment.Item>
-              <Segment.Item id="30D">30天</Segment.Item>
-            </Segment>
-          </KPI.Header>
-          <KPI.Content className="grid-cols-[1fr_1fr] items-end relative z-[1] ">
             <div className="flex flex-col gap-1">
               <KPI.Value
                 className="text-3xl"
                 maximumFractionDigits={0}
-                value={lastTotal}
+                value={s.masteredCount + s.unskilledCount}
               />
+
               <div className="flex items-center ">
                 <span
                   className="trend-chip__suffix text-xs min-w-fit"
                   data-slot="trend-chip-suffix"
                 >
-                  环比过去{PERIOD_DAYS[selectedPeriod]}天
+                  日均增长
                 </span>
 
-                <TrendChip trend={isUp ? "up" : "down"} variant="tertiary">
-                  {Math.abs(growthRate).toFixed(1)}%
-                  {/* <TrendChip.Suffix>环比过去{PERIOD_DAYS[selectedPeriod]}天</TrendChip.Suffix> */}
+                <TrendChip
+                  trend={isTodayUp ? "up" : "down"}
+                  variant="tertiary"
+                >
+                  {Math.abs(s.growthRate).toFixed(1)}%
+                  {/* <TrendChip.Suffix>今天学习{s.todayCount}</TrendChip.Suffix> */}
+                  {/* <TrendChip.Suffix>日均增长率</TrendChip.Suffix> */}
                 </TrendChip>
               </div>
             </div>
-            <KPI.Chart
-              color={isUp ? "var(--color-accent)" : "var(--color-danger)"}
-              data={sparklineData}
-              height={70}
-              strokeWidth={1.5}
+          </div>
+
+          <div className="flex items-center justify-end w-full">
+            <div className="flex items-center justify-center w-full gap-2 sm:gap-6">
+              <PieChart
+                className="flex items-center justify-center w-1/2 "
+                height={104}
+                width={104}
+              >
+                <PieChart.Pie
+                  cx="50%"
+                  cy="50%"
+                  data={pieData}
+                  dataKey="value"
+                  nameKey="name"
+                  outerRadius={50}
+                >
+                  {pieData.map((entry, idx) => (
+                    <PieChart.Cell
+                      key={entry.name}
+                      fill={CHART_COLORS[idx % CHART_COLORS.length]}
+                    />
+                  ))}
+                </PieChart.Pie>
+                <PieChart.Tooltip content={<PieTooltip total={pieTotal} />} />
+              </PieChart>
+
+              <div className="flex flex-1 flex-col gap-3 w-max max-w-[100px]">
+                {pieData.map((entry, idx) => {
+                  return (
+                    <div key={entry.name} className="flex items-center gap-1">
+                      <span
+                        className="size-3 shrink-0 rounded-full"
+                        style={{
+                          backgroundColor:
+                            CHART_COLORS[idx % CHART_COLORS.length],
+                        }}
+                      />
+                      <div className="flex flex-1 items-center justify-between">
+                        <span className="text-foreground text-sm">
+                          {entry.name}
+                        </span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-foreground text-sm font-semibold">
+                            {entry.value}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </KPI.Content>
+        </KPI>
+
+        <KPI>
+        <KPI.Header className="justify-between relative z-[1] ">
+          <div className="flex items-center gap-2 pb-2 relative z-[1] ">
+            <Target className="text-muted size-4" />
+            <KPI.Title>学习趋势图</KPI.Title>
+          </div>
+          {/* 
+bg-[var(--background)] */}
+
+          <Segment
+            className="absolute relative z-[1]  bg-white/50 dark:bg-black/30 "
+            selectedKey={selectedPeriod}
+            size="sm"
+            onSelectionChange={(value) => {
+              setSelectedPeriod(value as "7D" | "15D" | "30D");
+            }}
+          >
+            <Segment.Item id="7D">7天</Segment.Item>
+            <Segment.Item id="15D">15天</Segment.Item>
+            <Segment.Item id="30D">30天</Segment.Item>
+          </Segment>
+        </KPI.Header>
+        <KPI.Content className="grid-cols-[1fr_1fr] items-end relative z-[1] ">
+          <div className="flex flex-col gap-1">
+            <KPI.Value
+              className="text-3xl"
+              maximumFractionDigits={0}
+              value={lastTotal}
             />
-          </KPI.Content>
-            <GlassBorder />
+            <div className="flex items-center ">
+              <span
+                className="trend-chip__suffix text-xs min-w-fit"
+                data-slot="trend-chip-suffix"
+              >
+                环比过去{PERIOD_DAYS[selectedPeriod]}天
+              </span>
+
+              <TrendChip trend={isUp ? "up" : "down"} variant="tertiary">
+                {Math.abs(growthRate).toFixed(1)}%
+                {/* <TrendChip.Suffix>环比过去{PERIOD_DAYS[selectedPeriod]}天</TrendChip.Suffix> */}
+              </TrendChip>
+            </div>
+          </div>
+          <KPI.Chart
+            color={isUp ? "var(--color-accent)" : "var(--color-danger)"}
+            data={sparklineData}
+            height={70}
+            strokeWidth={1.5}
+          />
+        </KPI.Content>
         </KPI>
     </div>
   );

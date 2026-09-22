@@ -13,6 +13,7 @@ import {
   setGlassEnhance,
 } from "@/lib/glass-enhance";
 
+
 const STORAGE_KEY = "background-theme";
 const DEFAULT_THEME_ID = "magnificent";
 
@@ -97,6 +98,8 @@ export default function InlineSelectCustomIndicatorDemo() {
           </ListBox.Item>
         </ListBox>
       </InlineSelect.Popover>
+
+
     </InlineSelect>
   );
 }

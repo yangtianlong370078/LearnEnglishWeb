@@ -6,7 +6,7 @@ import ModalBackdrop from "@/components/common/modal-backdrop";
 import WordDetail from "@/components/common/word-detail";
 import { get, post } from "@/lib/api/request";
 
-import GlassBorder, { GlassWarp } from "@/components/courselearn/glass-border";
+import GlassCard from "@/components/common/glass-card";
 
 export default function FullWidth() {
   const [value, setValue] = React.useState("");
@@ -65,9 +65,7 @@ export default function FullWidth() {
         onChange={setValue}
         onSubmit={handleSearch}
       >
-        <div className="yinyinkuan !px-3 cl-glass-idle !h-11 rounded-[100px] !bg-transparent flex flex-row items-center justify-between w-full ">
-          <GlassWarp />
-
+        <GlassCard className="!px-3 !h-11 rounded-[100px] !bg-transparent flex flex-row items-center justify-between w-full ">
           <SearchField.Input
             autoComplete="off"
             className="word-search-input z-[1] !bg-transparent rounded-[100px] p-1 text-[14px]"
@@ -98,8 +96,7 @@ export default function FullWidth() {
             <SearchField.SearchIcon className="mx-3" />
           </Button>
 
-          <GlassBorder />
-        </div>
+        </GlassCard>
       </SearchField>
       <ModalBackdrop
         isOpen={isOpen}

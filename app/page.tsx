@@ -15,7 +15,7 @@ import TaskCalendar from "@/components/home/task-calendar";
 import FullWidthSearch from "@/components/common/search-field";
 import TaskYearCalendar from "@/components/home/task-year-calendar";
 import { statisticsApi } from "@/lib/api";
-import GlassBorder, { GlassWarp } from "@/components/courselearn/glass-border";
+import GlassCard from "@/components/common/glass-card";
 import KpiWithChartInline from "@/components/home/kpi-with-chart-inline";
 
 export default function Home() {
@@ -111,11 +111,10 @@ export default function Home() {
               : "按月查看每日任务量与完成情况"}
           </span>
         </div>
-        <div
-          className=" yinyinkuan rounded-3xl p-4 cl-glass-idle  flex flex-col gap-4"
+        <GlassCard
+          className="p-4 flex flex-col gap-4"
           // variant="secondary"
         >
-          <GlassWarp />
           {/* <LiquidGlass displacementScale={64}
   blurAmount={0.1}
   saturation={130}
@@ -175,9 +174,7 @@ export default function Home() {
           </AnimatePresence>
           {/* </LiquidGlass> */}
 
-<GlassBorder />
-
-        </div>
+        </GlassCard>
       </div>
     </div>
   );
