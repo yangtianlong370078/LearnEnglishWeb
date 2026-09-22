@@ -26,13 +26,12 @@ export function registerGlassNavigation(nav: HTMLElement) {
   let previousActive: boolean | undefined;
   let previousHeaderTop: number | undefined;
   let previousHeaderHeight: number | undefined;
+  const hostSelector = ".glass-warp, [data-glass-navigation-content]";
 
   function collectHosts() {
     const unique = new Set(
       Array.from(
-        main!.querySelectorAll<HTMLElement>(
-          ".glass-warp, [data-glass-navigation-content]",
-        ),
+        main!.querySelectorAll<HTMLElement>(hostSelector),
         (element) =>
           element.classList.contains("glass-warp")
             ? element.parentElement!
@@ -121,12 +120,35 @@ export function registerGlassNavigation(nav: HTMLElement) {
     hostsDirty = true;
     schedule();
   }
+  function containsHost(node: Node) {
+    if (node.nodeType !== 1) return false;
+    const element = node as Element;
+
+    return (
+      element.matches(hostSelector) || !!element.querySelector(hostSelector)
+    );
+  }
+  function contentMutated(records: MutationRecord[]) {
+    if (
+      !hostsDirty &&
+      records.some(
+        (record) =>
+          record.type === "attributes" ||
+          Array.from(record.addedNodes).some(containsHost) ||
+          Array.from(record.removedNodes).some(containsHost),
+      )
+    )
+      hostsDirty = true;
+    // Content without a glass host can still shift existing hosts. Always
+    // measure their live geometry, but reuse the candidate list when possible.
+    schedule();
+  }
   const resize = new ResizeObserver(schedule);
 
   resize.observe(main);
   resize.observe(nav);
   const overlays = new MutationObserver(schedule);
-  const content = new MutationObserver(contentChanged);
+  const content = new MutationObserver(contentMutated);
   const unsubscribeSurfaces = subscribeGlassSurfaceChanges(
     document,
     contentChanged,
