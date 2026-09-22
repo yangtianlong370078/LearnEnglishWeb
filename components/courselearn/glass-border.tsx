@@ -20,8 +20,8 @@ export function GlassWarp() {
         {glassEnhance && (
           <span
             aria-hidden="true"
-            className="pointer-events-none absolute yyk"
-            style={{ inset: "1px", borderRadius: "calc(var(--card-radius-zdy) - 1px)" }}
+            className="pointer-events-none absolute  yyk"
+            style={{ inset: "0px", borderRadius: "calc(var(--card-radius-zdy) - 1px)" }}
           />
         )}
         </>

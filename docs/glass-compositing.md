@@ -106,9 +106,13 @@ layers temporarily use `will-change: auto` for the duration of that animation.
 Decorative spans use visibility-based `will-change: opacity` promotion for
 ordinary glass surfaces. The two course accordion containers on `/learnwords`
 opt out with `data-glass-no-promotion`: layout changes can move their fixed
-wallpaper out of the viewport and back, and an explicitly promoted layer can
-retain an empty or stale raster in that case. The shared pre-blurred wallpaper
-textures are still cached and reused.
+wallpaper out of the viewport and back, and a layer promoted at that moment
+can rasterize empty (lost blur) or stale. Instead, the surface controller
+observes `document.body` size and host re-entry into the viewport; once
+layout settles, it alternates a sub-pixel `--glass-repaint-nudge`
+(0 ↔ 0.0156px) on the visible layers' `background-position-y`, forcing the
+fixed wallpaper to repaint at the current position. The shared pre-blurred
+wallpaper textures are still cached and reused.
 
 The inner glow uses a nested decorative span: a conic mask interpolates corner
 intensity, while the source pseudo-element uses linear/radial masks for inward
@@ -117,8 +121,8 @@ falloff. The thin rim and its white specular reflection remain separate.
 The surface controller manages registration, cache lifetime, viewport resize
 and visibility. One shared ResizeObserver tracks border radii on registration
 and resize, with batched reads/writes and no unchanged style writes. One shared
-IntersectionObserver tracks registered hosts' visibility; CSS keeps promotion
-disabled for the two opted-out containers. The controller has no scroll, mouse
+IntersectionObserver tracks registered hosts' visibility. The controller has
+no scroll, mouse
 or animation listener or scroll-time per-card geometry queries.
 Navigation retains its content-filter geometry updates;
 they do not position the cached wallpaper. This is a wallpaper renderer: a
@@ -341,21 +345,21 @@ the removed compositor hint.
 A subsequent [production performance assessment](glass-performance-2026-09-21.md)
 found that globally removing promotion lowered renderer main-thread work but
 worsened scroll cadence, particularly on the twelve-card learning page. The
-current implementation keeps promotion for other glass surfaces and limits the
-opt-out to these two course accordion containers.
+current implementation keeps promotion for all glass surfaces.
 
-## Scoped accordion fix (2026-09-22)
+## Accordion repaint nudge (2026-09-22)
 
-`renderCategoryAccordion` marks just the My Courses and Featured Courses hosts
-with `data-glass-no-promotion`. The override targets their direct warp/border
-children, leaving summary cards, navigation, nested glass and other routes on
-the original strategy. The surface controller is restored without changes.
-
-Production Chrome checks cover eight desktop/mobile, light/dark, photo/gradient
-combinations with three expansion/collapse cycles each. All 24 cropped images
-match their pre-expansion baseline exactly, without scrolling to restore glass.
-Computed-style assertions confirm that exactly four layers opt out and other
-visible glass remains promoted. Both isolated production builds and TypeScript
-pass. React Doctor remains 52/100 with the same diagnostics; focused ESLint
-retains the page's existing static-element click-handler error and formatting
-warnings, with no new error from this change.
+The two course accordion containers opt out of promotion with
+`data-glass-no-promotion`: with promotion enabled, collapsing My Courses
+revealed the Featured Courses card with an empty raster — the backdrop blur
+was lost entirely. Without promotion the blur survives, but the browser
+reuses the stale fixed-wallpaper raster from the card's old viewport
+position. The cached wallpaper rules therefore expose
+`background-position-y: var(--glass-repaint-nudge, 0px)`, and the surface
+controller alternates that custom property (0 ↔ 0.0156px, debounced 80ms
+after layout settles) on every visible layer when `document.body` resizes or
+a host re-enters the viewport. The imperceptible computed-value change
+invalidates the background and repaints it at the current position, so the
+Featured Courses rim and blur refresh automatically when My Courses
+collapses, without scrolling. Scroll-driven re-entries debounce away and
+cost at most one extra repaint after scrolling ends.

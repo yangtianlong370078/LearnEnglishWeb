@@ -38,7 +38,7 @@ export default function StatTabs({
             <button
               key={tab.zt}
               aria-pressed={isActive}
-              className={`inline-flex relative z-[1] items-center gap-2 rounded-full pl-3 pr-2 py-2 text-sm font-medium transition-all duration-300 ${
+              className={`inline-flex relative z-[1] shrink-0 items-center gap-2 whitespace-nowrap rounded-full pl-3 pr-2 py-2 text-sm font-medium transition-all duration-300 ${
                 isActive
                   ? "bg-white text-foreground shadow-md shadow-black/[0.06] dark:bg-white/15 dark:shadow-black/20"
                   : "text-muted hover:bg-white/40 hover:text-foreground dark:hover:bg-white/5"

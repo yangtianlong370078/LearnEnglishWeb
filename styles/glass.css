@@ -211,6 +211,9 @@ html[data-glass-wallpaper-ready] .glass-border::after {
   background-image: var(--glass-cached-base);
   background-size: var(--glass-viewport-width) var(--glass-viewport-height);
   background-position: top left;
+  /* The controller alternates this sub-pixel nudge after pure layout shifts
+     (accordion collapse) so stale fixed-wallpaper rasters repaint in place. */
+  background-position-y: var(--glass-repaint-nudge, 0px);
   background-attachment: fixed;
   filter: none;
 }
@@ -223,8 +226,9 @@ html[data-glass-wallpaper-ready] :is(.glass-warp, .glass-border)[data-glass-visi
 }
 
 /* Accordion containers can move a registered surface out of the viewport and
-   back during collapse. Keep their fixed wallpaper under normal paint
-   management so the browser does not reuse a stale promoted raster. */
+   back during collapse. A layer promoted at that moment can rasterize empty
+   (lost blur) or stale, so these surfaces stay under normal paint management;
+   the controller's repaint nudge refreshes their fixed wallpaper in place. */
 html[data-glass-wallpaper-ready]
   [data-glass-no-promotion]
   > :is(.glass-warp, .glass-border) {

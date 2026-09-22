@@ -61,8 +61,13 @@ function createController(document: Document) {
       for (const entry of entries) {
         const host = entry.target as HTMLElement;
 
-        if (entry.isIntersecting) visible.add(host);
-        else visible.delete(host);
+        if (entry.isIntersecting) {
+          visible.add(host);
+          // A surface re-entering without scrolling (accordion collapse) can
+          // reveal a stale fixed-wallpaper raster; refresh it once layout
+          // settles. Scroll-driven entries debounce away until scrolling ends.
+          scheduleRepaint();
+        } else visible.delete(host);
         for (const layer of Array.from(surfaces.get(host) ?? []))
           layer.toggleAttribute("data-glass-visible", entry.isIntersecting);
       }
@@ -71,6 +76,37 @@ function createController(document: Document) {
   );
   let disposed = false;
   let viewport = "";
+
+  // Pure layout shifts (accordion expand/collapse) move visible surfaces
+  // without scrolling, and the browser may keep their fixed wallpaper raster
+  // cached at the old viewport position. After layout settles, alternate a
+  // sub-pixel background-position nudge so those layers repaint in place.
+  let repaintTimer = 0;
+  let repaintOdd = false;
+
+  function repaintVisibleLayers() {
+    repaintTimer = 0;
+    if (disposed) return;
+    repaintOdd = !repaintOdd;
+    const nudge = repaintOdd ? "0.0156px" : "0px";
+
+    for (const [host, layers] of Array.from(surfaces)) {
+      if (!visible.has(host)) continue;
+      for (const layer of Array.from(layers))
+        layer.style.setProperty("--glass-repaint-nudge", nudge);
+    }
+  }
+
+  function scheduleRepaint() {
+    if (repaintTimer) view.clearTimeout(repaintTimer);
+    repaintTimer = view.setTimeout(repaintVisibleLayers, 80);
+  }
+
+  // Accordion panels change the page height; scroll-driven repaints already
+  // cover the rest, so body size is the only extra signal this cache needs.
+  const layoutShift = new ResizeObserver(scheduleRepaint);
+
+  layoutShift.observe(document.body);
 
   function measure() {
     const width = document.documentElement.clientWidth;
@@ -160,6 +196,8 @@ function createController(document: Document) {
         if (!surfaces.size) {
           disposed = true;
           cancelGlassFrame(view, measure);
+          view.clearTimeout(repaintTimer);
+          layoutShift.disconnect();
           view.removeEventListener("resize", resizeViewport);
           resize.disconnect();
           pendingBorders.clear();

@@ -25,7 +25,7 @@ export default function PaginationBar({
   const canNext = pageIndex < totalPages;
 
   const btn =
-    "inline-flex min-h-9 min-w-9 items-center justify-center rounded-full p-3 text-sm font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-40";
+    "inline-flex min-h-9 min-w-9 shrink-0 items-center justify-center rounded-full p-3 text-sm font-medium transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-40";
   const idle =
     "bg-white/70 text-foreground hover:-translate-y-px hover:bg-white hover:shadow-sm dark:bg-white/10 dark:hover:bg-white/15";
 
@@ -57,7 +57,7 @@ export default function PaginationBar({
         <ChevronLeft className="size-4" />
       </button>
 
-      <span className="inline-flex min-h-9 relative z-[1] items-center rounded-full bg-accent px-4 text-sm font-semibold text-accent-foreground tabular-nums">
+      <span className="inline-flex min-h-9 relative z-[1] shrink-0 items-center whitespace-nowrap rounded-full bg-accent px-4 text-sm font-semibold text-accent-foreground tabular-nums">
         {pageIndex} / {totalPages}
       </span>
 
