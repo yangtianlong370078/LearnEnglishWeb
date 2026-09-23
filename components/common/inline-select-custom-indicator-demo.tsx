@@ -7,6 +7,7 @@ import { ListBox, Separator } from "@heroui/react";
 import { useEffect, useId, useRef, useState } from "react";
 import { InlineSelect } from "@heroui-pro/react";
 
+import GlassBorder, { GlassWarp } from "@/components/courselearn/glass-border";
 import { setGlassTheme } from "@/lib/glass-wallpaper-cache";
 import { getGlassMode, setGlassMode, useGlassMode } from "@/lib/glass-enhance";
 
@@ -86,7 +87,7 @@ export default function InlineSelectCustomIndicatorDemo() {
                   value={value}
                   onChange={() => setGlassMode(value)}
                 />
-                <span className="flex min-h-10 items-center justify-center rounded-lg px-2 text-sm whitespace-nowrap text-muted peer-checked:bg-surface-secondary peer-checked:text-foreground peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent peer-disabled:cursor-not-allowed peer-disabled:opacity-40">
+                <span className="flex min-h-10 items-center justify-center rounded-full px-2 text-sm font-medium whitespace-nowrap text-muted transition-all duration-300 hover:bg-black/5 hover:text-foreground peer-checked:bg-accent/15 peer-checked:text-accent peer-checked:shadow-sm peer-checked:shadow-accent/20 peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent peer-disabled:cursor-not-allowed peer-disabled:opacity-40 dark:hover:bg-white/5 dark:peer-checked:bg-white/15 dark:peer-checked:text-foreground dark:peer-checked:shadow-black/20">
                   {label}
                 </span>
               </label>
