@@ -1,11 +1,33 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useSyncExternalStore } from "react";
 
 import { glassConfig } from "@/config/glass";
 
-const STORAGE_KEY = "glass-enhance";
-const CHANGE_EVENT = "glass-enhance-change";
+const LEGACY_STORAGE_KEY = "glass-enhance";
+const STORAGE_KEY = "glass-mode";
+
+export const GLASS_MODE_CHANGE_EVENT = "glass-mode-change";
+export type GlassMode = "card" | "glass" | "liquid";
+
+function isGlassMode(value: string | null): value is GlassMode {
+  return value === "card" || value === "glass" || value === "liquid";
+}
+
+function allowedGlassMode(mode: GlassMode): GlassMode {
+  if (mode !== "liquid") return mode;
+
+  let background = document.documentElement.getAttribute("data-bg-theme");
+
+  try {
+    // The selection is saved before the matching wallpaper finishes loading.
+    background = localStorage.getItem("background-theme") ?? background;
+  } catch {
+    // Use the applied theme when persistent storage is unavailable.
+  }
+
+  return (background ?? "magnificent") === "magnificent" ? mode : "glass";
+}
 
 /** 关闭玻璃加强时归零、开启时恢复配置值的 CSS 变量。 */
 function applyEnhanceVariables(enabled: boolean) {
@@ -41,35 +63,70 @@ function applyEnhanceVariables(enabled: boolean) {
   }
 }
 
-export function getGlassEnhance(): boolean {
-  if (typeof window === "undefined") return true;
-  const stored = localStorage.getItem(STORAGE_KEY);
+export function getGlassMode(): GlassMode {
+  if (typeof window === "undefined") return "glass";
 
-  return stored === null ? true : stored === "on";
+  const applied = document.documentElement.getAttribute("data-glass-mode");
+
+  if (isGlassMode(applied)) return allowedGlassMode(applied);
+
+  try {
+    const stored = localStorage.getItem(STORAGE_KEY);
+
+    if (isGlassMode(stored)) return allowedGlassMode(stored);
+
+    // Preserve the previous switch preference on the first visit after upgrade.
+    const legacy = localStorage.getItem(LEGACY_STORAGE_KEY);
+
+    return legacy === null || legacy === "on" ? "glass" : "card";
+  } catch {
+    return "glass";
+  }
+}
+
+export function setGlassMode(mode: GlassMode) {
+  mode = allowedGlassMode(mode);
+  const root = document.documentElement;
+  const enabled = mode !== "card";
+  const enhance = enabled ? "on" : "off";
+
+  try {
+    localStorage.setItem(STORAGE_KEY, mode);
+    localStorage.setItem(LEGACY_STORAGE_KEY, enhance);
+  } catch {
+    // The current session still works when persistent storage is unavailable.
+  }
+
+  root.setAttribute("data-glass-mode", mode);
+  if (root.getAttribute("data-glass-enhance") !== enhance) {
+    root.setAttribute("data-glass-enhance", enhance);
+    applyEnhanceVariables(enabled);
+  }
+  window.dispatchEvent(
+    new CustomEvent<GlassMode>(GLASS_MODE_CHANGE_EVENT, { detail: mode }),
+  );
+}
+
+function subscribeGlassMode(onChange: () => void) {
+  window.addEventListener(GLASS_MODE_CHANGE_EVENT, onChange);
+
+  return () => window.removeEventListener(GLASS_MODE_CHANGE_EVENT, onChange);
+}
+
+export function useGlassMode(): GlassMode {
+  return useSyncExternalStore(subscribeGlassMode, getGlassMode, () => "glass");
+}
+
+export function getGlassEnhance(): boolean {
+  return getGlassMode() !== "card";
 }
 
 export function setGlassEnhance(enabled: boolean) {
-  localStorage.setItem(STORAGE_KEY, enabled ? "on" : "off");
-  document.documentElement.setAttribute(
-    "data-glass-enhance",
-    enabled ? "on" : "off",
-  );
-  applyEnhanceVariables(enabled);
-  window.dispatchEvent(new CustomEvent<boolean>(CHANGE_EVENT, { detail: enabled }));
+  setGlassMode(enabled ? "glass" : "card");
 }
 
 export function useGlassEnhance(): boolean {
-  const [enabled, setEnabled] = useState(true);
-
-  useEffect(() => {
-    setEnabled(getGlassEnhance());
-    const handler = (event: Event) =>
-      setEnabled((event as CustomEvent<boolean>).detail);
-
-    window.addEventListener(CHANGE_EVENT, handler);
-
-    return () => window.removeEventListener(CHANGE_EVENT, handler);
-  }, []);
-
-  return enabled;
+  // Glass and liquid share the same existing DOM/CSS layers. A mode change
+  // between them must not rerender every card just to keep those layers on.
+  return useSyncExternalStore(subscribeGlassMode, getGlassEnhance, () => true);
 }

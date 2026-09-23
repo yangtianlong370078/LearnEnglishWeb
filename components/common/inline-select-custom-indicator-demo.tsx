@@ -3,21 +3,25 @@
 import type { Key } from "@heroui/react";
 
 import { ChevronRight } from "@gravity-ui/icons";
-import { ListBox, Separator, Switch } from "@heroui/react";
-import { useEffect, useRef, useState } from "react";
+import { ListBox, Separator } from "@heroui/react";
+import { useEffect, useId, useRef, useState } from "react";
 import { InlineSelect } from "@heroui-pro/react";
 
 import { setGlassTheme } from "@/lib/glass-wallpaper-cache";
-import {
-  getGlassEnhance,
-  setGlassEnhance,
-} from "@/lib/glass-enhance";
-
+import { getGlassMode, setGlassMode, useGlassMode } from "@/lib/glass-enhance";
 
 const STORAGE_KEY = "background-theme";
 const DEFAULT_THEME_ID = "magnificent";
+const GLASS_MODES = [
+  { value: "card", label: "卡片" },
+  { value: "glass", label: "玻璃" },
+  { value: "liquid", label: "液态玻璃" },
+] as const;
 
 function applyBackgroundTheme(themeId: string) {
+  // Release liquid resources immediately, including a pending dynamic import.
+  if (themeId !== DEFAULT_THEME_ID && getGlassMode() === "liquid")
+    setGlassMode("glass");
   localStorage.setItem(STORAGE_KEY, themeId);
 
   return setGlassTheme(document, { background: themeId }, () => {
@@ -27,7 +31,8 @@ function applyBackgroundTheme(themeId: string) {
 
 export default function InlineSelectCustomIndicatorDemo() {
   const [role, setRole] = useState<Key | null>(DEFAULT_THEME_ID);
-  const [glassEnhance, setGlassEnhanceState] = useState(true);
+  const glassMode = useGlassMode();
+  const modeGroupId = useId();
   const cancelTheme = useRef<(() => void) | undefined>(undefined);
 
   useEffect(() => {
@@ -35,10 +40,6 @@ export default function InlineSelectCustomIndicatorDemo() {
 
     setRole(storedTheme);
     cancelTheme.current = applyBackgroundTheme(storedTheme);
-    const enhance = getGlassEnhance();
-
-    setGlassEnhanceState(enhance);
-    setGlassEnhance(enhance);
 
     return () => cancelTheme.current?.();
   }, []);
@@ -49,11 +50,6 @@ export default function InlineSelectCustomIndicatorDemo() {
     setRole(themeId);
     cancelTheme.current?.();
     cancelTheme.current = applyBackgroundTheme(themeId);
-  };
-
-  const handleGlassEnhanceChange = (enabled: boolean) => {
-    setGlassEnhanceState(enabled);
-    setGlassEnhance(enabled);
   };
 
   return (
@@ -72,34 +68,43 @@ export default function InlineSelectCustomIndicatorDemo() {
       </InlineSelect.Trigger>
       <div aria-hidden="true" className="glass-overlay" />
 
-      <InlineSelect.Popover className="w-[180px]">
-        <div className="flex items-center justify-between gap-2 p-4">
-          <span className="text-sm text-foreground">玻璃加强</span>
-          <Switch
-            aria-label="玻璃加强"
-            isSelected={glassEnhance}
-            
-            onChange={handleGlassEnhanceChange}
-          >
-            <Switch.Control>
-              <Switch.Thumb />
-            </Switch.Control>
-          </Switch>
-        </div>
+      <InlineSelect.Popover className="w-[240px]">
+        <fieldset className="m-0 min-w-0 border-0 p-2">
+          <legend className="sr-only">卡片效果</legend>
+          <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-1">
+            {GLASS_MODES.map(({ value, label }) => (
+              <label
+                key={value}
+                className="relative cursor-[var(--cursor-interactive)]"
+              >
+                <input
+                  checked={glassMode === value}
+                  className="peer sr-only"
+                  disabled={value === "liquid" && role !== DEFAULT_THEME_ID}
+                  name={modeGroupId}
+                  type="radio"
+                  value={value}
+                  onChange={() => setGlassMode(value)}
+                />
+                <span className="flex min-h-10 items-center justify-center rounded-lg px-2 text-sm whitespace-nowrap text-muted peer-checked:bg-surface-secondary peer-checked:text-foreground peer-focus-visible:outline-2 peer-focus-visible:outline-offset-2 peer-focus-visible:outline-accent peer-disabled:cursor-not-allowed peer-disabled:opacity-40">
+                  {label}
+                </span>
+              </label>
+            ))}
+          </div>
+        </fieldset>
         <Separator />
         <ListBox>
-          <ListBox.Item id="defalut" textValue="光影">
-            光影
+          <ListBox.Item id="defalut" textValue="默认">
+            默认
             <ListBox.ItemIndicator />
           </ListBox.Item>
-          <ListBox.Item id="magnificent" textValue="绚丽">
-            绚丽
+          <ListBox.Item id="magnificent" textValue="图片">
+            图片
             <ListBox.ItemIndicator />
           </ListBox.Item>
         </ListBox>
       </InlineSelect.Popover>
-
-
     </InlineSelect>
   );
 }

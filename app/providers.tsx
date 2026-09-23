@@ -4,6 +4,7 @@ import * as React from "react";
 import { Toast } from "@heroui/react";
 
 import { setGlassTheme } from "@/lib/glass-wallpaper-cache";
+import LiquidGlassRuntime from "@/components/common/liquid-glass-runtime";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -167,7 +168,25 @@ export function Providers({ children, themeProps }: ProvidersProps) {
     observeAll();
 
     // 新挂载的卡片：补充观察并重新取整
-    const mutationObserver = new MutationObserver(() => {
+    const mutationObserver = new MutationObserver((records) => {
+      // Absolute liquid-glass canvases do not affect card dimensions. Avoid
+      // remeasuring every card when the renderer culls or restores a surface.
+      if (
+        records.every(
+          (record) =>
+            record.target instanceof Element &&
+            record.target.classList.contains("glass-warp") &&
+            [
+              ...Array.from(record.addedNodes),
+              ...Array.from(record.removedNodes),
+            ].every(
+              (node) =>
+                node instanceof Element &&
+                node.classList.contains("liquid-glass-surface"),
+            ),
+        )
+      )
+        return;
       observeAll();
       scheduleWidths();
       scheduleHeights();
@@ -205,6 +224,7 @@ export function Providers({ children, themeProps }: ProvidersProps) {
 
   return (
     <ThemeContext.Provider value={value}>
+      <LiquidGlassRuntime />
       {children}
       <Toast.Provider placement="top" />
     </ThemeContext.Provider>
