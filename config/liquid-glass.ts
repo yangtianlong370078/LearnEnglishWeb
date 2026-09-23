@@ -8,7 +8,7 @@ export const liquidGlassConfig = {
    * edgeInsetPx: 1,
    * refractionPx: 14,  扭曲的强度
    */
-  edgeInsetPx: 2,
+  edgeInsetPx: 1,
   refractionPx: 38,
   /** 附加菲涅尔反光强度（0–1），仅作用于透镜内侧。 
    * fresnelStrength: 0.12, 反光度
@@ -24,8 +24,8 @@ export const liquidGlassConfig = {
   disableDispersionMobile: true,
   /** 小屏或粗指针设备使用移动端预算。 */
   mobileBreakpointPx: 768,
-  desktop: { maxCards: 12, maxDpr: 1, maxPixels: 1_500_000 },
-  mobile: { maxCards: 8, maxDpr: 1, maxPixels: 500_000 },
+  desktop: { maxCards: 20, maxDpr: 1, maxPixels: 1_500_000 },
+  mobile: { maxCards: 15, maxDpr: 1, maxPixels: 500_000 },
   /** 静止时没有渲染循环；连续慢帧时在本次滚动期间退回普通玻璃。 */
   adaptive: {
     enabled: true,
