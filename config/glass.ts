@@ -3,7 +3,7 @@ import type { CSSProperties } from "react";
 /** 全站玻璃效果：修改后刷新页面；生产环境需要重新构建。 */
 export const glassConfig = {
   /** 模糊半径，单位 px，取非负数。卡片、导航栏和弹窗共用。 */
-  blurPx: 2,
+  blurPx: 8,
   /** 基础饱和度，单位 %，100 表示不增强。 */
   saturation: 140,
   /** 边框额外饱和度，单位 %，叠加在基础饱和度上。 */
