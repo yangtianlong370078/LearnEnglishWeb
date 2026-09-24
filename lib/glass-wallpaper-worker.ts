@@ -9,11 +9,14 @@ export type GlassWallpaperWorkerOptions = {
   borderSaturation: number;
   borderBrightness: number;
   losslessWallpaper: boolean;
+  // Ambient backgrounds use CSS colors captured on the main thread. Photo
+  // backgrounds transfer their decoded source instead.
+  ambient?: { base: string; colors: string[] };
 };
 
 export type GlassWallpaperWorkerRequest = GlassWallpaperWorkerOptions & {
   id: number;
-  image: ImageBitmap;
+  image?: ImageBitmap;
 };
 
 export type GlassWallpaperWorkerResult = { base: Blob; border: Blob };
@@ -22,7 +25,7 @@ export type GlassWallpaperWorkerResponse =
   | ({ id: number } & GlassWallpaperWorkerResult)
   | { id: number; error: string };
 
-/** Optional, interruptible preparation of the inactive mode's photo textures. */
+/** One interruptible off-thread renderer, shared by foreground and prewarm. */
 export function createGlassWallpaperWorker() {
   if (
     typeof Worker === "undefined" ||
@@ -58,7 +61,7 @@ export function createGlassWallpaperWorker() {
   }
 
   function render(
-    image: HTMLImageElement,
+    image: HTMLImageElement | undefined,
     options: GlassWallpaperWorkerOptions,
   ): Promise<GlassWallpaperWorkerResult> {
     if (disposed)
@@ -103,32 +106,37 @@ export function createGlassWallpaperWorker() {
         }
         const currentWorker = worker;
 
+        const send = (bitmap?: ImageBitmap) => {
+          if (active?.id !== id || currentWorker !== worker) {
+            bitmap?.close();
+
+            return;
+          }
+          try {
+            const request: GlassWallpaperWorkerRequest = {
+              ...options,
+              id,
+              image: bitmap,
+            };
+
+            currentWorker.postMessage(request, bitmap ? [bitmap] : []);
+          } catch (error) {
+            bitmap?.close();
+            stop(error);
+          }
+        };
+
+        if (!image) {
+          send();
+
+          return;
+        }
+
         // Reuse the decoded source. Only its transferable bitmap crosses the
         // thread boundary; the worker never downloads the photo again.
-        void createImageBitmap(image).then(
-          (bitmap) => {
-            if (active?.id !== id || currentWorker !== worker) {
-              bitmap.close();
-
-              return;
-            }
-            try {
-              const request: GlassWallpaperWorkerRequest = {
-                ...options,
-                id,
-                image: bitmap,
-              };
-
-              currentWorker.postMessage(request, [bitmap]);
-            } catch (error) {
-              bitmap.close();
-              stop(error);
-            }
-          },
-          (error) => {
-            if (active?.id === id) stop(error);
-          },
-        );
+        void createImageBitmap(image).then(send, (error) => {
+          if (active?.id === id) stop(error);
+        });
       } catch (error) {
         stop(error);
       }

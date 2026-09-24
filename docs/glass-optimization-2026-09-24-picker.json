@@ -1,0 +1,57 @@
+{
+  "startedAt": "2026-09-24T08:56:55.530Z",
+  "baseURL": "http://127.0.0.1:8095",
+  "browser": "153.0.8010.53",
+  "rounds": 20,
+  "checkpoints": [
+    {
+      "label": "warmed-glass",
+      "nodes": 1200,
+      "listeners": 617,
+      "jsHeapAfterGcMiB": 7.774059295654297
+    },
+    {
+      "label": "after-5-cycles",
+      "nodes": 1200,
+      "listeners": 617,
+      "jsHeapAfterGcMiB": 8.434967041015625
+    },
+    {
+      "label": "after-10-cycles",
+      "nodes": 1200,
+      "listeners": 617,
+      "jsHeapAfterGcMiB": 8.669864654541016
+    },
+    {
+      "label": "after-15-cycles",
+      "nodes": 1200,
+      "listeners": 617,
+      "jsHeapAfterGcMiB": 8.786128997802734
+    },
+    {
+      "label": "after-20-cycles",
+      "nodes": 1200,
+      "listeners": 616,
+      "jsHeapAfterGcMiB": 8.93038558959961
+    },
+    {
+      "label": "after-keyboard-and-close",
+      "nodes": 1200,
+      "listeners": 616,
+      "jsHeapAfterGcMiB": 8.956413269042969
+    },
+    {
+      "label": "final-glass",
+      "nodes": 1200,
+      "listeners": 617,
+      "jsHeapAfterGcMiB": 8.959835052490234
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "selectedStateTransition": {
+    "property": "all",
+    "duration": "0.3s"
+  },
+  "finishedAt": "2026-09-24T08:57:50.291Z"
+}

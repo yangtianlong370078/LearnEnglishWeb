@@ -1,0 +1,655 @@
+{
+  "baseline": "2eb4e2053bfef93a81c6c175bc3e82b98ce35cbe",
+  "browser": "153.0.8010.53",
+  "cases": [
+    {
+      "name": "desktop/0/0",
+      "pixels": 1296000,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 755702
+      },
+      "clearedPixelsChecked": 150535,
+      "stalePixels": 0
+    },
+    {
+      "name": "desktop/1/17.25",
+      "pixels": 1296000,
+      "changedPixels": 3,
+      "maxChannelDifference": 4,
+      "meanChannelDifference": 0.0000011574074074074074,
+      "significantPercent": 0.00007716049382716049,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 755702
+      },
+      "clearedPixelsChecked": 150535,
+      "stalePixels": 0
+    },
+    {
+      "name": "desktop/2/97.5",
+      "pixels": 1296000,
+      "changedPixels": 4,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 0.0000011574074074074074,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 859318
+      },
+      "clearedPixelsChecked": 46919,
+      "stalePixels": 0
+    },
+    {
+      "name": "desktop/3/270",
+      "pixels": 1296000,
+      "changedPixels": 31,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 0.000008873456790123457,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 840941,
+        "after": 840941
+      },
+      "fragmentPixels": {
+        "before": 840941,
+        "after": 776884
+      },
+      "clearedPixelsChecked": 64057,
+      "stalePixels": 0
+    },
+    {
+      "name": "desktop/4/510.75",
+      "pixels": 1296000,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 756660,
+        "after": 756660
+      },
+      "fragmentPixels": {
+        "before": 756660,
+        "after": 441940
+      },
+      "clearedPixelsChecked": 314720,
+      "stalePixels": 0
+    },
+    {
+      "name": "desktop/5/270",
+      "pixels": 1296000,
+      "changedPixels": 31,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 0.000008873456790123457,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 840941,
+        "after": 840941
+      },
+      "fragmentPixels": {
+        "before": 840941,
+        "after": 776884
+      },
+      "clearedPixelsChecked": 64057,
+      "stalePixels": 0
+    },
+    {
+      "name": "desktop/6/97.5",
+      "pixels": 1296000,
+      "changedPixels": 4,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 0.0000011574074074074074,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 859318
+      },
+      "clearedPixelsChecked": 46919,
+      "stalePixels": 0
+    },
+    {
+      "name": "desktop/7/17.25",
+      "pixels": 1296000,
+      "changedPixels": 3,
+      "maxChannelDifference": 4,
+      "meanChannelDifference": 0.0000011574074074074074,
+      "significantPercent": 0.00007716049382716049,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 755702
+      },
+      "clearedPixelsChecked": 150535,
+      "stalePixels": 0
+    },
+    {
+      "name": "desktop/8/0",
+      "pixels": 1296000,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 755702
+      },
+      "clearedPixelsChecked": 150535,
+      "stalePixels": 0
+    },
+    {
+      "name": "mobile/0/0",
+      "pixels": 329160,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 333987,
+        "after": 333987
+      },
+      "fragmentPixels": {
+        "before": 333987,
+        "after": 287402
+      },
+      "clearedPixelsChecked": 46585,
+      "stalePixels": 0
+    },
+    {
+      "name": "mobile/1/17.25",
+      "pixels": 329160,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 333987,
+        "after": 333987
+      },
+      "fragmentPixels": {
+        "before": 333987,
+        "after": 287402
+      },
+      "clearedPixelsChecked": 46585,
+      "stalePixels": 0
+    },
+    {
+      "name": "mobile/2/97.5",
+      "pixels": 329160,
+      "changedPixels": 1,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 0.0000015190181066958319,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 333987,
+        "after": 333987
+      },
+      "fragmentPixels": {
+        "before": 333987,
+        "after": 290218
+      },
+      "clearedPixelsChecked": 43769,
+      "stalePixels": 0
+    },
+    {
+      "name": "mobile/3/270",
+      "pixels": 329160,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 268691,
+        "after": 268691
+      },
+      "fragmentPixels": {
+        "before": 268691,
+        "after": 204634
+      },
+      "clearedPixelsChecked": 64057,
+      "stalePixels": 0
+    },
+    {
+      "name": "mobile/4/510.75",
+      "pixels": 329160,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 184410,
+        "after": 184410
+      },
+      "fragmentPixels": {
+        "before": 184410,
+        "after": 104890
+      },
+      "clearedPixelsChecked": 79520,
+      "stalePixels": 0
+    },
+    {
+      "name": "mobile/5/270",
+      "pixels": 329160,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 268691,
+        "after": 268691
+      },
+      "fragmentPixels": {
+        "before": 268691,
+        "after": 204634
+      },
+      "clearedPixelsChecked": 64057,
+      "stalePixels": 0
+    },
+    {
+      "name": "mobile/6/97.5",
+      "pixels": 329160,
+      "changedPixels": 1,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 0.0000015190181066958319,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 333987,
+        "after": 333987
+      },
+      "fragmentPixels": {
+        "before": 333987,
+        "after": 290218
+      },
+      "clearedPixelsChecked": 43769,
+      "stalePixels": 0
+    },
+    {
+      "name": "mobile/7/17.25",
+      "pixels": 329160,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 333987,
+        "after": 333987
+      },
+      "fragmentPixels": {
+        "before": 333987,
+        "after": 287402
+      },
+      "clearedPixelsChecked": 46585,
+      "stalePixels": 0
+    },
+    {
+      "name": "mobile/8/0",
+      "pixels": 329160,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 333987,
+        "after": 333987
+      },
+      "fragmentPixels": {
+        "before": 333987,
+        "after": 287402
+      },
+      "clearedPixelsChecked": 46585,
+      "stalePixels": 0
+    },
+    {
+      "name": "budget/0/0",
+      "pixels": 1296000,
+      "changedPixels": 5,
+      "maxChannelDifference": 5,
+      "meanChannelDifference": 0.0000036651234567901236,
+      "significantPercent": 0.0002314814814814815,
+      "copyPixels": {
+        "before": 260260,
+        "after": 260260
+      },
+      "fragmentPixels": {
+        "before": 260260,
+        "after": 227683
+      },
+      "clearedPixelsChecked": 32577,
+      "stalePixels": 0
+    },
+    {
+      "name": "budget/1/17.25",
+      "pixels": 1296000,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 260260,
+        "after": 260260
+      },
+      "fragmentPixels": {
+        "before": 260260,
+        "after": 227683
+      },
+      "clearedPixelsChecked": 32577,
+      "stalePixels": 0
+    },
+    {
+      "name": "budget/2/97.5",
+      "pixels": 1296000,
+      "changedPixels": 4,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 9.645061728395062e-7,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 260260,
+        "after": 260260
+      },
+      "fragmentPixels": {
+        "before": 260260,
+        "after": 245891
+      },
+      "clearedPixelsChecked": 14369,
+      "stalePixels": 0
+    },
+    {
+      "name": "budget/3/270",
+      "pixels": 1296000,
+      "changedPixels": 5,
+      "maxChannelDifference": 8,
+      "meanChannelDifference": 0.0000046296296296296296,
+      "significantPercent": 0.0002314814814814815,
+      "copyPixels": {
+        "before": 256358,
+        "after": 256358
+      },
+      "fragmentPixels": {
+        "before": 256358,
+        "after": 239198
+      },
+      "clearedPixelsChecked": 17160,
+      "stalePixels": 0
+    },
+    {
+      "name": "budget/4/510.75",
+      "pixels": 1296000,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 266334,
+        "after": 266334
+      },
+      "fragmentPixels": {
+        "before": 266334,
+        "after": 159838
+      },
+      "clearedPixelsChecked": 106496,
+      "stalePixels": 0
+    },
+    {
+      "name": "budget/5/270",
+      "pixels": 1296000,
+      "changedPixels": 5,
+      "maxChannelDifference": 8,
+      "meanChannelDifference": 0.0000046296296296296296,
+      "significantPercent": 0.0002314814814814815,
+      "copyPixels": {
+        "before": 256358,
+        "after": 256358
+      },
+      "fragmentPixels": {
+        "before": 256358,
+        "after": 239198
+      },
+      "clearedPixelsChecked": 17160,
+      "stalePixels": 0
+    },
+    {
+      "name": "budget/6/97.5",
+      "pixels": 1296000,
+      "changedPixels": 4,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 9.645061728395062e-7,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 260260,
+        "after": 260260
+      },
+      "fragmentPixels": {
+        "before": 260260,
+        "after": 245891
+      },
+      "clearedPixelsChecked": 14369,
+      "stalePixels": 0
+    },
+    {
+      "name": "budget/7/17.25",
+      "pixels": 1296000,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 260260,
+        "after": 260260
+      },
+      "fragmentPixels": {
+        "before": 260260,
+        "after": 227683
+      },
+      "clearedPixelsChecked": 32577,
+      "stalePixels": 0
+    },
+    {
+      "name": "budget/8/0",
+      "pixels": 1296000,
+      "changedPixels": 5,
+      "maxChannelDifference": 5,
+      "meanChannelDifference": 0.0000036651234567901236,
+      "significantPercent": 0.0002314814814814815,
+      "copyPixels": {
+        "before": 260260,
+        "after": 260260
+      },
+      "fragmentPixels": {
+        "before": 260260,
+        "after": 227683
+      },
+      "clearedPixelsChecked": 32577,
+      "stalePixels": 0
+    },
+    {
+      "name": "fresnel/0/0",
+      "pixels": 1296000,
+      "changedPixels": 1,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 3.8580246913580245e-7,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 755702
+      },
+      "clearedPixelsChecked": 150535,
+      "stalePixels": 0
+    },
+    {
+      "name": "fresnel/1/17.25",
+      "pixels": 1296000,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 755702
+      },
+      "clearedPixelsChecked": 150535,
+      "stalePixels": 0
+    },
+    {
+      "name": "fresnel/2/97.5",
+      "pixels": 1296000,
+      "changedPixels": 2,
+      "maxChannelDifference": 1,
+      "meanChannelDifference": 5.787037037037037e-7,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 859318
+      },
+      "clearedPixelsChecked": 46919,
+      "stalePixels": 0
+    },
+    {
+      "name": "fresnel/3/270",
+      "pixels": 1296000,
+      "changedPixels": 7,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 0.0000019290123456790124,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 840941,
+        "after": 840941
+      },
+      "fragmentPixels": {
+        "before": 840941,
+        "after": 776884
+      },
+      "clearedPixelsChecked": 64057,
+      "stalePixels": 0
+    },
+    {
+      "name": "fresnel/4/510.75",
+      "pixels": 1296000,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 756660,
+        "after": 756660
+      },
+      "fragmentPixels": {
+        "before": 756660,
+        "after": 441940
+      },
+      "clearedPixelsChecked": 314720,
+      "stalePixels": 0
+    },
+    {
+      "name": "fresnel/5/270",
+      "pixels": 1296000,
+      "changedPixels": 7,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 0.0000019290123456790124,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 840941,
+        "after": 840941
+      },
+      "fragmentPixels": {
+        "before": 840941,
+        "after": 776884
+      },
+      "clearedPixelsChecked": 64057,
+      "stalePixels": 0
+    },
+    {
+      "name": "fresnel/6/97.5",
+      "pixels": 1296000,
+      "changedPixels": 2,
+      "maxChannelDifference": 1,
+      "meanChannelDifference": 5.787037037037037e-7,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 859318
+      },
+      "clearedPixelsChecked": 46919,
+      "stalePixels": 0
+    },
+    {
+      "name": "fresnel/7/17.25",
+      "pixels": 1296000,
+      "changedPixels": 0,
+      "maxChannelDifference": 0,
+      "meanChannelDifference": 0,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 755702
+      },
+      "clearedPixelsChecked": 150535,
+      "stalePixels": 0
+    },
+    {
+      "name": "fresnel/8/0",
+      "pixels": 1296000,
+      "changedPixels": 2102,
+      "maxChannelDifference": 2,
+      "meanChannelDifference": 0.00043016975308641977,
+      "significantPercent": 0,
+      "copyPixels": {
+        "before": 906237,
+        "after": 906237
+      },
+      "fragmentPixels": {
+        "before": 906237,
+        "after": 755702
+      },
+      "clearedPixelsChecked": 150535,
+      "stalePixels": 0
+    }
+  ],
+  "passed": true
+}

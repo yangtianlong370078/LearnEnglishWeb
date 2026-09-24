@@ -17,6 +17,87 @@ export type LiquidGlassTile = {
   height: number;
 };
 
+export type LiquidGlassVisibleTile = LiquidGlassTile & {
+  /** Complete card size in CSS pixels; unchanged by viewport clipping. */
+  fullWidth: number;
+  fullHeight: number;
+  /** Keep each card canvas at its complete atlas resolution while scrolling. */
+  fullPixelWidth: number;
+  fullPixelHeight: number;
+  /** Exact destination pixel rectangle within that complete card canvas. */
+  destinationPixels: { x: number; y: number; width: number; height: number };
+  /** Destination within the complete card, in local CSS pixels. */
+  destination: { x: number; y: number; width: number; height: number };
+};
+
+// Quantized overscan reuses crop geometry through nearby scroll frames.
+const CLIP_STEP = 32;
+
+/** Clip on the existing atlas pixel grid, preserving its sampling resolution.
+ * A physical pixel of overscan keeps linear filtering away from the clipped
+ * boundary; outward quantization reuses the crop through nearby scroll frames.
+ * The complete card bounds still determine refraction and corners.
+ */
+export function clipLiquidGlassTile(
+  item: LiquidGlassItem,
+  tile: LiquidGlassTile,
+  viewport: { width: number; height: number },
+): LiquidGlassVisibleTile | null {
+  if (
+    item.x >= viewport.width ||
+    item.y >= viewport.height ||
+    item.x + item.width <= 0 ||
+    item.y + item.height <= 0
+  )
+    return null;
+
+  const scaleX = tile.width / item.width;
+  const scaleY = tile.height / item.height;
+  const left = Math.max(
+    0,
+    Math.floor((Math.floor(-item.x * scaleX) - 1) / CLIP_STEP) * CLIP_STEP,
+  );
+  const top = Math.max(
+    0,
+    Math.floor((Math.floor(-item.y * scaleY) - 1) / CLIP_STEP) * CLIP_STEP,
+  );
+  const right = Math.min(
+    tile.width,
+    Math.ceil((Math.ceil((viewport.width - item.x) * scaleX) + 1) / CLIP_STEP) *
+      CLIP_STEP,
+  );
+  const bottom = Math.min(
+    tile.height,
+    Math.ceil(
+      (Math.ceil((viewport.height - item.y) * scaleY) + 1) / CLIP_STEP,
+    ) * CLIP_STEP,
+  );
+
+  return {
+    id: tile.id,
+    x: tile.x + left,
+    y: tile.y + top,
+    width: right - left,
+    height: bottom - top,
+    fullWidth: item.width,
+    fullHeight: item.height,
+    fullPixelWidth: tile.width,
+    fullPixelHeight: tile.height,
+    destinationPixels: {
+      x: left,
+      y: top,
+      width: right - left,
+      height: bottom - top,
+    },
+    destination: {
+      x: left / scaleX,
+      y: top / scaleY,
+      width: (right - left) / scaleX,
+      height: (bottom - top) / scaleY,
+    },
+  };
+}
+
 type Atlas = { width: number; height: number; tiles: LiquidGlassTile[] };
 
 const GUTTER = 1;

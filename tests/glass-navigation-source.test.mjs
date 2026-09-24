@@ -296,6 +296,25 @@ test("ordinary content replacements reuse hosts but still apply current geometry
   h.dispose();
 });
 
+test("paint-only liquid canvas changes do not schedule navigation geometry", () => {
+  const h = setup();
+  const card = h.host("card");
+  h.flush();
+  const canvas = h.element("canvas");
+  canvas.className = "liquid-glass-surface";
+  card.append(canvas);
+  h.mutate([childList([canvas])]);
+  canvas.remove();
+  h.mutate([childList([], [canvas])]);
+  assert.equal(card.boundsReads, 1);
+  // Real text/layout mutations in the same batch must still be measured.
+  card.bounds.top = -20;
+  h.mutate([childList([canvas]), childList([{ nodeType: 3 }])]);
+  assert.equal(card.boundsReads, 2);
+  assert.equal(h.activeFilters.get(card).bounds.top, -20);
+  h.dispose();
+});
+
 test("added and removed subtrees update plain and glass hosts", () => {
   const h = setup();
   h.flush();

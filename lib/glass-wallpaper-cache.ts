@@ -131,7 +131,6 @@ export function createGlassWallpaperCache(document: Document) {
   const view = document.defaultView!;
   const root = document.documentElement;
   const cache = new Map<string, Wallpaper>();
-  const pending = new Map<string, Promise<void>>();
   const requests = new Set<ThemeRequest>();
   let requestedKey = "";
   let activeKey = "";
@@ -141,9 +140,15 @@ export function createGlassWallpaperCache(document: Document) {
   let warmupFrame = 0;
   let warmupIdle = 0;
   let warmupTimer = 0;
-  let worker: ReturnType<typeof createGlassWallpaperWorker>;
-  let canPrewarm = true;
-  let warmup: { key: string; cancelled: boolean } | undefined;
+  let canUseWorker = true;
+
+  type Job = {
+    key: string;
+    cancelled: boolean;
+    foreground: boolean;
+    worker?: ReturnType<typeof createGlassWallpaperWorker>;
+  };
+  let activeJob: Job | undefined;
 
   async function render(
     width: number,
@@ -153,149 +158,169 @@ export function createGlassWallpaperCache(document: Document) {
     photo: boolean,
     blurPx: number,
     blurPadding: number,
+    job: Job,
   ): Promise<Wallpaper | undefined> {
-    const source = document.createElement("canvas");
+    // Do not allocate full-size drawing buffers while a photo is loading, and
+    // do not start convolution if a newer request has superseded this one.
+    const image = photo
+      ? await loadImage(`/images/bg01_${dark ? "dark" : "light"}.jpeg`)
+      : undefined;
 
-    source.width = Math.ceil(width * scale);
-    source.height = Math.ceil(height * scale);
-    const context = source.getContext("2d");
+    if (disposed || job.cancelled) return;
+    const buffers: HTMLCanvasElement[] = [];
+    const canvas = () => {
+      const buffer = document.createElement("canvas");
 
-    if (!context || !("filter" in context)) return;
+      buffers.push(buffer);
 
-    context.scale(scale, scale);
+      return buffer;
+    };
 
-    if (photo) {
-      const image = await loadImage(
-        `/images/bg01_${dark ? "dark" : "light"}.jpeg`,
-      );
+    try {
+      const source = canvas();
 
-      if (disposed) return;
-      const ratio = Math.max(width / image.width, height / image.height);
+      source.width = Math.ceil(width * scale);
+      source.height = Math.ceil(height * scale);
+      const context = source.getContext("2d");
 
-      context.drawImage(
-        image,
-        (width - image.width * ratio) / 2,
-        (height - image.height * ratio) / 2,
-        image.width * ratio,
-        image.height * ratio,
-      );
-      const tint = context.createLinearGradient(0, 0, 0, height);
+      if (!context || !("filter" in context)) return;
 
-      tint.addColorStop(
-        0,
-        dark ? "rgb(5 10 24 / 0.16)" : "rgb(255 255 255 / 0.04)",
-      );
-      tint.addColorStop(
-        1,
-        dark ? "rgb(5 10 24 / 0.32)" : "rgb(255 255 255 / 0.12)",
-      );
-      context.fillStyle = tint;
-      context.fillRect(0, 0, width, height);
-    } else {
-      const styles = view.getComputedStyle(root);
-      const palette = `--glass-${dark ? "dark" : "light"}-ambient`;
+      context.scale(scale, scale);
 
-      context.fillStyle = styles.getPropertyValue(`${palette}-base`).trim();
-      context.fillRect(0, 0, width, height);
-      const geometry = dark
-        ? [
-            [0.12, 0.18, 0.9, 0.85, 0.62],
-            [0.78, 0.14, 0.8, 0.68, 0.58],
-            [0.78, 0.82, 0.75, 0.72, 0.58],
-            [0.18, 0.84, 0.68, 0.66, 0.58],
-          ]
-        : [
-            [0.12, 0.18, 0.8, 0.75, 0.6],
-            [0.78, 0.14, 0.7, 0.58, 0.58],
-            [0.78, 0.82, 0.65, 0.62, 0.58],
-            [0.18, 0.84, 0.58, 0.56, 0.58],
-          ];
+      if (image) {
+        const ratio = Math.max(width / image.width, height / image.height);
 
-      for (let i = 3; i >= 0; i--) {
-        const [cx, cy, rx, ry, stop] = geometry[i];
+        context.drawImage(
+          image,
+          (width - image.width * ratio) / 2,
+          (height - image.height * ratio) / 2,
+          image.width * ratio,
+          image.height * ratio,
+        );
+        const tint = context.createLinearGradient(0, 0, 0, height);
 
-        context.save();
-        context.translate(cx * width, cy * height);
-        context.scale(rx * width, ry * height);
-        const gradient = context.createRadialGradient(0, 0, 0, 0, 0, 1);
-
-        gradient.addColorStop(
+        tint.addColorStop(
           0,
-          styles.getPropertyValue(`${palette}-${i + 1}`).trim(),
+          dark ? "rgb(5 10 24 / 0.16)" : "rgb(255 255 255 / 0.04)",
         );
-        gradient.addColorStop(
-          stop,
-          styles
-            .getPropertyValue(`${palette}-${i + 1}`)
-            .trim()
-            .replace(/\/[^)]+\)/, "/ 0)"),
+        tint.addColorStop(
+          1,
+          dark ? "rgb(5 10 24 / 0.32)" : "rgb(255 255 255 / 0.12)",
         );
-        context.fillStyle = gradient;
-        context.fillRect(-2, -2, 4, 4);
-        context.restore();
+        context.fillStyle = tint;
+        context.fillRect(0, 0, width, height);
+      } else {
+        const styles = view.getComputedStyle(root);
+        const palette = `--glass-${dark ? "dark" : "light"}-ambient`;
+
+        context.fillStyle = styles.getPropertyValue(`${palette}-base`).trim();
+        context.fillRect(0, 0, width, height);
+        const geometry = dark
+          ? [
+              [0.12, 0.18, 0.9, 0.85, 0.62],
+              [0.78, 0.14, 0.8, 0.68, 0.58],
+              [0.78, 0.82, 0.75, 0.72, 0.58],
+              [0.18, 0.84, 0.68, 0.66, 0.58],
+            ]
+          : [
+              [0.12, 0.18, 0.8, 0.75, 0.6],
+              [0.78, 0.14, 0.7, 0.58, 0.58],
+              [0.78, 0.82, 0.65, 0.62, 0.58],
+              [0.18, 0.84, 0.58, 0.56, 0.58],
+            ];
+
+        for (let i = 3; i >= 0; i--) {
+          const [cx, cy, rx, ry, stop] = geometry[i];
+
+          context.save();
+          context.translate(cx * width, cy * height);
+          context.scale(rx * width, ry * height);
+          const gradient = context.createRadialGradient(0, 0, 0, 0, 0, 1);
+
+          gradient.addColorStop(
+            0,
+            styles.getPropertyValue(`${palette}-${i + 1}`).trim(),
+          );
+          gradient.addColorStop(
+            stop,
+            styles
+              .getPropertyValue(`${palette}-${i + 1}`)
+              .trim()
+              .replace(/\/[^)]+\)/, "/ 0)"),
+          );
+          context.fillStyle = gradient;
+          context.fillRect(-2, -2, 4, 4);
+          context.restore();
+        }
       }
+
+      // Repeat edge pixels before convolution, as in the modal source filter.
+      const pad = Math.ceil(blurPadding * scale);
+      const expanded = canvas();
+
+      expanded.width = source.width + 2 * pad;
+      expanded.height = source.height + 2 * pad;
+      const input = expanded.getContext("2d")!;
+      const w = source.width,
+        h = source.height;
+
+      input.drawImage(source, pad, pad);
+      input.drawImage(source, 0, 0, w, 1, pad, 0, w, pad);
+      input.drawImage(source, 0, h - 1, w, 1, pad, pad + h, w, pad);
+      input.drawImage(source, 0, 0, 1, h, 0, pad, pad, h);
+      input.drawImage(source, w - 1, 0, 1, h, pad + w, pad, pad, h);
+      for (const [sx, sy, dx, dy] of [
+        [0, 0, 0, 0],
+        [w - 1, 0, w + pad, 0],
+        [0, h - 1, 0, h + pad],
+        [w - 1, h - 1, w + pad, h + pad],
+      ]) {
+        input.drawImage(source, sx, sy, 1, 1, dx, dy, pad, pad);
+      }
+      const base = canvas();
+
+      base.width = w;
+      base.height = h;
+      const paint = base.getContext("2d")!;
+
+      paint.filter = `blur(${blurPx * scale}px) saturate(${glassConfig.saturation}%)`;
+      paint.drawImage(expanded, -pad, -pad);
+      // Dither after the blur so its grain survives: 8-bit radial gradients
+      // band, and the saturate filters widen those steps into visible bands.
+      // Mid-gray noise under the overlay blend is neutral but breaks the steps.
+      paint.globalCompositeOperation = "overlay";
+      const tile = ditherTile(document);
+
+      buffers.push(tile);
+      paint.fillStyle = paint.createPattern(tile, "repeat")!;
+      paint.fillRect(0, 0, w, h);
+      paint.globalCompositeOperation = "source-over";
+      const border = canvas();
+
+      border.width = w;
+      border.height = h;
+      const rim = border.getContext("2d")!;
+
+      rim.filter = `saturate(${glassConfig.borderSaturation}%) brightness(${glassConfig.borderBrightness})`;
+      rim.drawImage(base, 0, 0);
+      // Release drawing buffers promptly; only the completed image resources
+      // survive between updates. Do not create URLs until both encodes succeed.
+      source.width = 0;
+      expanded.width = 0;
+      const lossy = !glassConfig.losslessWallpaper && photo;
+      const [baseBlob, borderBlob] = await Promise.all([
+        canvasBlob(base, lossy),
+        canvasBlob(border, lossy),
+      ]).finally(() => {
+        base.width = 0;
+        border.width = 0;
+      });
+
+      if (!disposed && !job.cancelled)
+        return decodeWallpaper(baseBlob, borderBlob, blurPx);
+    } finally {
+      for (const buffer of buffers) buffer.width = 0;
     }
-
-    // Repeat edge pixels before convolution, as in the modal source filter.
-    const pad = Math.ceil(blurPadding * scale);
-    const expanded = document.createElement("canvas");
-
-    expanded.width = source.width + 2 * pad;
-    expanded.height = source.height + 2 * pad;
-    const input = expanded.getContext("2d")!;
-    const w = source.width,
-      h = source.height;
-
-    input.drawImage(source, pad, pad);
-    input.drawImage(source, 0, 0, w, 1, pad, 0, w, pad);
-    input.drawImage(source, 0, h - 1, w, 1, pad, pad + h, w, pad);
-    input.drawImage(source, 0, 0, 1, h, 0, pad, pad, h);
-    input.drawImage(source, w - 1, 0, 1, h, pad + w, pad, pad, h);
-    for (const [sx, sy, dx, dy] of [
-      [0, 0, 0, 0],
-      [w - 1, 0, w + pad, 0],
-      [0, h - 1, 0, h + pad],
-      [w - 1, h - 1, w + pad, h + pad],
-    ]) {
-      input.drawImage(source, sx, sy, 1, 1, dx, dy, pad, pad);
-    }
-    const base = document.createElement("canvas");
-
-    base.width = w;
-    base.height = h;
-    const paint = base.getContext("2d")!;
-
-    paint.filter = `blur(${blurPx * scale}px) saturate(${glassConfig.saturation}%)`;
-    paint.drawImage(expanded, -pad, -pad);
-    // Dither after the blur so its grain survives: 8-bit radial gradients
-    // band, and the saturate filters widen those steps into visible bands.
-    // Mid-gray noise under the overlay blend is neutral but breaks the steps.
-    paint.globalCompositeOperation = "overlay";
-    paint.fillStyle = paint.createPattern(ditherTile(document), "repeat")!;
-    paint.fillRect(0, 0, w, h);
-    paint.globalCompositeOperation = "source-over";
-    const border = document.createElement("canvas");
-
-    border.width = w;
-    border.height = h;
-    const rim = border.getContext("2d")!;
-
-    rim.filter = `saturate(${glassConfig.borderSaturation}%) brightness(${glassConfig.borderBrightness})`;
-    rim.drawImage(base, 0, 0);
-    // Release drawing buffers promptly; only the completed image resources
-    // survive between updates. Do not create URLs until both encodes succeed.
-    source.width = 0;
-    expanded.width = 0;
-    const lossy = !glassConfig.losslessWallpaper && photo;
-    const [baseBlob, borderBlob] = await Promise.all([
-      canvasBlob(base, lossy),
-      canvasBlob(border, lossy),
-    ]).finally(() => {
-      base.width = 0;
-      border.width = 0;
-    });
-
-    return decodeWallpaper(baseBlob, borderBlob, blurPx);
   }
 
   function release(entry: Wallpaper) {
@@ -345,23 +370,25 @@ export function createGlassWallpaperCache(document: Document) {
     return { width, height, scale, dark, photo, blurPx, blurPadding, key };
   }
 
-  function cancelPrewarm(keepKey?: string) {
+  function cancelPreparation(keepKey?: string) {
     view.cancelAnimationFrame(warmupFrame);
     if (warmupIdle) view.cancelIdleCallback(warmupIdle);
     view.clearTimeout(warmupTimer);
     warmupFrame = warmupIdle = warmupTimer = 0;
-    if (!warmup || warmup.key === keepKey) return;
-    warmup.cancelled = true;
-    pending.delete(warmup.key);
-    warmup = undefined;
-    worker?.cancel();
+    if (!activeJob || activeJob.key === keepKey) return;
+    activeJob.cancelled = true;
+    // Termination interrupts synchronous OffscreenCanvas work as well as an
+    // encode in progress. A late bitmap/decode cannot populate the cache.
+    activeJob.worker?.dispose();
+    activeJob.worker = undefined;
+    activeJob = undefined;
   }
 
   function schedulePrewarm() {
-    if (disposed || !canPrewarm || warmup) return;
-    cancelPrewarm();
-    // Let the current texture paint first. Background preparation never enters
-    // the foreground render path or runs its convolution on the main thread.
+    if (disposed || !canUseWorker || activeJob) return;
+    cancelPreparation();
+    // The requested texture paints before speculative work is eligible. There
+    // is exactly one render job, so foreground work never queues behind it.
     warmupFrame = view.requestAnimationFrame(() => {
       warmupFrame = 0;
       if (view.requestIdleCallback) {
@@ -378,9 +405,105 @@ export function createGlassWallpaperCache(document: Document) {
     });
   }
 
+  async function prepare(target: ReturnType<typeof getTarget>, job: Job) {
+    if (canUseWorker) {
+      const renderer = createGlassWallpaperWorker();
+
+      if (renderer) {
+        job.worker = renderer;
+        let blobs;
+
+        try {
+          const image = target.photo
+            ? await loadImage(
+                `/images/bg01_${target.dark ? "dark" : "light"}.jpeg`,
+              )
+            : undefined;
+
+          if (disposed || job.cancelled) return;
+          const styles = target.photo ? undefined : view.getComputedStyle(root);
+          const palette = `--glass-${target.dark ? "dark" : "light"}-ambient`;
+
+          blobs = await renderer.render(image, {
+            ...target,
+            saturation: glassConfig.saturation,
+            borderSaturation: glassConfig.borderSaturation,
+            borderBrightness: glassConfig.borderBrightness,
+            losslessWallpaper: glassConfig.losslessWallpaper,
+            ambient: styles
+              ? {
+                  base: styles.getPropertyValue(`${palette}-base`).trim(),
+                  colors: [1, 2, 3, 4].map((index) =>
+                    styles.getPropertyValue(`${palette}-${index}`).trim(),
+                  ),
+                }
+              : undefined,
+          });
+        } catch {
+          if (disposed || job.cancelled) return;
+          // Unsupported worker filters/CSP/bitmap transfer must not prevent a
+          // selected mode from loading. Retry only required work in Canvas.
+          canUseWorker = false;
+        } finally {
+          if (job.worker === renderer) {
+            renderer.dispose();
+            job.worker = undefined;
+          }
+        }
+        if (disposed || job.cancelled) return;
+        if (blobs)
+          return decodeWallpaper(blobs.base, blobs.border, target.blurPx);
+      } else canUseWorker = false;
+    }
+    if (!job.foreground || disposed || job.cancelled) return;
+
+    return render(
+      target.width,
+      target.height,
+      target.scale,
+      target.dark,
+      target.photo,
+      target.blurPx,
+      target.blurPadding,
+      job,
+    );
+  }
+
+  function startJob(target: ReturnType<typeof getTarget>, foreground: boolean) {
+    const job: Job = { key: target.key, cancelled: false, foreground };
+
+    activeJob = job;
+    void prepare(target, job)
+      .then((result) => {
+        if (disposed || job.cancelled) {
+          if (result) release(result);
+
+          return;
+        }
+        if (result) {
+          cache.set(job.key, result);
+          commitRequests(job.key, result);
+          trim();
+        } else if (job.foreground) commitRequests(job.key);
+      })
+      // Preserve the last good texture if encoding/decoding fails. Theme
+      // controls still commit with the existing CSS source fallback.
+      .catch(() => {
+        if (disposed || job.cancelled) return;
+        if (job.foreground) commitRequests(job.key);
+        // A speculative decode failure must not start an endless idle retry
+        // loop. A future foreground request still has the Canvas fallback.
+        else canUseWorker = false;
+      })
+      .finally(() => {
+        if (activeJob !== job) return;
+        activeJob = undefined;
+        if (!disposed && activeKey === getTarget().key) schedulePrewarm();
+      });
+  }
+
   function prewarmOtherMode() {
-    if (disposed || !canPrewarm || warmup || pending.size || requests.size)
-      return;
+    if (disposed || !canUseWorker || activeJob || requests.size) return;
     const current = getTarget();
 
     // Liquid mode is only available with the photo background.
@@ -395,74 +518,7 @@ export function createGlassWallpaperCache(document: Document) {
     );
 
     if (alternate.key === current.key || cache.has(alternate.key)) return;
-    worker ??= createGlassWallpaperWorker();
-    if (!worker) {
-      canPrewarm = false;
-
-      return;
-    }
-    const renderer = worker;
-    const job = { key: alternate.key, cancelled: false };
-
-    warmup = job;
-    const task = loadImage(
-      `/images/bg01_${alternate.dark ? "dark" : "light"}.jpeg`,
-    )
-      .then(async (image) => {
-        if (disposed || job.cancelled) return;
-        const blobs = await renderer.render(image, {
-          ...alternate,
-          saturation: glassConfig.saturation,
-          borderSaturation: glassConfig.borderSaturation,
-          borderBrightness: glassConfig.borderBrightness,
-          losslessWallpaper: glassConfig.losslessWallpaper,
-        });
-
-        if (disposed || job.cancelled) return;
-        const result = await decodeWallpaper(
-          blobs.base,
-          blobs.border,
-          alternate.blurPx,
-        );
-
-        if (disposed || job.cancelled) {
-          release(result);
-
-          return;
-        }
-        cache.set(job.key, result);
-        // A user can select this mode while its prewarm is still finishing.
-        // Reuse that work, but never change the active mode just to prewarm it.
-        commitRequests(job.key, result);
-        trim();
-      })
-      .catch(() => {
-        if (job.cancelled || disposed) return;
-        // Unsupported worker filters or a blocked worker only disable this
-        // optimization. The requested mode can still render through Canvas.
-        canPrewarm = false;
-        renderer.dispose();
-        worker = undefined;
-      })
-      .finally(() => {
-        if (pending.get(job.key) === task) pending.delete(job.key);
-        if (warmup === job) {
-          warmup = undefined;
-          renderer.dispose();
-          if (worker === renderer) worker = undefined;
-        }
-        if (
-          !disposed &&
-          !job.cancelled &&
-          requestedKey === job.key &&
-          !cache.has(job.key)
-        ) {
-          requestedKey = "";
-          update();
-        }
-      });
-
-    pending.set(job.key, task);
+    startJob(alternate, false);
   }
 
   function commitRequests(key: string, result?: Wallpaper) {
@@ -492,12 +548,13 @@ export function createGlassWallpaperCache(document: Document) {
 
   function update() {
     if (disposed) return;
-    const { width, height, scale, dark, photo, blurPx, blurPadding, key } =
-      getTarget();
+    const target = getTarget();
+    const { blurPx, key } = target;
 
     // A new foreground request supersedes speculative work for another size,
     // theme, or mode. Selecting the in-flight prewarm itself reuses its task.
-    if (key !== requestedKey) cancelPrewarm(key);
+    if (key !== requestedKey) cancelPreparation(key);
+    if (activeJob?.key === key) activeJob.foreground = true;
 
     // A mode change must use its own blur immediately. The CSS source fallback
     // already has the new radius while a matching texture renders and decodes.
@@ -505,10 +562,10 @@ export function createGlassWallpaperCache(document: Document) {
       root.removeAttribute("data-glass-wallpaper-ready");
 
     // Other root classes (for example scrollbar state) do not change the
-    // wallpaper. A rapid theme round trip also reuses its in-flight render.
+    // wallpaper. Mode changes reuse any matching in-flight preparation.
     if (
       key === requestedKey &&
-      ((key === activeKey && !requests.size) || pending.has(key))
+      ((key === activeKey && !requests.size) || activeJob?.key === key)
     )
       return;
     requestedKey = key;
@@ -524,32 +581,8 @@ export function createGlassWallpaperCache(document: Document) {
 
       return;
     }
-    if (pending.has(key)) return;
-    const task = render(width, height, scale, dark, photo, blurPx, blurPadding)
-      .then((result) => {
-        if (!result) {
-          commitRequests(key);
-
-          return;
-        }
-        if (disposed) {
-          release(result);
-
-          return;
-        }
-        cache.set(key, result);
-        commitRequests(key, result);
-        trim();
-      })
-      // A failed refresh keeps the displayed texture. A pending theme change
-      // still commits through the source fallback so controls cannot get stuck.
-      .catch(() => commitRequests(key))
-      .finally(() => {
-        if (pending.get(key) === task) pending.delete(key);
-        if (!disposed && activeKey === getTarget().key) schedulePrewarm();
-      });
-
-    pending.set(key, task);
+    if (activeJob?.key === key) return;
+    startJob(target, true);
   }
 
   const coordinate: ThemeCoordinator = (change, commit) => {
@@ -584,7 +617,7 @@ export function createGlassWallpaperCache(document: Document) {
   coordinators.set(document, coordinate);
 
   function resize() {
-    cancelPrewarm();
+    cancelPreparation();
     requestedKey = "";
     view.clearTimeout(timer);
     timer = view.setTimeout(update, 100);
@@ -601,8 +634,7 @@ export function createGlassWallpaperCache(document: Document) {
 
   return () => {
     disposed = true;
-    cancelPrewarm();
-    worker?.dispose();
+    cancelPreparation();
     if (coordinators.get(document) === coordinate)
       coordinators.delete(document);
     // A route may remove the final glass surface while its theme provider stays

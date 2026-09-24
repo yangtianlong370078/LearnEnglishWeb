@@ -365,14 +365,18 @@ async function switchCheck(run, prewarm) {
     const worker = await page.evaluate(() => ({
       workers: window.__liquidStartup.workers,
       replies: window.__liquidStartup.replies,
+      posts: window.__liquidStartup.posts,
     }));
     assert.ok(
-      worker.workers.length > 0,
-      "Alternate blur is prepared by a Worker",
+      worker.workers.length >= 2,
+      "Current and alternate blur are prepared by Workers",
     );
+    assert.equal(worker.workers[0].ready, false, "Current mode starts first");
+    assert.equal(worker.posts[0].blurPx, config.getGlassBlurPx(initialMode));
+    assert.equal(worker.posts[1].blurPx, config.getGlassBlurPx(alternateMode));
     assert.ok(
-      worker.workers.every((instance) => instance.ready),
-      "Worker starts only after current wallpaper is published",
+      worker.workers.slice(1).every((instance) => instance.ready),
+      "Alternate Worker starts after current wallpaper is published",
     );
     assert.ok(
       worker.replies.every((reply) => !reply.error),
@@ -380,8 +384,8 @@ async function switchCheck(run, prewarm) {
     );
     assert.equal(
       (await counters(page)).toBlob,
-      worker.workers[0].toBlob,
-      "Preparing the alternate blur does not encode on the main thread",
+      0,
+      "Neither foreground nor alternate blur encodes on the main thread",
     );
     assert.equal(
       (await page.evaluate(() => window.__readLiquidStartup())).texture,

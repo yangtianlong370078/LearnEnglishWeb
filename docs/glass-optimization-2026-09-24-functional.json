@@ -1,0 +1,795 @@
+{
+  "baseURL": "http://127.0.0.1:8095",
+  "createdAt": "2026-09-24T09:36:09.950Z",
+  "browser": "153.0.8010.53",
+  "softwareRequested": false,
+  "conditions": "Real application routes with 12 fictional words / 18 fictional courses. Native CDP wheel scrolling, two 2-second passes per sample after warmup. Mobile is desktop CPU/GPU emulation, not thermal/power measurement. rAF intervals are not directly presented GPU FPS. TaskDuration is renderer main-thread work, not total CPU usage.",
+  "results": [
+    {
+      "profile": {
+        "name": "desktop",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "dpr": 1,
+        "mobile": false,
+        "cap": 20
+      },
+      "page": "courselearn",
+      "fixtures": {
+        "words": 12,
+        "courses": 18
+      },
+      "functional": {
+        "liquid": {
+          "draws": 1,
+          "copies": 11,
+          "uploads": 1,
+          "maxInstances": 11,
+          "contexts": 1,
+          "liveContexts": 1,
+          "canvases": 11,
+          "mode": "liquid",
+          "idleDraws": 0
+        },
+        "persisted": {
+          "draws": 1,
+          "copies": 11,
+          "uploads": 1,
+          "maxInstances": 11,
+          "contexts": 1,
+          "liveContexts": 1,
+          "canvases": 11,
+          "mode": "liquid"
+        },
+        "returnToGlass": {
+          "draws": 2,
+          "copies": 22,
+          "uploads": 2,
+          "maxInstances": 11,
+          "contexts": 2,
+          "liveContexts": 0,
+          "canvases": 0,
+          "mode": "glass",
+          "idleDraws": 0,
+          "identicalScreenshot": true,
+          "pixelDifference": {
+            "changedPixels": 0,
+            "comparedPixels": 1296000,
+            "maxChannelDifference": 0,
+            "meanChannelDifference": 0,
+            "bounds": null
+          },
+          "cardPixelDifference": {
+            "changedPixels": 0,
+            "comparedPixels": 657419,
+            "maxChannelDifference": 0,
+            "meanChannelDifference": 0,
+            "bounds": null
+          },
+          "cardRegions": [
+            {
+              "x": 560,
+              "y": 85,
+              "width": 320,
+              "height": 52,
+              "radius": 33554400
+            },
+            {
+              "x": 228,
+              "y": 157,
+              "width": 984,
+              "height": 52,
+              "radius": 24
+            },
+            {
+              "x": 228,
+              "y": 229,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 562.65625,
+              "y": 229,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 897.328125,
+              "y": 229,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 228,
+              "y": 469,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 562.65625,
+              "y": 469,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 897.328125,
+              "y": 469,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 228,
+              "y": 709,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 562.65625,
+              "y": 709,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 897.328125,
+              "y": 709,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 228,
+              "y": 949,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 562.65625,
+              "y": 949,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 897.328125,
+              "y": 949,
+              "width": 314,
+              "height": 220,
+              "radius": 24
+            },
+            {
+              "x": 585,
+              "y": 1189,
+              "width": 270,
+              "height": 56,
+              "radius": 33554400
+            }
+          ],
+          "rectangularPixelDifference": {
+            "changedPixels": 0,
+            "comparedPixels": 662210,
+            "maxChannelDifference": 0,
+            "meanChannelDifference": 0,
+            "bounds": null
+          }
+        },
+        "protection": {
+          "modalSuspension": true,
+          "modalRestore": true,
+          "slowFrames": {
+            "throttled": true,
+            "canvases": 0,
+            "updates": 9
+          },
+          "restoredAfterScroll": true
+        },
+        "contextLoss": {
+          "draws": 13,
+          "copies": 143,
+          "uploads": 3,
+          "maxInstances": 11,
+          "contexts": 3,
+          "liveContexts": 0,
+          "canvases": 0,
+          "mode": "glass",
+          "idleDraws": 0
+        }
+      },
+      "samples": [],
+      "requests": {
+        "mocked": [
+          "GET /api/Word/Words",
+          "GET /api/Word/Words"
+        ],
+        "blockedWrites": [],
+        "unknownAPI": [],
+        "blockedExternal": []
+      },
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "desktop",
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "dpr": 1,
+        "mobile": false,
+        "cap": 20
+      },
+      "page": "learnwords",
+      "fixtures": {
+        "words": 12,
+        "courses": 18
+      },
+      "functional": {
+        "liquid": {
+          "draws": 1,
+          "copies": 3,
+          "uploads": 1,
+          "maxInstances": 3,
+          "contexts": 1,
+          "liveContexts": 1,
+          "canvases": 3,
+          "mode": "liquid",
+          "idleDraws": 0
+        },
+        "persisted": {
+          "draws": 1,
+          "copies": 5,
+          "uploads": 1,
+          "maxInstances": 5,
+          "contexts": 1,
+          "liveContexts": 1,
+          "canvases": 5,
+          "mode": "liquid"
+        },
+        "returnToGlass": {
+          "draws": 7,
+          "copies": 22,
+          "uploads": 2,
+          "maxInstances": 5,
+          "contexts": 2,
+          "liveContexts": 0,
+          "canvases": 0,
+          "mode": "glass",
+          "idleDraws": 0,
+          "identicalScreenshot": false,
+          "pixelDifference": {
+            "changedPixels": 4,
+            "comparedPixels": 1296000,
+            "maxChannelDifference": 3,
+            "meanChannelDifference": 0.000005915637860082305,
+            "bounds": [
+              1383,
+              17,
+              1398,
+              32
+            ]
+          },
+          "cardPixelDifference": {
+            "changedPixels": 0,
+            "comparedPixels": 967746,
+            "maxChannelDifference": 0,
+            "meanChannelDifference": 0,
+            "bounds": null
+          },
+          "cardRegions": [
+            {
+              "x": 104,
+              "y": 89,
+              "width": 402,
+              "height": 383,
+              "radius": 24
+            },
+            {
+              "x": 518.65625,
+              "y": 89,
+              "width": 402,
+              "height": 383,
+              "radius": 24
+            },
+            {
+              "x": 933.328125,
+              "y": 89,
+              "width": 402,
+              "height": 383,
+              "radius": 24
+            },
+            {
+              "x": 104,
+              "y": 488,
+              "width": 1232,
+              "height": 1708,
+              "radius": 24
+            },
+            {
+              "x": 104,
+              "y": 2212,
+              "width": 1232,
+              "height": 129,
+              "radius": 24
+            }
+          ],
+          "rectangularPixelDifference": {
+            "changedPixels": 0,
+            "comparedPixels": 969482,
+            "maxChannelDifference": 0,
+            "meanChannelDifference": 0,
+            "bounds": null
+          }
+        },
+        "protection": {
+          "modalSuspension": true,
+          "modalRestore": true,
+          "slowFrames": {
+            "throttled": true,
+            "canvases": 0,
+            "updates": 9
+          },
+          "restoredAfterScroll": true
+        },
+        "contextLoss": {
+          "draws": 18,
+          "copies": 55,
+          "uploads": 3,
+          "maxInstances": 5,
+          "contexts": 3,
+          "liveContexts": 0,
+          "canvases": 0,
+          "mode": "glass",
+          "idleDraws": 0
+        }
+      },
+      "samples": [],
+      "requests": {
+        "mocked": [
+          "GET /api/Course/MyCategoryContent",
+          "GET /api/Course/MyCategoryContent"
+        ],
+        "blockedWrites": [],
+        "unknownAPI": [],
+        "blockedExternal": [
+          "https://img.heroui.chat/image/avatar",
+          "https://img.heroui.chat/image/avatar"
+        ]
+      },
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "mobile",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dpr": 2,
+        "mobile": true,
+        "cap": 15
+      },
+      "page": "courselearn",
+      "fixtures": {
+        "words": 12,
+        "courses": 18
+      },
+      "functional": {
+        "liquid": {
+          "draws": 1,
+          "copies": 4,
+          "uploads": 1,
+          "maxInstances": 4,
+          "contexts": 1,
+          "liveContexts": 1,
+          "canvases": 4,
+          "mode": "liquid",
+          "idleDraws": 0
+        },
+        "persisted": {
+          "draws": 1,
+          "copies": 4,
+          "uploads": 1,
+          "maxInstances": 4,
+          "contexts": 1,
+          "liveContexts": 1,
+          "canvases": 4,
+          "mode": "liquid"
+        },
+        "returnToGlass": {
+          "draws": 2,
+          "copies": 8,
+          "uploads": 2,
+          "maxInstances": 4,
+          "contexts": 2,
+          "liveContexts": 0,
+          "canvases": 0,
+          "mode": "glass",
+          "idleDraws": 0,
+          "identicalScreenshot": true,
+          "pixelDifference": {
+            "changedPixels": 0,
+            "comparedPixels": 1316640,
+            "maxChannelDifference": 0,
+            "meanChannelDifference": 0,
+            "bounds": null
+          },
+          "cardPixelDifference": {
+            "changedPixels": 0,
+            "comparedPixels": 805604,
+            "maxChannelDifference": 0,
+            "meanChannelDifference": 0,
+            "bounds": null
+          },
+          "cardRegions": [
+            {
+              "x": 278,
+              "y": 178,
+              "width": 224,
+              "height": 296,
+              "radius": 67108800
+            },
+            {
+              "x": 40,
+              "y": 514,
+              "width": 700,
+              "height": 200,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 754,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 1234,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 1714,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 2194,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 2674,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 3154,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 3634,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 4114,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 4594,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 5074,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 5554,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 40,
+              "y": 6034,
+              "width": 700,
+              "height": 440,
+              "radius": 48
+            },
+            {
+              "x": 120,
+              "y": 6514,
+              "width": 540,
+              "height": 112,
+              "radius": 67108800
+            }
+          ],
+          "rectangularPixelDifference": {
+            "changedPixels": 0,
+            "comparedPixels": 822304,
+            "maxChannelDifference": 0,
+            "meanChannelDifference": 0,
+            "bounds": null
+          }
+        },
+        "protection": {
+          "modalSuspension": true,
+          "modalRestore": true,
+          "slowFrames": {
+            "throttled": true,
+            "canvases": 0,
+            "updates": 9
+          },
+          "restoredAfterScroll": true
+        },
+        "contextLoss": {
+          "draws": 13,
+          "copies": 55,
+          "uploads": 3,
+          "maxInstances": 5,
+          "contexts": 3,
+          "liveContexts": 0,
+          "canvases": 0,
+          "mode": "glass",
+          "idleDraws": 0
+        }
+      },
+      "samples": [],
+      "requests": {
+        "mocked": [
+          "GET /api/Word/Words",
+          "GET /api/Word/Words"
+        ],
+        "blockedWrites": [],
+        "unknownAPI": [],
+        "blockedExternal": []
+      },
+      "errors": []
+    },
+    {
+      "profile": {
+        "name": "mobile",
+        "viewport": {
+          "width": 390,
+          "height": 844
+        },
+        "dpr": 2,
+        "mobile": true,
+        "cap": 15
+      },
+      "page": "learnwords",
+      "fixtures": {
+        "words": 12,
+        "courses": 18
+      },
+      "functional": {
+        "liquid": {
+          "draws": 1,
+          "copies": 2,
+          "uploads": 1,
+          "maxInstances": 2,
+          "contexts": 1,
+          "liveContexts": 1,
+          "canvases": 2,
+          "mode": "liquid",
+          "idleDraws": 0
+        },
+        "persisted": {
+          "draws": 1,
+          "copies": 2,
+          "uploads": 1,
+          "maxInstances": 2,
+          "contexts": 1,
+          "liveContexts": 1,
+          "canvases": 2,
+          "mode": "liquid"
+        },
+        "returnToGlass": {
+          "draws": 6,
+          "copies": 8,
+          "uploads": 2,
+          "maxInstances": 2,
+          "contexts": 2,
+          "liveContexts": 0,
+          "canvases": 0,
+          "mode": "glass",
+          "idleDraws": 0,
+          "identicalScreenshot": true,
+          "pixelDifference": {
+            "changedPixels": 0,
+            "comparedPixels": 1316640,
+            "maxChannelDifference": 0,
+            "meanChannelDifference": 0,
+            "bounds": null
+          },
+          "cardPixelDifference": {
+            "changedPixels": 0,
+            "comparedPixels": 1013448,
+            "maxChannelDifference": 0,
+            "meanChannelDifference": 0,
+            "bounds": null
+          },
+          "cardRegions": [
+            {
+              "x": 48,
+              "y": 178,
+              "width": 684,
+              "height": 766,
+              "radius": 48
+            },
+            {
+              "x": 48,
+              "y": 968,
+              "width": 684,
+              "height": 766,
+              "radius": 48
+            },
+            {
+              "x": 48,
+              "y": 1758,
+              "width": 684,
+              "height": 766,
+              "radius": 48
+            },
+            {
+              "x": 48,
+              "y": 2556,
+              "width": 684,
+              "height": 9716,
+              "radius": 48
+            },
+            {
+              "x": 48,
+              "y": 12304,
+              "width": 684,
+              "height": 258,
+              "radius": 48
+            }
+          ],
+          "rectangularPixelDifference": {
+            "changedPixels": 0,
+            "comparedPixels": 1016424,
+            "maxChannelDifference": 0,
+            "meanChannelDifference": 0,
+            "bounds": null
+          }
+        },
+        "protection": {
+          "modalSuspension": true,
+          "modalRestore": true,
+          "slowFrames": {
+            "throttled": true,
+            "canvases": 0,
+            "updates": 9
+          },
+          "restoredAfterScroll": true
+        },
+        "contextLoss": {
+          "draws": 17,
+          "copies": 30,
+          "uploads": 3,
+          "maxInstances": 2,
+          "contexts": 3,
+          "liveContexts": 0,
+          "canvases": 0,
+          "mode": "glass",
+          "idleDraws": 0
+        }
+      },
+      "samples": [],
+      "requests": {
+        "mocked": [
+          "GET /api/Course/MyCategoryContent",
+          "GET /api/Course/MyCategoryContent"
+        ],
+        "blockedWrites": [],
+        "unknownAPI": [],
+        "blockedExternal": [
+          "https://img.heroui.chat/image/avatar",
+          "https://img.heroui.chat/image/avatar"
+        ]
+      },
+      "errors": []
+    }
+  ],
+  "unsupported": {
+    "draws": 0,
+    "copies": 0,
+    "uploads": 0,
+    "maxInstances": 0,
+    "contexts": 0,
+    "liveContexts": 0,
+    "canvases": 0,
+    "mode": "glass",
+    "idleDraws": 0
+  },
+  "gpu": {
+    "devices": [
+      {
+        "vendorId": 32902,
+        "deviceId": 42912,
+        "subSysId": 2334855228,
+        "revision": 4,
+        "vendorString": "",
+        "deviceString": "Intel(R) Iris(R) Xe Graphics",
+        "driverVendor": "Intel",
+        "driverVersion": "31.0.101.4502"
+      },
+      {
+        "vendorId": 32902,
+        "deviceId": 42912,
+        "subSysId": 2334855228,
+        "revision": 4,
+        "vendorString": "",
+        "deviceString": "Intel(R) Iris(R) Xe Graphics",
+        "driverVendor": "",
+        "driverVersion": "31.0.101.4502"
+      },
+      {
+        "vendorId": 5140,
+        "deviceId": 140,
+        "subSysId": 0,
+        "revision": 0,
+        "vendorString": "",
+        "deviceString": "Microsoft Basic Render Driver",
+        "driverVendor": "",
+        "driverVersion": "10.0.22621.2506"
+      }
+    ],
+    "renderer": "ANGLE (Intel, Intel(R) Iris(R) Xe Graphics (0x0000A7A0) Direct3D11 vs_5_0 ps_5_0, D3D11-31.0.101.4502)",
+    "featureStatus": {
+      "2d_canvas": "enabled",
+      "direct_rendering_display_compositor": "disabled_off_ok",
+      "gpu_compositing": "enabled",
+      "multiple_raster_threads": "enabled_on",
+      "opengl": "enabled_on",
+      "rasterization": "enabled",
+      "raw_draw": "disabled_off_ok",
+      "skia_graphite": "disabled_off",
+      "trees_in_viz": "disabled_off",
+      "video_decode": "enabled",
+      "video_encode": "enabled",
+      "webgl": "enabled",
+      "webgpu": "enabled",
+      "webnn": "disabled_off"
+    }
+  },
+  "hardwareAccelerated": true,
+  "functionalPassed": true,
+  "visualAllExact": false,
+  "cardVisualAllExact": true,
+  "passed": true
+}

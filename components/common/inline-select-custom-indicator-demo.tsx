@@ -6,6 +6,7 @@ import { ChevronRight } from "@gravity-ui/icons";
 import { ListBox, Separator } from "@heroui/react";
 import { useEffect, useId, useRef, useState } from "react";
 import { InlineSelect } from "@heroui-pro/react";
+import { runAfterTransition } from "@react-aria/utils";
 
 import { setGlassTheme } from "@/lib/glass-wallpaper-cache";
 import { getGlassMode, setGlassMode, useGlassMode } from "@/lib/glass-enhance";
@@ -20,6 +21,20 @@ const GLASS_MODES = [
   { value: "glass", label: "玻璃" },
   { value: "liquid", label: "液态玻璃" },
 ] as const;
+
+const finishPopoverTransitionCleanup = () => {};
+
+function releasePopoverTransitions(node: HTMLDivElement | null) {
+  if (node) return;
+
+  // React Aria 3.48 can retain an unmounted element when several CSS
+  // transitions cancel together: its once-only cancel listener removes just
+  // the first property from the global transition map. Its public scheduler
+  // prunes detached elements on the next frame, after this ref is released.
+  // Keep the callback shared so an unrelated active transition cannot build
+  // up closures. The existing transitions and focus behavior stay intact.
+  runAfterTransition(finishPopoverTransitionCleanup);
+}
 
 function applyBackgroundTheme(themeId: string) {
   // Release liquid resources immediately, including a pending dynamic import.
@@ -78,7 +93,10 @@ export default function InlineSelectCustomIndicatorDemo() {
       </InlineSelect.Trigger>
       <div aria-hidden="true" className="glass-overlay" />
 
-      <InlineSelect.Popover className="w-[240px]">
+      <InlineSelect.Popover
+        ref={releasePopoverTransitions}
+        className="w-[240px]"
+      >
         <fieldset className="m-0 min-w-0 border-0 p-2">
           <legend className="sr-only">卡片效果</legend>
           <div className="grid grid-cols-[1fr_1fr_1.4fr] gap-1">

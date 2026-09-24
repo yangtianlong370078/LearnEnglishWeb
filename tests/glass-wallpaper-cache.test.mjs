@@ -44,23 +44,33 @@ function setup({
   const timers = new Map();
   const listeners = new Map();
   const workerCalls = [];
-  const workerState = { created: 0, cancelled: 0, disposed: 0 };
+  const workerState = { created: 0, disposed: 0 };
   let nextTask = 0;
-  const worker = {
-    render(image, options) {
-      return new Promise((resolve, reject) =>
-        workerCalls.push({ image, options, resolve, reject }),
-      );
-    },
-    // Leave the result controllable after cancellation to exercise replies and
-    // image decodes that were already queued when the work was superseded.
-    cancel() {
-      workerState.cancelled++;
-    },
-    dispose() {
-      workerState.disposed++;
-    },
-  };
+  function createWorker() {
+    const instance = { disposed: false };
+    return {
+      render(image, options) {
+        return new Promise((resolve, reject) => {
+          const call = { image, options, instance, settled: false };
+          call.resolve = (result) => {
+            call.settled = true;
+            resolve(result);
+          };
+          call.reject = (error) => {
+            call.settled = true;
+            reject(error);
+          };
+          workerCalls.push(call);
+        });
+      },
+      // Keep stale results controllable to model replies/decodes already queued
+      // when termination invalidates the job.
+      dispose() {
+        instance.disposed = true;
+        workerState.disposed++;
+      },
+    };
+  }
   const root = {
     clientWidth: 800,
     dataset: { bgTheme: background, glassMode: mode },
@@ -143,7 +153,7 @@ function setup({
         return {
           createGlassWallpaperWorker() {
             workerState.created++;
-            return workerSupported ? worker : undefined;
+            return workerSupported ? createWorker() : undefined;
           },
         };
       assert.equal(name, "@/config/glass");
@@ -202,6 +212,7 @@ function setup({
     frames,
     idleCallbacks,
     timers,
+    listeners,
     observedOptions,
     dispose,
     flush,
@@ -220,6 +231,13 @@ function setup({
     ready: () => attributes.has("data-glass-wallpaper-ready"),
     async finishTexture({ fail = false } = {}) {
       await flush();
+      const foreground = workerCalls.findLast(
+        (call) => !call.settled && !call.instance.disposed,
+      );
+      if (foreground) {
+        foreground.resolve({ base: {}, border: {} });
+        await flush();
+      }
       const pending = decodes.splice(0);
       assert.ok(pending.length, "a rendered texture must be awaiting decode");
       for (const item of pending) {
@@ -232,6 +250,7 @@ function setup({
       root.dataset.glassMode = mode;
       update();
     },
+    refresh: () => update(),
     resize(width, height = 600) {
       root.clientWidth = width;
       document.defaultView.innerHeight = height;
@@ -246,71 +265,301 @@ function setup({
 const expectedFilter = (mode, scale = 1) =>
   `blur(${configuration.getGlassBlurPx(mode) * scale}px) saturate(${configuration.glassConfig.saturation}%)`;
 
-test("each first wallpaper uses its configured mode radius at device scale", async () => {
+async function startPrewarm(h) {
+  const before = h.workerCalls.length;
+  await h.runFrames();
+  await h.runIdle();
+  assert.equal(h.workerCalls.length, before + 1);
+  return h.workerCalls.at(-1);
+}
+
+test("the requested mode renders first off-thread at full device resolution", async () => {
   for (const [mode, scale] of [
-    ["liquid", 1],
-    ["liquid", 2],
     ["glass", 1],
-    ["card", 2],
+    ["liquid", 2],
+    ["card", 3],
   ]) {
     const h = setup({ mode, scale });
     await h.flush();
-    assert.deepEqual(h.filters, [expectedFilter(mode, scale)]);
+    assert.equal(h.workerCalls.length, 1);
+    const { options, image } = h.workerCalls[0];
+    assert.equal(options.width, 800);
+    assert.equal(options.height, 600);
+    assert.equal(options.scale, scale);
+    assert.equal(options.blurPx, configuration.getGlassBlurPx(mode));
+    assert.equal(options.blurPadding, configuration.getGlassBlurPadding(mode));
+    assert.equal(options.saturation, configuration.glassConfig.saturation);
     assert.equal(
-      h.ready(),
-      false,
-      "textures must be decoded before publication",
+      options.borderSaturation,
+      configuration.glassConfig.borderSaturation,
     );
+    assert.equal(
+      options.borderBrightness,
+      configuration.glassConfig.borderBrightness,
+    );
+    assert.equal(
+      options.losslessWallpaper,
+      configuration.glassConfig.losslessWallpaper,
+    );
+    assert.equal(image.url, "/images/bg01_light.jpeg");
+    assert.deepEqual(
+      h.filters,
+      [],
+      "foreground convolution must leave the main thread",
+    );
+    assert.equal(h.ready(), false);
+    assert.equal(h.frames.size, 0);
     await h.finishTexture();
     assert.equal(h.ready(), true);
+    assert.equal(h.workerState.disposed, 1);
+    assert.equal(h.workerCalls.length, 1);
+    await h.runFrames();
+    assert.equal(h.workerCalls.length, 1);
+    assert.equal(h.idleCallbacks.size, 1);
+    await h.runIdle();
+    assert.equal(h.workerCalls.length, 2);
+    assert.equal(
+      h.workerCalls[1].options.blurPx,
+      configuration.getGlassBlurPx(mode === "liquid" ? "glass" : "liquid"),
+    );
     h.dispose();
   }
 });
 
-test("mode switches use the correct fallback until a matching texture is decoded", async () => {
+test("decoded alternate textures are reused immediately and card shares glass radius", async () => {
   const h = setup();
   await h.finishTexture();
   const standard = h.variables.get("--glass-cached-base");
-  assert.ok(h.observedOptions.attributeFilter.includes("data-glass-mode"));
+  await startPrewarm(h);
+  await h.finishTexture();
+  assert.equal(h.variables.get("--glass-cached-base"), standard);
+  assert.equal(h.created.length - h.revoked.length, 4);
   h.changeMode("liquid");
+  assert.equal(h.ready(), true);
+  assert.notEqual(h.variables.get("--glass-cached-base"), standard);
+  h.changeMode("card");
+  assert.equal(h.variables.get("--glass-cached-base"), standard);
+  h.changeMode("glass");
+  await h.runFrames();
+  await h.runIdle();
+  assert.equal(h.workerCalls.length, 2);
+  assert.deepEqual(h.filters, []);
+  h.dispose();
+  assert.deepEqual(new Set(h.revoked), new Set(h.created));
+});
+
+test("selecting an in-flight alternate promotes the same job without duplicate rendering", async () => {
+  const h = setup();
+  await h.finishTexture();
+  const standard = h.variables.get("--glass-cached-base");
+  const job = await startPrewarm(h);
+  h.changeMode("liquid");
+  await h.flush();
   assert.equal(h.ready(), false);
+  assert.equal(job.instance.disposed, false);
+  assert.equal(h.workerCalls.length, 2);
   await h.finishTexture();
   assert.equal(h.ready(), true);
   assert.notEqual(h.variables.get("--glass-cached-base"), standard);
-  assert.deepEqual(h.filters, [
-    expectedFilter("glass"),
-    expectedFilter("liquid"),
-  ]);
-  h.changeMode("card");
-  assert.equal(h.ready(), true);
-  assert.equal(h.variables.get("--glass-cached-base"), standard);
+  h.dispose();
+});
+
+test("a new foreground mode cancels the obsolete foreground job and ignores its late result", async () => {
+  const h = setup();
+  await h.flush();
+  const stale = h.workerCalls[0];
+  h.changeMode("liquid");
+  assert.equal(stale.instance.disposed, true);
+  await h.flush();
+  assert.equal(h.workerCalls.length, 2);
+  await h.finishTexture();
+  const current = h.variables.get("--glass-cached-base");
+  const allocated = h.created.length;
+  stale.resolve({ base: {}, border: {} });
+  await h.flush();
+  assert.equal(h.created.length, allocated);
+  assert.equal(h.variables.get("--glass-cached-base"), current);
   assert.equal(
     h.filters.length,
-    2,
-    "card and ordinary glass reuse one texture",
+    0,
+    "cancellation must not trigger a Canvas fallback",
   );
   h.dispose();
 });
 
-test("rapid mode reversal restores the cached texture and rejects stale publication", async () => {
+test("rapid mode reversal restores cached content and prevents canceled work entering the cache", async () => {
   const h = setup();
   await h.finishTexture();
   const standard = h.variables.get("--glass-cached-base");
   h.changeMode("liquid");
   await h.flush();
+  const stale = h.workerCalls.at(-1);
   h.changeMode("glass");
   assert.equal(h.ready(), true);
   assert.equal(h.variables.get("--glass-cached-base"), standard);
-  await h.finishTexture();
-  assert.equal(h.variables.get("--glass-cached-base"), standard);
+  stale.resolve({ base: {}, border: {} });
+  await h.flush();
+  assert.equal(h.created.length, 2);
   h.changeMode("liquid");
+  assert.equal(h.ready(), false);
+  await h.finishTexture();
   assert.equal(h.ready(), true);
-  assert.notEqual(h.variables.get("--glass-cached-base"), standard);
-  assert.equal(h.filters.length, 2);
+  assert.equal(h.workerCalls.length, 3);
   h.dispose();
 });
 
-test("a failed new-mode texture keeps the correct CSS fallback and can recover", async () => {
+test("theme changes commit atomically with their decoded matching texture", async () => {
+  const h = setup({ mode: "liquid" });
+  await h.finishTexture();
+  const light = h.variables.get("--glass-cached-base");
+  let committed = false;
+  h.changeTheme({ dark: true }, () => {
+    committed = true;
+    h.root.dark = true;
+  });
+  await h.flush();
+  assert.equal(committed, false);
+  assert.equal(h.ready(), true);
+  assert.equal(h.variables.get("--glass-cached-base"), light);
+  assert.equal(h.workerCalls.at(-1).image.url, "/images/bg01_dark.jpeg");
+  await h.finishTexture();
+  assert.equal(committed, true);
+  assert.notEqual(h.variables.get("--glass-cached-base"), light);
+  h.dispose();
+});
+
+test("resize interrupts current work immediately and batches successive sizes into one latest render", async () => {
+  for (const stage of ["foreground", "prewarm"]) {
+    const h = setup();
+    if (stage === "prewarm") {
+      await h.finishTexture();
+      await startPrewarm(h);
+    } else await h.flush();
+    const stale = h.workerCalls.at(-1);
+    const before = h.workerCalls.length;
+    h.resize(900);
+    assert.equal(stale.instance.disposed, true);
+    h.resize(1000);
+    h.resize(1200, 700);
+    assert.equal(h.timers.size, 1);
+    assert.equal(h.workerCalls.length, before);
+    await h.runTimers(100);
+    assert.equal(h.workerCalls.length, before + 1);
+    assert.equal(h.workerCalls.at(-1).options.width, 1200);
+    assert.equal(h.workerCalls.at(-1).options.height, 700);
+    await h.finishTexture();
+    const current = h.variables.get("--glass-cached-base");
+    await startPrewarm(h);
+    await h.finishTexture();
+    const allocated = h.created.length;
+    stale.resolve({ base: {}, border: {} });
+    await h.flush();
+    assert.equal(h.created.length, allocated);
+    assert.equal(h.created.length - h.revoked.length, 4);
+    assert.equal(h.variables.get("--glass-cached-base"), current);
+    h.dispose();
+  }
+});
+
+test("cancellation during decode releases URLs and never evicts the two current-size entries", async () => {
+  const h = setup();
+  await h.flush();
+  h.workerCalls[0].resolve({ base: {}, border: {} });
+  await h.flush();
+  const staleDecodes = h.decodes.splice(0);
+  assert.equal(staleDecodes.length, 2);
+  const staleUrls = [...h.created];
+  h.resize(1024);
+  await h.runTimers(100);
+  await h.finishTexture();
+  const current = h.variables.get("--glass-cached-base");
+  await startPrewarm(h);
+  await h.finishTexture();
+  for (const decode of staleDecodes) decode.resolve();
+  await h.flush();
+  assert.ok(staleUrls.every((url) => h.revoked.includes(url)));
+  assert.equal(h.created.length - h.revoked.length, 4);
+  assert.equal(h.variables.get("--glass-cached-base"), current);
+  h.dispose();
+});
+
+test("worker failures fall back once on the foreground and preserve exact Canvas parameters", async () => {
+  for (const promote of [false, true]) {
+    const h = setup({ scale: 2 });
+    if (promote) {
+      await h.finishTexture();
+      await startPrewarm(h);
+      h.changeMode("liquid");
+    } else await h.flush();
+    h.workerCalls
+      .at(-1)
+      .reject(new Error("OffscreenCanvas filters are unavailable"));
+    await h.finishTexture();
+    assert.equal(h.ready(), true);
+    assert.deepEqual(h.filters, [
+      expectedFilter(promote ? "liquid" : "glass", 2),
+    ]);
+    await h.runFrames();
+    await h.runIdle();
+    assert.equal(h.workerCalls.length, promote ? 2 : 1);
+    h.dispose();
+  }
+});
+
+test("failed speculative work preserves the visible mode and later uses Canvas on demand", async () => {
+  const h = setup();
+  await h.finishTexture();
+  const current = h.variables.get("--glass-cached-base");
+  const job = await startPrewarm(h);
+  job.reject(new Error("worker blocked"));
+  await h.flush();
+  assert.equal(h.ready(), true);
+  assert.equal(h.variables.get("--glass-cached-base"), current);
+  assert.equal(h.filters.length, 0);
+  h.changeMode("liquid");
+  await h.finishTexture();
+  assert.equal(h.ready(), true);
+  assert.deepEqual(h.filters, [expectedFilter("liquid")]);
+  h.dispose();
+});
+
+test("unsupported workers retain Canvas rendering and do not prewarm on the main thread", async () => {
+  const h = setup({ workerSupported: false });
+  await h.finishTexture();
+  await h.runFrames();
+  await h.runIdle();
+  h.changeMode("liquid");
+  await h.finishTexture();
+  assert.equal(h.ready(), true);
+  assert.deepEqual(h.filters, [
+    expectedFilter("glass"),
+    expectedFilter("liquid"),
+  ]);
+  assert.equal(h.workerState.created, 1);
+  h.dispose();
+});
+
+test("ambient colors use worker rendering while incompatible backgrounds and equal radii skip prewarm", async () => {
+  for (const options of [{ sameRadius: true }, { background: "defalut" }]) {
+    const h = setup(options);
+    await h.finishTexture();
+    await h.runFrames();
+    await h.runIdle();
+    assert.equal(h.workerCalls.length, 1);
+    if (options.background) {
+      assert.equal(h.workerCalls[0].image, undefined);
+      assert.equal(h.workerCalls[0].options.ambient.colors.length, 4);
+      assert.equal(
+        h.workerCalls[0].options.ambient.base,
+        "rgb(255 255 255 / 0.5)",
+      );
+    }
+    assert.deepEqual(h.filters, []);
+    h.dispose();
+  }
+});
+
+test("decode failure releases its URLs, preserves the mode fallback, and allows later recovery", async () => {
   const h = setup();
   await h.finishTexture();
   const standard = h.variables.get("--glass-cached-base");
@@ -324,194 +573,14 @@ test("a failed new-mode texture keeps the correct CSS fallback and can recover",
   h.dispose();
 });
 
-test("theme changes continue to commit only with their matching decoded texture", async () => {
-  const h = setup({ mode: "liquid" });
-  await h.finishTexture();
-  const light = h.variables.get("--glass-cached-base");
-  let committed = false;
-  h.changeTheme({ dark: true }, () => {
-    committed = true;
-    h.root.dark = true;
-  });
-  await h.flush();
-  assert.equal(committed, false);
-  assert.equal(h.ready(), true);
-  assert.equal(h.variables.get("--glass-cached-base"), light);
-  await h.finishTexture();
-  assert.equal(committed, true);
-  assert.notEqual(h.variables.get("--glass-cached-base"), light);
-  assert.deepEqual(h.filters, [
-    expectedFilter("liquid"),
-    expectedFilter("liquid"),
-  ]);
-  h.dispose();
-});
-
-async function startPrewarm(h) {
-  await h.runFrames();
-  await h.runIdle();
-  assert.ok(
-    h.workerCalls.length,
-    "the alternate mode should render in a worker",
-  );
-  return h.workerCalls.at(-1);
-}
-
-async function finishPrewarm(h, job) {
-  job.resolve({ base: {}, border: {} });
-  await h.finishTexture();
-}
-
-test("the current mode publishes before a frame and idle callback may start alternate work", async () => {
-  for (const mode of ["glass", "liquid"]) {
-    const h = setup({ mode });
-    await h.flush();
-    assert.equal(h.ready(), false);
-    assert.equal(h.frames.size, 0);
-    assert.equal(h.workerState.created, 0);
-    await h.finishTexture();
-    assert.equal(h.ready(), true);
-    assert.equal(h.workerState.created, 0);
-    assert.equal(h.frames.size, 1);
-    await h.runFrames();
-    assert.equal(h.workerCalls.length, 0);
-    assert.equal(h.idleCallbacks.size, 1);
-    await h.runIdle();
-    assert.equal(h.workerCalls.length, 1);
-    const job = h.workerCalls[0];
-    const alternate = mode === "liquid" ? "glass" : "liquid";
-    assert.equal(job.options.blurPx, configuration.getGlassBlurPx(alternate));
-    assert.equal(
-      job.options.blurPadding,
-      configuration.getGlassBlurPadding(alternate),
-    );
-    assert.equal(job.image.url, "/images/bg01_light.jpeg");
-    assert.deepEqual(h.filters, [expectedFilter(mode)]);
-    h.dispose();
-  }
-});
-
-test("a warmed alternate never changes the displayed texture and later switches reuse both caches", async () => {
-  const h = setup();
-  await h.finishTexture();
-  const standard = h.variables.get("--glass-cached-base");
-  const job = await startPrewarm(h);
-  await finishPrewarm(h, job);
-  assert.equal(h.root.dataset.glassMode, "glass");
-  assert.equal(h.variables.get("--glass-cached-base"), standard);
-  assert.equal(h.ready(), true);
-  assert.equal(h.created.length - h.revoked.length, 4);
-  h.changeMode("liquid");
-  assert.equal(h.ready(), true);
-  assert.notEqual(h.variables.get("--glass-cached-base"), standard);
-  h.changeMode("glass");
-  assert.equal(h.variables.get("--glass-cached-base"), standard);
-  await h.runFrames();
-  await h.runIdle();
-  assert.equal(h.workerCalls.length, 1);
-  assert.deepEqual(h.filters, [expectedFilter("glass")]);
-  h.dispose();
-  assert.deepEqual(new Set(h.revoked), new Set(h.created));
-});
-
-test("selecting an in-flight alternate promotes its worker job without duplicate rendering", async () => {
-  const h = setup();
-  await h.finishTexture();
-  const standard = h.variables.get("--glass-cached-base");
-  const job = await startPrewarm(h);
-  h.changeMode("liquid");
-  await h.flush();
-  assert.equal(h.ready(), false);
-  assert.equal(h.workerState.cancelled, 0);
-  assert.equal(h.workerCalls.length, 1);
-  assert.equal(h.filters.length, 1);
-  await finishPrewarm(h, job);
-  assert.equal(h.ready(), true);
-  assert.notEqual(h.variables.get("--glass-cached-base"), standard);
-  assert.equal(h.root.dataset.glassMode, "liquid");
-  assert.equal(h.filters.length, 1);
-  h.dispose();
-});
-
-test("resize and theme changes cancel speculative work and ignore late worker results", async () => {
-  for (const change of ["resize", "theme"]) {
+test("disposal cancels foreground, scheduled and speculative work without late publication", async () => {
+  for (const stage of ["foreground", "frame", "idle", "worker", "decode"]) {
     const h = setup();
-    await h.finishTexture();
-    const stale = await startPrewarm(h);
-    if (change === "resize") {
-      h.resize(1024);
-      await h.runTimers(100);
-    } else {
-      h.changeTheme({ dark: true }, () => {
-        h.root.dark = true;
-      });
-    }
-    assert.equal(h.workerState.cancelled, 1);
-    await h.finishTexture();
-    const current = h.variables.get("--glass-cached-base");
-    const replacement = await startPrewarm(h);
-    assert.notEqual(replacement, stale);
-    assert.equal(replacement.options.width, change === "resize" ? 1024 : 800);
-    assert.equal(replacement.options.dark, change === "theme");
-    await finishPrewarm(h, replacement);
-    assert.equal(h.created.length - h.revoked.length, 4);
-    const allocated = h.created.length;
-    stale.resolve({ base: {}, border: {} });
-    await h.flush();
-    assert.equal(
-      h.created.length,
-      allocated,
-      "stale blobs must not enter the cache",
-    );
-    assert.equal(h.decodes.length, 0);
-    assert.equal(h.variables.get("--glass-cached-base"), current);
-    h.changeMode("liquid");
-    assert.equal(h.ready(), true);
-    h.changeMode("glass");
-    assert.equal(h.variables.get("--glass-cached-base"), current);
-    assert.equal(
-      h.filters.length,
-      2,
-      "late work must not evict either current-size mode",
-    );
-    h.dispose();
-  }
-});
-
-test("a cancelled alternate decode releases its URLs without evicting current mode caches", async () => {
-  const h = setup();
-  await h.finishTexture();
-  const stale = await startPrewarm(h);
-  stale.resolve({ base: {}, border: {} });
-  await h.flush();
-  const staleDecodes = h.decodes.splice(0);
-  assert.equal(staleDecodes.length, 2);
-  const staleUrls = h.created.slice(-2);
-  h.resize(1024);
-  await h.runTimers(100);
-  await h.finishTexture();
-  const current = h.variables.get("--glass-cached-base");
-  await finishPrewarm(h, await startPrewarm(h));
-  for (const decode of staleDecodes) decode.resolve();
-  await h.flush();
-  assert.ok(staleUrls.every((url) => h.revoked.includes(url)));
-  assert.equal(h.created.length - h.revoked.length, 4);
-  assert.equal(h.variables.get("--glass-cached-base"), current);
-  h.changeMode("liquid");
-  assert.equal(h.ready(), true);
-  h.changeMode("glass");
-  assert.equal(h.variables.get("--glass-cached-base"), current);
-  assert.equal(h.filters.length, 2);
-  h.dispose();
-});
-
-test("disposing cancels scheduled and active background work and rejects late publication", async () => {
-  for (const stage of ["frame", "idle", "worker", "decode"]) {
-    const h = setup();
-    await h.finishTexture();
-    if (stage !== "frame") await h.runFrames();
-    if (stage === "worker" || stage === "decode") await h.runIdle();
-    const job = h.workerCalls[0];
+    if (stage !== "foreground") await h.finishTexture();
+    else await h.flush();
+    if (["idle", "worker", "decode"].includes(stage)) await h.runFrames();
+    if (["worker", "decode"].includes(stage)) await h.runIdle();
+    const job = h.workerCalls.at(-1);
     if (stage === "decode") {
       job.resolve({ base: {}, border: {} });
       await h.flush();
@@ -520,12 +589,9 @@ test("disposing cancels scheduled and active background work and rejects late pu
     assert.equal(h.frames.size, 0);
     assert.equal(h.idleCallbacks.size, 0);
     assert.equal(h.timers.size, 0);
-    if (job) {
-      assert.equal(h.workerState.cancelled, 1);
-      assert.equal(h.workerState.disposed, 1);
-      if (stage === "worker") job.resolve({ base: {}, border: {} });
-      for (const decode of h.decodes.splice(0)) decode.resolve();
-    }
+    assert.equal(job.instance.disposed, true);
+    if (!job.settled) job.resolve({ base: {}, border: {} });
+    for (const decode of h.decodes.splice(0)) decode.resolve();
     await h.flush();
     assert.equal(h.ready(), false);
     assert.equal(h.variables.size, 0);
@@ -533,77 +599,54 @@ test("disposing cancels scheduled and active background work and rejects late pu
   }
 });
 
-test("unsupported workers keep current and later foreground modes functional", async () => {
-  const h = setup({ workerSupported: false });
+test("without idle callbacks only alternate preparation waits for the frame and timer", async () => {
+  const h = setup({ idleSupported: false });
+  await h.flush();
+  assert.equal(h.workerCalls.length, 1);
+  await h.finishTexture();
+  await h.runFrames();
+  assert.equal(h.workerCalls.length, 1);
+  assert.equal(h.timers.size, 1);
+  await h.runTimers(100);
+  assert.equal(h.workerCalls.length, 2);
+  assert.equal(h.ready(), true);
+  h.dispose();
+});
+
+test("unchanged root state reuses the static wallpaper and scrolling has no cache work", async () => {
+  const h = setup();
+  await h.finishTexture();
+  await startPrewarm(h);
   await h.finishTexture();
   const current = h.variables.get("--glass-cached-base");
+  for (let i = 0; i < 20; i++) h.refresh();
   await h.runFrames();
   await h.runIdle();
-  assert.equal(h.workerState.created, 1);
+  assert.equal(h.workerCalls.length, 2);
+  assert.equal(h.created.length, 4);
+  assert.equal(h.variables.get("--glass-cached-base"), current);
+  assert.equal(h.listeners.has("scroll"), false);
+  h.dispose();
+});
+
+test("a failed speculative decode does not loop or disturb current content", async () => {
+  const h = setup();
+  await h.finishTexture();
+  const current = h.variables.get("--glass-cached-base");
+  await startPrewarm(h);
+  await h.finishTexture({ fail: true });
+  for (let i = 0; i < 3; i++) {
+    await h.runFrames();
+    await h.runIdle();
+  }
+  assert.equal(h.workerCalls.length, 2);
+  assert.equal(h.frames.size, 0);
+  assert.equal(h.idleCallbacks.size, 0);
   assert.equal(h.ready(), true);
   assert.equal(h.variables.get("--glass-cached-base"), current);
   h.changeMode("liquid");
   await h.finishTexture();
   assert.equal(h.ready(), true);
-  assert.deepEqual(h.filters, [
-    expectedFilter("glass"),
-    expectedFilter("liquid"),
-  ]);
-  await h.runFrames();
-  await h.runIdle();
-  assert.equal(h.workerState.created, 1);
-  h.dispose();
-});
-
-test("a failed speculative worker preserves the current mode and a promoted job retries in Canvas", async () => {
-  for (const promote of [false, true]) {
-    const h = setup();
-    await h.finishTexture();
-    const current = h.variables.get("--glass-cached-base");
-    const job = await startPrewarm(h);
-    if (promote) h.changeMode("liquid");
-    job.reject(new Error("OffscreenCanvas filtering unavailable"));
-    await h.flush();
-    assert.ok(h.workerState.disposed >= 1);
-    if (!promote) {
-      assert.equal(h.ready(), true);
-      assert.equal(h.variables.get("--glass-cached-base"), current);
-      assert.equal(h.filters.length, 1);
-      h.changeMode("liquid");
-    }
-    await h.finishTexture();
-    assert.equal(h.ready(), true);
-    assert.notEqual(h.variables.get("--glass-cached-base"), current);
-    assert.deepEqual(h.filters, [
-      expectedFilter("glass"),
-      expectedFilter("liquid"),
-    ]);
-    h.dispose();
-  }
-});
-
-test("equal radii and incompatible backgrounds skip alternate generation", async () => {
-  for (const options of [{ sameRadius: true }, { background: "defalut" }]) {
-    const h = setup(options);
-    await h.finishTexture();
-    await h.runFrames();
-    await h.runIdle();
-    assert.equal(h.ready(), true);
-    assert.equal(h.workerState.created, 0);
-    assert.equal(h.filters.length, 1);
-    h.dispose();
-  }
-});
-
-test("browsers without idle callbacks defer speculative work until after the frame and timer", async () => {
-  const h = setup({ idleSupported: false });
-  await h.finishTexture();
-  assert.equal(h.workerCalls.length, 0);
-  await h.runFrames();
-  assert.equal(h.workerCalls.length, 0);
-  assert.equal(h.timers.size, 1);
-  await h.runTimers(100);
-  assert.equal(h.workerCalls.length, 1);
-  assert.equal(h.ready(), true);
+  assert.deepEqual(h.filters, [expectedFilter("liquid")]);
   h.dispose();
 });

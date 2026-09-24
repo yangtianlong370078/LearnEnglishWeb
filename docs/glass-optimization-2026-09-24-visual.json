@@ -1,0 +1,3940 @@
+{
+  "createdAt": "2026-09-24T09:32:22.618Z",
+  "browser": "153.0.8010.53",
+  "servers": {
+    "before": "http://127.0.0.1:8094",
+    "after": "http://127.0.0.1:8095"
+  },
+  "note": "Stable full-page viewport screenshots at device DPR. Independent random dither/JPEG may differ slightly. Significant pixel threshold is >8/255; geometry is checked independently. Heatmaps amplify differences 8x. Mobile is desktop emulation.",
+  "cases": [
+    {
+      "name": "desktop-courselearn-dark-liquid-0",
+      "difference": {
+        "pixels": 1296000,
+        "changedPixels": 607277,
+        "maxChannelDifference": 7,
+        "meanChannelDifference": 0.25057818930041154,
+        "significantPercent": 0,
+        "worst32pxBlockMeanMaxDifference": 1.3203125
+      },
+      "geometryMatches": true,
+      "before": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 60
+            },
+            {
+              "x": 560,
+              "y": 85,
+              "width": 320,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 157,
+              "width": 984,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 585,
+              "y": 1189,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": [
+            {
+              "x": 560,
+              "y": 85,
+              "width": 320,
+              "height": 52,
+              "parent": {
+                "x": 560,
+                "y": 85,
+                "width": 320,
+                "height": 52
+              },
+              "widthPixels": 320,
+              "heightPixels": 52,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 157,
+              "width": 984,
+              "height": 52,
+              "parent": {
+                "x": 228,
+                "y": 157,
+                "width": 984,
+                "height": 52
+              },
+              "widthPixels": 984,
+              "heightPixels": 52,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 229,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 229,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 229,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 229,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 229,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 229,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 469,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 469,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 469,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 469,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 469,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 469,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 709,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 709,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 709,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 709,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 709,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 709,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-courselearn-dark-liquid-0-before.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "after": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 60
+            },
+            {
+              "x": 560,
+              "y": 85,
+              "width": 320,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 157,
+              "width": 984,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 585,
+              "y": 1189,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": [
+            {
+              "x": 560,
+              "y": 85,
+              "width": 320,
+              "height": 52,
+              "parent": {
+                "x": 560,
+                "y": 85,
+                "width": 320,
+                "height": 52
+              },
+              "widthPixels": 320,
+              "heightPixels": 52,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 157,
+              "width": 984,
+              "height": 52,
+              "parent": {
+                "x": 228,
+                "y": 157,
+                "width": 984,
+                "height": 52
+              },
+              "widthPixels": 984,
+              "heightPixels": 52,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 229,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 229,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 229,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 229,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 229,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 229,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 469,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 469,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 469,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 469,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 469,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 469,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 709,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 709,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 709,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 709,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 709,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 709,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-courselearn-dark-liquid-0-after.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "desktop-courselearn-dark-liquid-193",
+      "difference": {
+        "pixels": 1296000,
+        "changedPixels": 434340,
+        "maxChannelDifference": 5,
+        "meanChannelDifference": 0.19632150205761317,
+        "significantPercent": 0,
+        "worst32pxBlockMeanMaxDifference": 1.078125
+      },
+      "geometryMatches": true,
+      "before": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 193,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 60
+            },
+            {
+              "x": 560,
+              "y": -108,
+              "width": 320,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": -36,
+              "width": 984,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 36,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 36,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 36,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 276,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 276,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 276,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 516,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 516,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 516,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 756,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 756,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 756,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 585,
+              "y": 996,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": [
+            {
+              "x": 228,
+              "y": -36,
+              "width": 984,
+              "height": 52,
+              "parent": {
+                "x": 228,
+                "y": -36,
+                "width": 984,
+                "height": 52
+              },
+              "widthPixels": 984,
+              "heightPixels": 52,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 36,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 36,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 36,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 36,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 36,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 36,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 276,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 276,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 276,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 276,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 276,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 276,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 516,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 516,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 516,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 516,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 516,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 516,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 756,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 756,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 756,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 756,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 756,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 756,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-courselearn-dark-liquid-193-before.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "after": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 193,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 60
+            },
+            {
+              "x": 560,
+              "y": -108,
+              "width": 320,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": -36,
+              "width": 984,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 36,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 36,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 36,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 276,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 276,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 276,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 516,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 516,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 516,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 756,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 756,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 756,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 585,
+              "y": 996,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": [
+            {
+              "x": 228,
+              "y": -36,
+              "width": 984,
+              "height": 52,
+              "parent": {
+                "x": 228,
+                "y": -36,
+                "width": 984,
+                "height": 52
+              },
+              "widthPixels": 984,
+              "heightPixels": 52,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 36,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 36,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 36,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 36,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 36,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 36,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 276,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 276,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 276,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 276,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 276,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 276,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 516,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 516,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 516,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 516,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 516,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 516,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 228,
+              "y": 756,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 228,
+                "y": 756,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 562.65625,
+              "y": 756,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 562.65625,
+                "y": 756,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 897.328125,
+              "y": 756,
+              "width": 314,
+              "height": 220,
+              "parent": {
+                "x": 897.328125,
+                "y": 756,
+                "width": 314,
+                "height": 220
+              },
+              "widthPixels": 314,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-courselearn-dark-liquid-193-after.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "desktop-learnwords-dark-liquid-0",
+      "difference": {
+        "pixels": 1296000,
+        "changedPixels": 457926,
+        "maxChannelDifference": 73,
+        "meanChannelDifference": 0.19296836419753086,
+        "significantPercent": 0.041435185185185186,
+        "worst32pxBlockMeanMaxDifference": 1.0361328125
+      },
+      "geometryMatches": true,
+      "before": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 64
+            },
+            {
+              "x": 104,
+              "y": 89,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 518.65625,
+              "y": 89,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 933.328125,
+              "y": 89,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 104,
+              "y": 488,
+              "width": 1232,
+              "height": 1708
+            },
+            {
+              "x": 104,
+              "y": 2212,
+              "width": 1232,
+              "height": 129
+            }
+          ],
+          "canvases": [
+            {
+              "x": 104,
+              "y": 89,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 104,
+                "y": 89,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 518.65625,
+              "y": 89,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 518.65625,
+                "y": 89,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 933.328125,
+              "y": 89,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 933.328125,
+                "y": 89,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-learnwords-dark-liquid-0-before.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Course/MyCategoryContent"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": [
+            "https://img.heroui.chat/image/avatar"
+          ]
+        }
+      },
+      "after": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 64
+            },
+            {
+              "x": 104,
+              "y": 89,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 518.65625,
+              "y": 89,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 933.328125,
+              "y": 89,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 104,
+              "y": 488,
+              "width": 1232,
+              "height": 1708
+            },
+            {
+              "x": 104,
+              "y": 2212,
+              "width": 1232,
+              "height": 129
+            }
+          ],
+          "canvases": [
+            {
+              "x": 104,
+              "y": 89,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 104,
+                "y": 89,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 518.65625,
+              "y": 89,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 518.65625,
+                "y": 89,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 933.328125,
+              "y": 89,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 933.328125,
+                "y": 89,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-learnwords-dark-liquid-0-after.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Course/MyCategoryContent"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": [
+            "https://img.heroui.chat/image/avatar"
+          ]
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "desktop-learnwords-dark-liquid-193",
+      "difference": {
+        "pixels": 1296000,
+        "changedPixels": 452364,
+        "maxChannelDifference": 4,
+        "meanChannelDifference": 0.18270447530864198,
+        "significantPercent": 0,
+        "worst32pxBlockMeanMaxDifference": 1.126953125
+      },
+      "geometryMatches": true,
+      "before": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 193,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 64
+            },
+            {
+              "x": 104,
+              "y": -104,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 518.65625,
+              "y": -104,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 933.328125,
+              "y": -104,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 104,
+              "y": 295,
+              "width": 1232,
+              "height": 1708
+            },
+            {
+              "x": 104,
+              "y": 2019,
+              "width": 1232,
+              "height": 129
+            }
+          ],
+          "canvases": [
+            {
+              "x": 104,
+              "y": -104,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 104,
+                "y": -104,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 518.65625,
+              "y": -104,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 518.65625,
+                "y": -104,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 933.328125,
+              "y": -104,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 933.328125,
+                "y": -104,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-learnwords-dark-liquid-193-before.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Course/MyCategoryContent"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": [
+            "https://img.heroui.chat/image/avatar"
+          ]
+        }
+      },
+      "after": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 193,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 64
+            },
+            {
+              "x": 104,
+              "y": -104,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 518.65625,
+              "y": -104,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 933.328125,
+              "y": -104,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 104,
+              "y": 295,
+              "width": 1232,
+              "height": 1708
+            },
+            {
+              "x": 104,
+              "y": 2019,
+              "width": 1232,
+              "height": 129
+            }
+          ],
+          "canvases": [
+            {
+              "x": 104,
+              "y": -104,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 104,
+                "y": -104,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 518.65625,
+              "y": -104,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 518.65625,
+                "y": -104,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 933.328125,
+              "y": -104,
+              "width": 402,
+              "height": 383,
+              "parent": {
+                "x": 933.328125,
+                "y": -104,
+                "width": 402,
+                "height": 383
+              },
+              "widthPixels": 402,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-learnwords-dark-liquid-193-after.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Course/MyCategoryContent"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": [
+            "https://img.heroui.chat/image/avatar"
+          ]
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "mobile-courselearn-dark-liquid-0",
+      "difference": {
+        "pixels": 1316640,
+        "changedPixels": 2947,
+        "maxChannelDifference": 2,
+        "meanChannelDifference": 0.0009010309069550776,
+        "significantPercent": 0,
+        "worst32pxBlockMeanMaxDifference": 0.28515625
+      },
+      "geometryMatches": true,
+      "before": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 64
+            },
+            {
+              "x": 139,
+              "y": 89,
+              "width": 112,
+              "height": 148
+            },
+            {
+              "x": 20,
+              "y": 257,
+              "width": 350,
+              "height": 100
+            },
+            {
+              "x": 20,
+              "y": 377,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 617,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 857,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1097,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1337,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1577,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1817,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2057,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2297,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2537,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2777,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 3017,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 60,
+              "y": 3257,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": [
+            {
+              "x": 139,
+              "y": 89,
+              "width": 112,
+              "height": 148,
+              "parent": {
+                "x": 139,
+                "y": 89,
+                "width": 112,
+                "height": 148
+              },
+              "widthPixels": 112,
+              "heightPixels": 148,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 257,
+              "width": 350,
+              "height": 100,
+              "parent": {
+                "x": 20,
+                "y": 257,
+                "width": 350,
+                "height": 100
+              },
+              "widthPixels": 350,
+              "heightPixels": 100,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 377,
+              "width": 350,
+              "height": 220,
+              "parent": {
+                "x": 20,
+                "y": 377,
+                "width": 350,
+                "height": 220
+              },
+              "widthPixels": 350,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 617,
+              "width": 350,
+              "height": 220,
+              "parent": {
+                "x": 20,
+                "y": 617,
+                "width": 350,
+                "height": 220
+              },
+              "widthPixels": 350,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\mobile-courselearn-dark-liquid-0-before.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "after": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 64
+            },
+            {
+              "x": 139,
+              "y": 89,
+              "width": 112,
+              "height": 148
+            },
+            {
+              "x": 20,
+              "y": 257,
+              "width": 350,
+              "height": 100
+            },
+            {
+              "x": 20,
+              "y": 377,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 617,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 857,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1097,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1337,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1577,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1817,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2057,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2297,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2537,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2777,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 3017,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 60,
+              "y": 3257,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": [
+            {
+              "x": 139,
+              "y": 89,
+              "width": 112,
+              "height": 148,
+              "parent": {
+                "x": 139,
+                "y": 89,
+                "width": 112,
+                "height": 148
+              },
+              "widthPixels": 112,
+              "heightPixels": 148,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 257,
+              "width": 350,
+              "height": 100,
+              "parent": {
+                "x": 20,
+                "y": 257,
+                "width": 350,
+                "height": 100
+              },
+              "widthPixels": 350,
+              "heightPixels": 100,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 377,
+              "width": 350,
+              "height": 220,
+              "parent": {
+                "x": 20,
+                "y": 377,
+                "width": 350,
+                "height": 220
+              },
+              "widthPixels": 350,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 617,
+              "width": 350,
+              "height": 220,
+              "parent": {
+                "x": 20,
+                "y": 617,
+                "width": 350,
+                "height": 220
+              },
+              "widthPixels": 350,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\mobile-courselearn-dark-liquid-0-after.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "mobile-courselearn-dark-liquid-193",
+      "difference": {
+        "pixels": 1316640,
+        "changedPixels": 2847,
+        "maxChannelDifference": 2,
+        "meanChannelDifference": 0.0009002713979017297,
+        "significantPercent": 0,
+        "worst32pxBlockMeanMaxDifference": 0.296875
+      },
+      "geometryMatches": true,
+      "before": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 193,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 64
+            },
+            {
+              "x": 139,
+              "y": -104,
+              "width": 112,
+              "height": 148
+            },
+            {
+              "x": 20,
+              "y": 64,
+              "width": 350,
+              "height": 100
+            },
+            {
+              "x": 20,
+              "y": 184,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 424,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 664,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 904,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1144,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1384,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1624,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1864,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2104,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2344,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2584,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2824,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 60,
+              "y": 3064,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": [
+            {
+              "x": 139,
+              "y": -104,
+              "width": 112,
+              "height": 148,
+              "parent": {
+                "x": 139,
+                "y": -104,
+                "width": 112,
+                "height": 148
+              },
+              "widthPixels": 112,
+              "heightPixels": 148,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 64,
+              "width": 350,
+              "height": 100,
+              "parent": {
+                "x": 20,
+                "y": 64,
+                "width": 350,
+                "height": 100
+              },
+              "widthPixels": 350,
+              "heightPixels": 100,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 184,
+              "width": 350,
+              "height": 220,
+              "parent": {
+                "x": 20,
+                "y": 184,
+                "width": 350,
+                "height": 220
+              },
+              "widthPixels": 350,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 424,
+              "width": 350,
+              "height": 220,
+              "parent": {
+                "x": 20,
+                "y": 424,
+                "width": 350,
+                "height": 220
+              },
+              "widthPixels": 350,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 664,
+              "width": 350,
+              "height": 220,
+              "parent": {
+                "x": 20,
+                "y": 664,
+                "width": 350,
+                "height": 220
+              },
+              "widthPixels": 350,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\mobile-courselearn-dark-liquid-193-before.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "after": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 193,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 64
+            },
+            {
+              "x": 139,
+              "y": -104,
+              "width": 112,
+              "height": 148
+            },
+            {
+              "x": 20,
+              "y": 64,
+              "width": 350,
+              "height": 100
+            },
+            {
+              "x": 20,
+              "y": 184,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 424,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 664,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 904,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1144,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1384,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1624,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 1864,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2104,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2344,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2584,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 20,
+              "y": 2824,
+              "width": 350,
+              "height": 220
+            },
+            {
+              "x": 60,
+              "y": 3064,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": [
+            {
+              "x": 139,
+              "y": -104,
+              "width": 112,
+              "height": 148,
+              "parent": {
+                "x": 139,
+                "y": -104,
+                "width": 112,
+                "height": 148
+              },
+              "widthPixels": 112,
+              "heightPixels": 148,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 64,
+              "width": 350,
+              "height": 100,
+              "parent": {
+                "x": 20,
+                "y": 64,
+                "width": 350,
+                "height": 100
+              },
+              "widthPixels": 350,
+              "heightPixels": 100,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 184,
+              "width": 350,
+              "height": 220,
+              "parent": {
+                "x": 20,
+                "y": 184,
+                "width": 350,
+                "height": 220
+              },
+              "widthPixels": 350,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 424,
+              "width": 350,
+              "height": 220,
+              "parent": {
+                "x": 20,
+                "y": 424,
+                "width": 350,
+                "height": 220
+              },
+              "widthPixels": 350,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 20,
+              "y": 664,
+              "width": 350,
+              "height": 220,
+              "parent": {
+                "x": 20,
+                "y": 664,
+                "width": 350,
+                "height": 220
+              },
+              "widthPixels": 350,
+              "heightPixels": 220,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\mobile-courselearn-dark-liquid-193-after.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "mobile-learnwords-dark-liquid-0",
+      "difference": {
+        "pixels": 1316640,
+        "changedPixels": 2245,
+        "maxChannelDifference": 2,
+        "meanChannelDifference": 0.0006855835054887187,
+        "significantPercent": 0,
+        "worst32pxBlockMeanMaxDifference": 0.24609375
+      },
+      "geometryMatches": true,
+      "before": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 64
+            },
+            {
+              "x": 24,
+              "y": 89,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 484,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 879,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 1278,
+              "width": 342,
+              "height": 4858
+            },
+            {
+              "x": 24,
+              "y": 6152,
+              "width": 342,
+              "height": 129
+            }
+          ],
+          "canvases": [
+            {
+              "x": 24,
+              "y": 89,
+              "width": 342,
+              "height": 383,
+              "parent": {
+                "x": 24,
+                "y": 89,
+                "width": 342,
+                "height": 383
+              },
+              "widthPixels": 342,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 24,
+              "y": 484,
+              "width": 342,
+              "height": 383,
+              "parent": {
+                "x": 24,
+                "y": 484,
+                "width": 342,
+                "height": 383
+              },
+              "widthPixels": 342,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\mobile-learnwords-dark-liquid-0-before.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Course/MyCategoryContent"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": [
+            "https://img.heroui.chat/image/avatar"
+          ]
+        }
+      },
+      "after": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 64
+            },
+            {
+              "x": 24,
+              "y": 89,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 484,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 879,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 1278,
+              "width": 342,
+              "height": 4858
+            },
+            {
+              "x": 24,
+              "y": 6152,
+              "width": 342,
+              "height": 129
+            }
+          ],
+          "canvases": [
+            {
+              "x": 24,
+              "y": 89,
+              "width": 342,
+              "height": 383,
+              "parent": {
+                "x": 24,
+                "y": 89,
+                "width": 342,
+                "height": 383
+              },
+              "widthPixels": 342,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 24,
+              "y": 484,
+              "width": 342,
+              "height": 383,
+              "parent": {
+                "x": 24,
+                "y": 484,
+                "width": 342,
+                "height": 383
+              },
+              "widthPixels": 342,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\mobile-learnwords-dark-liquid-0-after.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Course/MyCategoryContent"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": [
+            "https://img.heroui.chat/image/avatar"
+          ]
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "mobile-learnwords-dark-liquid-193",
+      "difference": {
+        "pixels": 1316640,
+        "changedPixels": 2260,
+        "maxChannelDifference": 2,
+        "meanChannelDifference": 0.0007020395349779236,
+        "significantPercent": 0,
+        "worst32pxBlockMeanMaxDifference": 0.2994791666666667
+      },
+      "geometryMatches": true,
+      "before": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 193,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 64
+            },
+            {
+              "x": 24,
+              "y": -104,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 291,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 686,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 1085,
+              "width": 342,
+              "height": 4858
+            },
+            {
+              "x": 24,
+              "y": 5959,
+              "width": 342,
+              "height": 129
+            }
+          ],
+          "canvases": [
+            {
+              "x": 24,
+              "y": -104,
+              "width": 342,
+              "height": 383,
+              "parent": {
+                "x": 24,
+                "y": -104,
+                "width": 342,
+                "height": 383
+              },
+              "widthPixels": 342,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 24,
+              "y": 291,
+              "width": 342,
+              "height": 383,
+              "parent": {
+                "x": 24,
+                "y": 291,
+                "width": 342,
+                "height": 383
+              },
+              "widthPixels": 342,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 24,
+              "y": 686,
+              "width": 342,
+              "height": 383,
+              "parent": {
+                "x": 24,
+                "y": 686,
+                "width": 342,
+                "height": 383
+              },
+              "widthPixels": 342,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\mobile-learnwords-dark-liquid-193-before.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Course/MyCategoryContent"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": [
+            "https://img.heroui.chat/image/avatar"
+          ]
+        }
+      },
+      "after": {
+        "state": {
+          "theme": "dark",
+          "background": "magnificent",
+          "mode": "liquid",
+          "scroll": 193,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 390,
+              "height": 64
+            },
+            {
+              "x": 24,
+              "y": -104,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 291,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 686,
+              "width": 342,
+              "height": 383
+            },
+            {
+              "x": 24,
+              "y": 1085,
+              "width": 342,
+              "height": 4858
+            },
+            {
+              "x": 24,
+              "y": 5959,
+              "width": 342,
+              "height": 129
+            }
+          ],
+          "canvases": [
+            {
+              "x": 24,
+              "y": -104,
+              "width": 342,
+              "height": 383,
+              "parent": {
+                "x": 24,
+                "y": -104,
+                "width": 342,
+                "height": 383
+              },
+              "widthPixels": 342,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 24,
+              "y": 291,
+              "width": 342,
+              "height": 383,
+              "parent": {
+                "x": 24,
+                "y": 291,
+                "width": 342,
+                "height": 383
+              },
+              "widthPixels": 342,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            },
+            {
+              "x": 24,
+              "y": 686,
+              "width": 342,
+              "height": 383,
+              "parent": {
+                "x": 24,
+                "y": 686,
+                "width": 342,
+                "height": 383
+              },
+              "widthPixels": 342,
+              "heightPixels": 383,
+              "placement": {
+                "left": "",
+                "top": "",
+                "width": "",
+                "height": ""
+              }
+            }
+          ]
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\mobile-learnwords-dark-liquid-193-after.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Course/MyCategoryContent"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": [
+            "https://img.heroui.chat/image/avatar"
+          ]
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "desktop-light-photo-glass",
+      "difference": {
+        "pixels": 1296000,
+        "changedPixels": 379808,
+        "maxChannelDifference": 5,
+        "meanChannelDifference": 0.17578189300411523,
+        "significantPercent": 0,
+        "worst32pxBlockMeanMaxDifference": 1.3046875
+      },
+      "geometryMatches": true,
+      "before": {
+        "state": {
+          "theme": "light",
+          "background": "magnificent",
+          "mode": "glass",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 60
+            },
+            {
+              "x": 560,
+              "y": 84,
+              "width": 320,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 156,
+              "width": 984,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 228,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 228,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 228,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 468,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 468,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 468,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 708,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 708,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 708,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 948,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 948,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 948,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 585,
+              "y": 1188,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": []
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-light-photo-glass-before.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "after": {
+        "state": {
+          "theme": "light",
+          "background": "magnificent",
+          "mode": "glass",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 60
+            },
+            {
+              "x": 560,
+              "y": 84,
+              "width": 320,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 156,
+              "width": 984,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 228,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 228,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 228,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 468,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 468,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 468,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 708,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 708,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 708,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 948,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 948,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 948,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 585,
+              "y": 1188,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": []
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-light-photo-glass-after.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "desktop-light-ambient-card",
+      "difference": {
+        "pixels": 1296000,
+        "changedPixels": 2125,
+        "maxChannelDifference": 80,
+        "meanChannelDifference": 0.009383744855967078,
+        "significantPercent": 0.06936728395061728,
+        "worst32pxBlockMeanMaxDifference": 1.1025390625
+      },
+      "geometryMatches": true,
+      "before": {
+        "state": {
+          "theme": "light",
+          "background": "defalut",
+          "mode": "card",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 64
+            },
+            {
+              "x": 104,
+              "y": 88,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 518.65625,
+              "y": 88,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 933.328125,
+              "y": 88,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 104,
+              "y": 487,
+              "width": 1232,
+              "height": 1708
+            },
+            {
+              "x": 104,
+              "y": 2211,
+              "width": 1232,
+              "height": 129
+            }
+          ],
+          "canvases": []
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-light-ambient-card-before.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Course/MyCategoryContent"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": [
+            "https://img.heroui.chat/image/avatar"
+          ]
+        }
+      },
+      "after": {
+        "state": {
+          "theme": "light",
+          "background": "defalut",
+          "mode": "card",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 64
+            },
+            {
+              "x": 104,
+              "y": 88,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 518.65625,
+              "y": 88,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 933.328125,
+              "y": 88,
+              "width": 402,
+              "height": 383
+            },
+            {
+              "x": 104,
+              "y": 487,
+              "width": 1232,
+              "height": 1708
+            },
+            {
+              "x": 104,
+              "y": 2211,
+              "width": 1232,
+              "height": 129
+            }
+          ],
+          "canvases": []
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-light-ambient-card-after.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Course/MyCategoryContent"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": [
+            "https://img.heroui.chat/image/avatar"
+          ]
+        }
+      },
+      "passed": true
+    },
+    {
+      "name": "desktop-dark-ambient-glass",
+      "difference": {
+        "pixels": 1296000,
+        "changedPixels": 0,
+        "maxChannelDifference": 0,
+        "meanChannelDifference": 0,
+        "significantPercent": 0,
+        "worst32pxBlockMeanMaxDifference": 0
+      },
+      "geometryMatches": true,
+      "before": {
+        "state": {
+          "theme": "dark",
+          "background": "defalut",
+          "mode": "glass",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 60
+            },
+            {
+              "x": 560,
+              "y": 85,
+              "width": 320,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 157,
+              "width": 984,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 585,
+              "y": 1189,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": []
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-dark-ambient-glass-before.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "after": {
+        "state": {
+          "theme": "dark",
+          "background": "defalut",
+          "mode": "glass",
+          "scroll": 0,
+          "ready": true,
+          "layers": [
+            {
+              "x": 0,
+              "y": 0,
+              "width": 1440,
+              "height": 60
+            },
+            {
+              "x": 560,
+              "y": 85,
+              "width": 320,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 157,
+              "width": 984,
+              "height": 52
+            },
+            {
+              "x": 228,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 229,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 469,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 709,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 228,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 562.65625,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 897.328125,
+              "y": 949,
+              "width": 314,
+              "height": 220
+            },
+            {
+              "x": 585,
+              "y": 1189,
+              "width": 270,
+              "height": 56
+            }
+          ],
+          "canvases": []
+        },
+        "screenshot": "C:\\Users\\EDY\\AppData\\Local\\Temp\\glass-page-visual-20260924\\desktop-dark-ambient-glass-after.png",
+        "requests": {
+          "mocked": [
+            "GET /api/Word/Words"
+          ],
+          "blockedWrites": [],
+          "unknownAPI": [],
+          "blockedExternal": []
+        }
+      },
+      "passed": true
+    }
+  ],
+  "passed": true,
+  "review": {
+    "note": "All >8/255 differences in the two noted learnwords cases lie inside the six unchanged animated Recharts ring charts. No regions were excluded from pass criteria. Large differences are consistent with chart animation/raster timing; glass geometry remains aligned.",
+    "cases": {
+      "desktop-learnwords-dark-liquid-0": {
+        "significantPixelsInsideCharts": 537,
+        "significantPixelsOutsideCharts": 0,
+        "maxChannelDifferenceOutsideCharts": 4
+      },
+      "desktop-light-ambient-card": {
+        "significantPixelsInsideCharts": 899,
+        "significantPixelsOutsideCharts": 0,
+        "maxChannelDifferenceOutsideCharts": 1
+      }
+    }
+  }
+}

@@ -10,11 +10,13 @@
  * No real API request is allowed through. Mobile is desktop emulation.
  */
 import assert from "node:assert/strict";
-import { existsSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import { mkdir, readdir, writeFile } from "node:fs/promises";
 import os from "node:os";
 import path from "node:path";
 import { pathToFileURL } from "node:url";
+import { runInNewContext } from "node:vm";
+import ts from "typescript";
 
 const baseURL = process.env.LIQUID_GLASS_BASE_URL ?? "http://127.0.0.1:8093";
 assert.notEqual(
@@ -33,6 +35,13 @@ const functionalOnly = process.env.LIQUID_GLASS_FUNCTIONAL_ONLY === "1";
 const requestedProfiles = (
   process.env.LIQUID_GLASS_PROFILES ?? "desktop,mobile"
 ).split(",");
+const configExports = {};
+runInNewContext(
+  ts.transpileModule(readFileSync(new URL("../config/liquid-glass.ts", import.meta.url), "utf8"), {
+    compilerOptions: { module: ts.ModuleKind.CommonJS },
+  }).outputText,
+  { exports: configExports },
+);
 
 async function imageDifference(before, after, regions) {
   const { default: sharp } = await import("sharp");
@@ -692,14 +701,14 @@ async function main() {
       viewport: { width: 1440, height: 900 },
       dpr: 1,
       mobile: false,
-      cap: 12,
+      cap: configExports.liquidGlassConfig.desktop.maxCards,
     },
     {
       name: "mobile",
       viewport: { width: 390, height: 844 },
       dpr: 2,
       mobile: true,
-      cap: 8,
+      cap: configExports.liquidGlassConfig.mobile.maxCards,
     },
   ].filter((profile) => requestedProfiles.includes(profile.name));
   try {

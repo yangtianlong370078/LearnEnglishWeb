@@ -13,10 +13,15 @@ type Surface = {
   styleDirty: boolean;
   canvas?: HTMLCanvasElement;
   context?: CanvasRenderingContext2D;
+  lastPaint?: readonly number[];
 };
 
 // These surfaces intentionally sample a different source (login / page content).
 const excluded = ".login-scene, .navbar-root, .cl-navbar, .modal__dialog";
+
+function sameNumbers(a: readonly number[], b: readonly number[]) {
+  return a.length === b.length && a.every((value, index) => value === b[index]);
+}
 
 /** Loaded ahead of hydration for a saved liquid preference. */
 export function createLiquidGlassController(
@@ -47,6 +52,8 @@ export function createLiquidGlassController(
     () => queueMicrotask(fail),
   );
   const surfaces = new Map<HTMLElement, Surface>();
+  const surfacesById = new Map<number, Surface>();
+  const painted = new Set<Surface>();
   const visible = new Set<HTMLElement>();
   const moving = new Map<Element, Set<string>>();
   const style = document.createElement("style");
@@ -66,7 +73,8 @@ export function createLiquidGlassController(
   let sourceVersion = 0;
   let sourceReady = false;
   let pendingImage: HTMLImageElement | undefined;
-  let previousSignature = "";
+  let previousItems: readonly LiquidGlassItem[] = [];
+  let previousViewport: readonly number[] = [];
   let scrolling = false;
   let throttled = false;
   let slowFrames = 0;
@@ -101,11 +109,14 @@ export function createLiquidGlassController(
     surface.canvas.width = surface.canvas.height = 0;
     surface.canvas = undefined;
     surface.context = undefined;
+    surface.lastPaint = undefined;
+    painted.delete(surface);
   }
 
   function clear() {
-    for (const surface of Array.from(surfaces.values())) removeCanvas(surface);
-    previousSignature = "";
+    for (const surface of Array.from(painted)) removeCanvas(surface);
+    previousItems = [];
+    previousViewport = [];
     if (root.getAttribute("data-liquid-glass-active") !== "0")
       root.setAttribute("data-liquid-glass-active", "0");
   }
@@ -121,18 +132,22 @@ export function createLiquidGlassController(
       if (layers.has(layer)) continue;
       removeCanvas(surface);
       surfaces.delete(layer);
+      surfacesById.delete(surface.id);
       visible.delete(layer);
       intersection.unobserve(layer);
       resize.unobserve(layer);
     }
     for (const layer of Array.from(layers)) {
       if (surfaces.has(layer)) continue;
-      surfaces.set(layer, {
+      const surface: Surface = {
         id: ++sequence,
         layer,
         radius: 0,
         styleDirty: true,
-      });
+      };
+
+      surfaces.set(layer, surface);
+      surfacesById.set(surface.id, surface);
       // The first render must not wait for IntersectionObserver delivery.
       // measure() still rejects offscreen and zero-size surfaces.
       visible.add(layer);
@@ -242,21 +257,65 @@ export function createLiquidGlassController(
 
         return;
       }
-      const signature = JSON.stringify([viewport, sourceVersion, items]);
+      const viewportState = [
+        viewport.width,
+        viewport.height,
+        viewport.dpr,
+        sourceVersion,
+      ];
 
-      if (signature === previousSignature) return;
+      if (
+        sameNumbers(viewportState, previousViewport) &&
+        items.length === previousItems.length &&
+        items.every((item, index) => {
+          const previous = previousItems[index];
+
+          return (
+            item.id === previous.id &&
+            item.x === previous.x &&
+            item.y === previous.y &&
+            item.width === previous.width &&
+            item.height === previous.height &&
+            item.radius === previous.radius
+          );
+        })
+      )
+        return;
       try {
         const tiles = renderer.render(items, viewport);
-        const selected = new Map(tiles.map((tile) => [tile.id, tile]));
+        const selected = new Set(tiles.map((tile) => tile.id));
+        const itemsById = new Map(items.map((item) => [item.id, item]));
+
+        for (const surface of Array.from(painted)) {
+          if (!selected.has(surface.id)) removeCanvas(surface);
+        }
 
         // Copies stay in this task; preserveDrawingBuffer is deliberately off.
-        for (const surface of Array.from(surfaces.values())) {
-          const tile = selected.get(surface.id);
+        for (const tile of tiles) {
+          const surface = surfacesById.get(tile.id)!;
+          const item = itemsById.get(tile.id)!;
+          const destination = tile.destinationPixels;
+          const paintState = [
+            ...viewportState,
+            item.x,
+            item.y,
+            item.width,
+            item.height,
+            item.radius,
+            tile.width,
+            tile.height,
+            tile.fullPixelWidth,
+            tile.fullPixelHeight,
+            destination.x,
+            destination.y,
+            destination.width,
+            destination.height,
+          ];
 
-          if (!tile) {
-            removeCanvas(surface);
+          // A fixed card may share an atlas with scrolling cards. Its existing
+          // image is still correct even when another tile moved in the atlas.
+          if (surface.lastPaint && sameNumbers(paintState, surface.lastPaint))
             continue;
-          }
           if (!surface.canvas) {
             const canvas = document.createElement("canvas");
             const context = canvas.getContext("2d");
@@ -267,27 +326,39 @@ export function createLiquidGlassController(
             surface.layer.append(canvas);
             surface.canvas = canvas;
             surface.context = context;
+            painted.add(surface);
           }
           const canvas = surface.canvas;
           const context = surface.context!;
 
-          if (canvas.width !== tile.width) canvas.width = tile.width;
-          if (canvas.height !== tile.height) canvas.height = tile.height;
+          // Keep the full card buffer stable during scrolling. Copy its entire
+          // atlas tile to retain the browser's full-canvas copy path; the atlas
+          // is cleared before drawing, so pixels outside the crop are transparent.
+          // CSS maps the original buffer to the layer, including transforms.
+          if (canvas.width !== tile.fullPixelWidth)
+            canvas.width = tile.fullPixelWidth;
+          if (canvas.height !== tile.fullPixelHeight)
+            canvas.height = tile.fullPixelHeight;
           context.globalCompositeOperation = "copy";
           context.drawImage(
             renderer.canvas,
-            tile.x,
-            tile.y,
-            tile.width,
-            tile.height,
+            tile.x - destination.x,
+            tile.y - destination.y,
+            tile.fullPixelWidth,
+            tile.fullPixelHeight,
             0,
             0,
-            canvas.width,
-            canvas.height,
+            tile.fullPixelWidth,
+            tile.fullPixelHeight,
           );
+          surface.lastPaint = paintState;
         }
-        root.setAttribute("data-liquid-glass-active", String(tiles.length));
-        previousSignature = signature;
+        const active = String(tiles.length);
+
+        if (root.getAttribute("data-liquid-glass-active") !== active)
+          root.setAttribute("data-liquid-glass-active", active);
+        previousItems = items;
+        previousViewport = viewportState;
         const elapsed = view.performance.now() - start;
         const interval = previousFrame ? start - previousFrame : 0;
 
@@ -329,7 +400,7 @@ export function createLiquidGlassController(
   function invalidateStyles() {
     for (const surface of Array.from(surfaces.values()))
       surface.styleDirty = true;
-    previousSignature = "";
+    previousItems = [];
     schedule();
   }
 
@@ -434,6 +505,7 @@ export function createLiquidGlassController(
     unsubscribe();
     clear();
     surfaces.clear();
+    surfacesById.clear();
     visible.clear();
     moving.clear();
     renderer.dispose();

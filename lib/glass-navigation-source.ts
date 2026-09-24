@@ -132,9 +132,26 @@ export function registerGlassNavigation(nav: HTMLElement) {
     );
   }
   function contentMutated(records: MutationRecord[]) {
+    // Liquid canvases are absolute paint-only children. Their insertion or
+    // removal cannot move navigation sources; do not schedule a second full
+    // geometry pass after every visible-card change.
+    const relevant = records.filter((record) => {
+      if (record.type !== "childList") return true;
+
+      return [
+        ...Array.from(record.addedNodes),
+        ...Array.from(record.removedNodes),
+      ].some(
+        (node) =>
+          node.nodeType !== 1 ||
+          !(node as Element).classList.contains("liquid-glass-surface"),
+      );
+    });
+
+    if (!relevant.length) return;
     if (
       !hostsDirty &&
-      records.some(
+      relevant.some(
         (record) =>
           record.type === "attributes" ||
           Array.from(record.addedNodes).some(containsHost) ||

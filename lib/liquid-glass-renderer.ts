@@ -1,8 +1,15 @@
-import type { LiquidGlassItem, LiquidGlassTile } from "./liquid-glass-geometry";
+import type {
+  LiquidGlassItem,
+  LiquidGlassTile,
+  LiquidGlassVisibleTile,
+} from "./liquid-glass-geometry";
 
-import { packLiquidGlassAtlas } from "./liquid-glass-geometry";
+import {
+  clipLiquidGlassTile,
+  packLiquidGlassAtlas,
+} from "./liquid-glass-geometry";
 
-export type { LiquidGlassItem, LiquidGlassTile };
+export type { LiquidGlassItem, LiquidGlassTile, LiquidGlassVisibleTile };
 
 export type LiquidGlassRendererOptions = {
   maxDpr: number;
@@ -34,7 +41,7 @@ export type LiquidGlassRenderer = {
   render: (
     items: readonly LiquidGlassItem[],
     viewport: LiquidGlassViewport,
-  ) => LiquidGlassTile[];
+  ) => LiquidGlassVisibleTile[];
   dispose: () => void;
 };
 
@@ -43,6 +50,7 @@ precision highp float;
 layout(location = 0) in vec4 aAtlas;
 layout(location = 1) in vec4 aCard;
 layout(location = 2) in float aRadius;
+layout(location = 3) in vec4 aClip;
 uniform vec2 uAtlasSize;
 out vec2 vLocal;
 flat out vec4 vCard;
@@ -51,21 +59,22 @@ void main() {
   vec2 corner = vec2(float(gl_VertexID & 1), float((gl_VertexID >> 1) & 1));
   vec2 pixel = aAtlas.xy + corner * aAtlas.zw;
   gl_Position = vec4(pixel / uAtlasSize * vec2(2.0, -2.0) + vec2(-1.0, 1.0), 0.0, 1.0);
-  vLocal = corner * aCard.zw;
+  vLocal = aClip.xy + corner * aClip.zw;
   vCard = aCard;
   vRadius = aRadius;
 }`;
 
-function fragmentShader(dispersion: boolean) {
+function fragmentShader(dispersion: boolean, fresnel: boolean) {
   return `#version 300 es
 ${dispersion ? "#define DISPERSION" : ""}
+${fresnel ? "#define FRESNEL" : ""}
 precision highp float;
 uniform sampler2D uBackground;
 uniform vec2 uViewport;
 uniform float uEdgeWidth;
 uniform float uEdgeInset;
 uniform float uRefraction;
-uniform float uFresnel;
+${fresnel ? "uniform float uFresnel;" : ""}
 uniform vec3 uBend;
 ${dispersion ? "uniform float uDispersion;" : ""}
 in vec2 vLocal;
@@ -91,19 +100,27 @@ void main() {
   // to zero toward the center. Sampling inward spreads content outward.
   float t = clamp((inside - uEdgeInset) / edgeWidth, 0.0, 1.0);
   float bend = pow(t, uBend.x) * pow(1.0 - t, uBend.y) * uBend.z;
-  vec2 uv = (vCard.xy + vLocal - normal * uRefraction * bend) / uViewport;
+  // This support mask is one everywhere bend can contribute. Its smooth
+  // transitions lie entirely outside the lens, where bend is already zero:
+  // multiplying it preserves the original refraction curve without branches.
+  float edgeMask = smoothstep(uEdgeInset - 1.0, uEdgeInset, inside)
+    * (1.0 - smoothstep(uEdgeInset + edgeWidth, uEdgeInset + edgeWidth + 1.0, inside));
+  float offsetStrength = bend * edgeMask;
+  vec2 uv = (vCard.xy + vLocal - normal * uRefraction * offsetStrength) / uViewport;
   vec3 color;
 #ifdef DISPERSION
-  vec2 separation = normal * uDispersion * bend / uViewport;
+  vec2 separation = normal * uDispersion * offsetStrength / uViewport;
   color = vec3(texture(uBackground, uv + separation).r,
                texture(uBackground, uv).g,
                texture(uBackground, uv - separation).b);
 #else
   color = texture(uBackground, uv).rgb;
 #endif
+#ifdef FRESNEL
   float light = 0.25 + 0.75 * max(0.0, dot(normal, vec2(-0.6, -0.8)));
   float fresnel = clamp(uFresnel * bend * bend * light, 0.0, 1.0);
   color = mix(color, vec3(1.0), fresnel);
+#endif
   // The WebGL canvas uses premultiplied alpha when copied to card canvases.
   outColor = vec4(color * alpha, alpha);
 }`;
@@ -226,9 +243,13 @@ export function createLiquidGlassRenderer(
 
   try {
     const dispersion = !options.disableDispersion && options.dispersionPx > 0;
+    const fresnel = options.fresnelStrength > 0;
 
     vertices = compile(gl.VERTEX_SHADER, VERTEX_SHADER);
-    fragments = compile(gl.FRAGMENT_SHADER, fragmentShader(dispersion));
+    fragments = compile(
+      gl.FRAGMENT_SHADER,
+      fragmentShader(dispersion, fresnel),
+    );
     program = gl.createProgram();
     if (!program) throw new Error("Cannot allocate liquid glass program");
     gl.attachShader(program, vertices);
@@ -260,9 +281,10 @@ export function createLiquidGlassRenderer(
       [0, 4, 0],
       [1, 4, 4],
       [2, 1, 8],
+      [3, 4, 9],
     ]) {
       gl.enableVertexAttribArray(location);
-      gl.vertexAttribPointer(location, size, gl.FLOAT, false, 36, offset * 4);
+      gl.vertexAttribPointer(location, size, gl.FLOAT, false, 52, offset * 4);
       gl.vertexAttribDivisor(location, 1);
     }
     gl.activeTexture(gl.TEXTURE0);
@@ -287,13 +309,15 @@ export function createLiquidGlassRenderer(
     const bendA = options.bendPeak * options.bendSharpness;
     const bendB = (1 - options.bendPeak) * options.bendSharpness;
     const bendNorm =
-      1 / (Math.pow(options.bendPeak, bendA) * Math.pow(1 - options.bendPeak, bendB));
+      1 /
+      (Math.pow(options.bendPeak, bendA) *
+        Math.pow(1 - options.bendPeak, bendB));
 
     gl.uniform1i(uniform("uBackground"), 0);
     gl.uniform1f(uniform("uEdgeWidth"), options.edgeWidthPx);
     gl.uniform1f(uniform("uEdgeInset"), options.edgeInsetPx);
     gl.uniform1f(uniform("uRefraction"), options.refractionPx);
-    gl.uniform1f(uniform("uFresnel"), options.fresnelStrength);
+    if (fresnel) gl.uniform1f(uniform("uFresnel"), options.fresnelStrength);
     gl.uniform3f(uniform("uBend"), bendA, bendB, bendNorm);
     if (dispersion) gl.uniform1f(uniform("uDispersion"), options.dispersionPx);
 
@@ -413,7 +437,7 @@ export function createLiquidGlassRenderer(
       }
       if (items.length > instanceCapacity) {
         instanceCapacity = items.length;
-        instanceData = new Float32Array(instanceCapacity * 9);
+        instanceData = new Float32Array(instanceCapacity * 13);
         gl!.bufferData(
           gl!.ARRAY_BUFFER,
           instanceData.byteLength,
@@ -421,10 +445,10 @@ export function createLiquidGlassRenderer(
         );
         checkDraw = true;
       }
+      const visibleTiles: LiquidGlassVisibleTile[] = [];
+
       for (let index = 0; index < items.length; index++) {
         const item = items[index];
-        const tile = atlas.tiles[index];
-        const offset = index * 9;
 
         if (
           !Number.isFinite(item.x) ||
@@ -434,6 +458,12 @@ export function createLiquidGlassRenderer(
         ) {
           throw new Error("Invalid liquid glass card bounds");
         }
+        const tile = clipLiquidGlassTile(item, atlas.tiles[index], viewport);
+
+        if (!tile) continue;
+        const offset = visibleTiles.length * 13;
+
+        visibleTiles.push(tile);
         instanceData[offset] = tile.x;
         instanceData[offset + 1] = tile.y;
         instanceData[offset + 2] = tile.width;
@@ -443,12 +473,23 @@ export function createLiquidGlassRenderer(
         instanceData[offset + 6] = item.width;
         instanceData[offset + 7] = item.height;
         instanceData[offset + 8] = item.radius;
+        instanceData[offset + 9] = tile.destination.x;
+        instanceData[offset + 10] = tile.destination.y;
+        instanceData[offset + 11] = tile.destination.width;
+        instanceData[offset + 12] = tile.destination.height;
       }
-      gl!.bufferSubData(gl!.ARRAY_BUFFER, 0, instanceData, 0, items.length * 9);
+      if (!visibleTiles.length) return visibleTiles;
+      gl!.bufferSubData(
+        gl!.ARRAY_BUFFER,
+        0,
+        instanceData,
+        0,
+        visibleTiles.length * 13,
+      );
       gl!.uniform2f(atlasSize, atlas.width, atlas.height);
       gl!.uniform2f(viewportSize, viewport.width, viewport.height);
       gl!.clear(gl!.COLOR_BUFFER_BIT);
-      gl!.drawArraysInstanced(gl!.TRIANGLE_STRIP, 0, 4, items.length);
+      gl!.drawArraysInstanced(gl!.TRIANGLE_STRIP, 0, 4, visibleTiles.length);
       // Check new allocations/draw state only, avoiding a driver query on
       // every scroll frame. Context loss is also handled by the canvas event.
       if (checkDraw) {
@@ -456,7 +497,7 @@ export function createLiquidGlassRenderer(
         checkDraw = false;
       }
 
-      return atlas.tiles;
+      return visibleTiles;
     };
 
     return { canvas, setBackground, render, dispose };

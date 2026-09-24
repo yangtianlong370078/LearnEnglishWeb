@@ -33,6 +33,7 @@ async function render({
   borderSaturation,
   borderBrightness,
   losslessWallpaper,
+  ambient,
 }: GlassWallpaperWorkerRequest): Promise<GlassWallpaperWorkerResult> {
   const buffers: OffscreenCanvas[] = [];
   const canvas = (w: number, h: number) => {
@@ -50,27 +51,65 @@ async function render({
     const context = getContext(source);
 
     context.scale(scale, scale);
-    const ratio = Math.max(width / image.width, height / image.height);
+    if (image) {
+      const ratio = Math.max(width / image.width, height / image.height);
 
-    context.drawImage(
-      image,
-      (width - image.width * ratio) / 2,
-      (height - image.height * ratio) / 2,
-      image.width * ratio,
-      image.height * ratio,
-    );
-    const tint = context.createLinearGradient(0, 0, 0, height);
+      context.drawImage(
+        image,
+        (width - image.width * ratio) / 2,
+        (height - image.height * ratio) / 2,
+        image.width * ratio,
+        image.height * ratio,
+      );
+      const tint = context.createLinearGradient(0, 0, 0, height);
 
-    tint.addColorStop(
-      0,
-      dark ? "rgb(5 10 24 / 0.16)" : "rgb(255 255 255 / 0.04)",
-    );
-    tint.addColorStop(
-      1,
-      dark ? "rgb(5 10 24 / 0.32)" : "rgb(255 255 255 / 0.12)",
-    );
-    context.fillStyle = tint;
-    context.fillRect(0, 0, width, height);
+      tint.addColorStop(
+        0,
+        dark ? "rgb(5 10 24 / 0.16)" : "rgb(255 255 255 / 0.04)",
+      );
+      tint.addColorStop(
+        1,
+        dark ? "rgb(5 10 24 / 0.32)" : "rgb(255 255 255 / 0.12)",
+      );
+      context.fillStyle = tint;
+      context.fillRect(0, 0, width, height);
+    } else if (ambient) {
+      context.fillStyle = ambient.base;
+      context.fillRect(0, 0, width, height);
+      const geometry = dark
+        ? [
+            [0.12, 0.18, 0.9, 0.85, 0.62],
+            [0.78, 0.14, 0.8, 0.68, 0.58],
+            [0.78, 0.82, 0.75, 0.72, 0.58],
+            [0.18, 0.84, 0.68, 0.66, 0.58],
+          ]
+        : [
+            [0.12, 0.18, 0.8, 0.75, 0.6],
+            [0.78, 0.14, 0.7, 0.58, 0.58],
+            [0.78, 0.82, 0.65, 0.62, 0.58],
+            [0.18, 0.84, 0.58, 0.56, 0.58],
+          ];
+
+      for (let i = 3; i >= 0; i--) {
+        const [cx, cy, rx, ry, stop] = geometry[i];
+
+        context.save();
+        context.translate(cx * width, cy * height);
+        context.scale(rx * width, ry * height);
+        const gradient = context.createRadialGradient(0, 0, 0, 0, 0, 1);
+
+        gradient.addColorStop(0, ambient.colors[i]);
+        gradient.addColorStop(
+          stop,
+          ambient.colors[i].replace(/\/[^)]+\)/, "/ 0)"),
+        );
+        context.fillStyle = gradient;
+        context.fillRect(-2, -2, 4, 4);
+        context.restore();
+      }
+    } else {
+      throw new Error("Glass wallpaper source is missing");
+    }
 
     const pad = Math.ceil(blurPadding * scale);
     const expanded = canvas(w + 2 * pad, h + 2 * pad);
@@ -122,7 +161,7 @@ async function render({
     source.width = 0;
     expanded.width = 0;
     const encodeOptions = {
-      type: losslessWallpaper ? "image/png" : "image/jpeg",
+      type: losslessWallpaper || !image ? "image/png" : "image/jpeg",
       quality: 0.98,
     };
     const [baseBlob, borderBlob] = await Promise.all([
@@ -132,7 +171,7 @@ async function render({
 
     return { base: baseBlob, border: borderBlob };
   } finally {
-    image.close();
+    image?.close();
     for (const buffer of buffers) buffer.width = 0;
   }
 }
