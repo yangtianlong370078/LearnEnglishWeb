@@ -1,5 +1,5 @@
 {
-  "createdAt": "2026-09-24T09:32:22.618Z",
+  "createdAt": "2026-09-24T10:17:23.685Z",
   "browser": "153.0.8010.53",
   "servers": {
     "before": "http://127.0.0.1:8094",
@@ -11,11 +11,11 @@
       "name": "desktop-courselearn-dark-liquid-0",
       "difference": {
         "pixels": 1296000,
-        "changedPixels": 607277,
-        "maxChannelDifference": 7,
-        "meanChannelDifference": 0.25057818930041154,
+        "changedPixels": 399900,
+        "maxChannelDifference": 4,
+        "meanChannelDifference": 0.17976568930041154,
         "significantPercent": 0,
-        "worst32pxBlockMeanMaxDifference": 1.3203125
+        "worst32pxBlockMeanMaxDifference": 1.078125
       },
       "geometryMatches": true,
       "before": {
@@ -700,9 +700,9 @@
       "name": "desktop-courselearn-dark-liquid-193",
       "difference": {
         "pixels": 1296000,
-        "changedPixels": 434340,
+        "changedPixels": 434506,
         "maxChannelDifference": 5,
-        "meanChannelDifference": 0.19632150205761317,
+        "meanChannelDifference": 0.19638940329218108,
         "significantPercent": 0,
         "worst32pxBlockMeanMaxDifference": 1.078125
       },
@@ -1469,11 +1469,11 @@
       "name": "desktop-learnwords-dark-liquid-0",
       "difference": {
         "pixels": 1296000,
-        "changedPixels": 457926,
-        "maxChannelDifference": 73,
-        "meanChannelDifference": 0.19296836419753086,
-        "significantPercent": 0.041435185185185186,
-        "worst32pxBlockMeanMaxDifference": 1.0361328125
+        "changedPixels": 470665,
+        "maxChannelDifference": 4,
+        "meanChannelDifference": 0.19502932098765433,
+        "significantPercent": 0,
+        "worst32pxBlockMeanMaxDifference": 1.1611328125
       },
       "geometryMatches": true,
       "before": {
@@ -1722,11 +1722,11 @@
       "name": "desktop-learnwords-dark-liquid-193",
       "difference": {
         "pixels": 1296000,
-        "changedPixels": 452364,
+        "changedPixels": 451987,
         "maxChannelDifference": 4,
-        "meanChannelDifference": 0.18270447530864198,
+        "meanChannelDifference": 0.18254192386831275,
         "significantPercent": 0,
-        "worst32pxBlockMeanMaxDifference": 1.126953125
+        "worst32pxBlockMeanMaxDifference": 1.1474609375
       },
       "geometryMatches": true,
       "before": {
@@ -1975,11 +1975,11 @@
       "name": "mobile-courselearn-dark-liquid-0",
       "difference": {
         "pixels": 1316640,
-        "changedPixels": 2947,
+        "changedPixels": 2470,
         "maxChannelDifference": 2,
-        "meanChannelDifference": 0.0009010309069550776,
+        "meanChannelDifference": 0.0007660914651435979,
         "significantPercent": 0,
-        "worst32pxBlockMeanMaxDifference": 0.28515625
+        "worst32pxBlockMeanMaxDifference": 0.3333333333333333
       },
       "geometryMatches": true,
       "before": {
@@ -2384,11 +2384,11 @@
       "name": "mobile-courselearn-dark-liquid-193",
       "difference": {
         "pixels": 1316640,
-        "changedPixels": 2847,
+        "changedPixels": 60599,
         "maxChannelDifference": 2,
-        "meanChannelDifference": 0.0009002713979017297,
+        "meanChannelDifference": 0.020661684287276706,
         "significantPercent": 0,
-        "worst32pxBlockMeanMaxDifference": 0.296875
+        "worst32pxBlockMeanMaxDifference": 0.447265625
       },
       "geometryMatches": true,
       "before": {
@@ -2833,11 +2833,11 @@
       "name": "mobile-learnwords-dark-liquid-0",
       "difference": {
         "pixels": 1316640,
-        "changedPixels": 2245,
-        "maxChannelDifference": 2,
-        "meanChannelDifference": 0.0006855835054887187,
+        "changedPixels": 289346,
+        "maxChannelDifference": 7,
+        "meanChannelDifference": 0.09014562320249524,
         "significantPercent": 0,
-        "worst32pxBlockMeanMaxDifference": 0.24609375
+        "worst32pxBlockMeanMaxDifference": 0.6923828125
       },
       "geometryMatches": true,
       "before": {
@@ -3046,11 +3046,11 @@
       "name": "mobile-learnwords-dark-liquid-193",
       "difference": {
         "pixels": 1316640,
-        "changedPixels": 2260,
-        "maxChannelDifference": 2,
-        "meanChannelDifference": 0.0007020395349779236,
+        "changedPixels": 254971,
+        "maxChannelDifference": 3,
+        "meanChannelDifference": 0.07798360473123506,
         "significantPercent": 0,
-        "worst32pxBlockMeanMaxDifference": 0.2994791666666667
+        "worst32pxBlockMeanMaxDifference": 0.5927734375
       },
       "geometryMatches": true,
       "before": {
@@ -3299,11 +3299,11 @@
       "name": "desktop-light-photo-glass",
       "difference": {
         "pixels": 1296000,
-        "changedPixels": 379808,
-        "maxChannelDifference": 5,
-        "meanChannelDifference": 0.17578189300411523,
-        "significantPercent": 0,
-        "worst32pxBlockMeanMaxDifference": 1.3046875
+        "changedPixels": 580907,
+        "maxChannelDifference": 20,
+        "meanChannelDifference": 0.24760082304526748,
+        "significantPercent": 0.005015432098765432,
+        "worst32pxBlockMeanMaxDifference": 1.328125
       },
       "geometryMatches": true,
       "before": {
@@ -3546,11 +3546,11 @@
       "name": "desktop-light-ambient-card",
       "difference": {
         "pixels": 1296000,
-        "changedPixels": 2125,
-        "maxChannelDifference": 80,
-        "meanChannelDifference": 0.009383744855967078,
-        "significantPercent": 0.06936728395061728,
-        "worst32pxBlockMeanMaxDifference": 1.1025390625
+        "changedPixels": 833,
+        "maxChannelDifference": 59,
+        "meanChannelDifference": 0.0031368312757201647,
+        "significantPercent": 0.01882716049382716,
+        "worst32pxBlockMeanMaxDifference": 0.5498046875
       },
       "geometryMatches": true,
       "before": {
@@ -3921,20 +3921,5 @@
       "passed": true
     }
   ],
-  "passed": true,
-  "review": {
-    "note": "All >8/255 differences in the two noted learnwords cases lie inside the six unchanged animated Recharts ring charts. No regions were excluded from pass criteria. Large differences are consistent with chart animation/raster timing; glass geometry remains aligned.",
-    "cases": {
-      "desktop-learnwords-dark-liquid-0": {
-        "significantPixelsInsideCharts": 537,
-        "significantPixelsOutsideCharts": 0,
-        "maxChannelDifferenceOutsideCharts": 4
-      },
-      "desktop-light-ambient-card": {
-        "significantPixelsInsideCharts": 899,
-        "significantPixelsOutsideCharts": 0,
-        "maxChannelDifferenceOutsideCharts": 1
-      }
-    }
-  }
+  "passed": true
 }

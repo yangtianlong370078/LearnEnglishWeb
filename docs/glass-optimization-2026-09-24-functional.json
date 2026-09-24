@@ -1,6 +1,6 @@
 {
   "baseURL": "http://127.0.0.1:8095",
-  "createdAt": "2026-09-24T09:36:09.950Z",
+  "createdAt": "2026-09-24T10:24:21.954Z",
   "browser": "153.0.8010.53",
   "softwareRequested": false,
   "conditions": "Real application routes with 12 fictional words / 18 fictional courses. Native CDP wheel scrolling, two 2-second passes per sample after warmup. Mobile is desktop CPU/GPU emulation, not thermal/power measurement. rAF intervals are not directly presented GPU FPS. TaskDuration is renderer main-thread work, not total CPU usage.",
@@ -44,8 +44,8 @@
           "mode": "liquid"
         },
         "returnToGlass": {
-          "draws": 2,
-          "copies": 22,
+          "draws": 3,
+          "copies": 33,
           "uploads": 2,
           "maxInstances": 11,
           "contexts": 2,
@@ -194,8 +194,8 @@
           "restoredAfterScroll": true
         },
         "contextLoss": {
-          "draws": 13,
-          "copies": 143,
+          "draws": 14,
+          "copies": 154,
           "uploads": 3,
           "maxInstances": 11,
           "contexts": 3,
@@ -256,8 +256,8 @@
           "mode": "liquid"
         },
         "returnToGlass": {
-          "draws": 7,
-          "copies": 22,
+          "draws": 9,
+          "copies": 26,
           "uploads": 2,
           "maxInstances": 5,
           "contexts": 2,
@@ -270,7 +270,7 @@
             "changedPixels": 4,
             "comparedPixels": 1296000,
             "maxChannelDifference": 3,
-            "meanChannelDifference": 0.000005915637860082305,
+            "meanChannelDifference": 0.0000051440329218107,
             "bounds": [
               1383,
               17,
@@ -341,8 +341,8 @@
           "restoredAfterScroll": true
         },
         "contextLoss": {
-          "draws": 18,
-          "copies": 55,
+          "draws": 20,
+          "copies": 59,
           "uploads": 3,
           "maxInstances": 5,
           "contexts": 3,
@@ -618,10 +618,10 @@
           "mode": "liquid"
         },
         "returnToGlass": {
-          "draws": 6,
-          "copies": 8,
+          "draws": 7,
+          "copies": 12,
           "uploads": 2,
-          "maxInstances": 2,
+          "maxInstances": 3,
           "contexts": 2,
           "liveContexts": 0,
           "canvases": 0,
@@ -698,10 +698,10 @@
           "restoredAfterScroll": true
         },
         "contextLoss": {
-          "draws": 17,
-          "copies": 30,
+          "draws": 18,
+          "copies": 34,
           "uploads": 3,
-          "maxInstances": 2,
+          "maxInstances": 3,
           "contexts": 3,
           "liveContexts": 0,
           "canvases": 0,

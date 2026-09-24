@@ -118,7 +118,7 @@ test("viewport clipping preserves the complete card pixel grid and overscans edg
   assert.equal(clipped.fullHeight, item.height);
   assert.equal(clipped.fullPixelWidth, original.width);
   assert.equal(clipped.fullPixelHeight, original.height);
-  assert.deepEqual(JSON.parse(JSON.stringify(clipped.destinationPixels)), {
+  assert.deepEqual({ ...clipped.destinationPixels }, {
     x: clipped.x - original.x,
     y: clipped.y - original.y,
     width: clipped.width,
