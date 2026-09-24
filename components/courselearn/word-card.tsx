@@ -597,6 +597,9 @@ function WordCardInner(
           ? "transition-[background-color,border-color,box-shadow] duration-500 ease-out"
           : ""
         } `}
+      // 抖动位移期间：液态玻璃 canvas 随卡片一起移动、内容不变，
+      // 豁免全局 motion 挂起，避免本卡抖动清空并重绘所有卡片的液态玻璃
+      data-glass-motion-ignore={shaking ? "" : undefined}
       onAnimationEnd={() => setShaking(false)}
     >
       {/* Keep the same blur layer mounted when the answer tint changes. */}

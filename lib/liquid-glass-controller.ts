@@ -408,6 +408,10 @@ export function createLiquidGlassController(
     const element = event.target;
 
     if (!(element instanceof Element)) return;
+    // Opt-out for self-contained shakes (courselearn wrong answer): the glass
+    // canvas rides along inside the card, so no surface needs a repaint and
+    // the global moving-suspension must not clear every other card either.
+    if (element.closest("[data-glass-motion-ignore]")) return;
     if (
       !element.closest(".glass-warp") &&
       !element.querySelector(".glass-warp")
