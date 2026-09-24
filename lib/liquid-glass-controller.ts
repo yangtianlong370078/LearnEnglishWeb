@@ -38,6 +38,8 @@ export function createLiquidGlassController(
       refractionPx: config.refractionPx,
       fresnelStrength: config.fresnelStrength,
       dispersionPx: config.dispersionPx,
+      bendPeak: config.edgeBendPeak,
+      bendSharpness: config.edgeBendSharpness,
       disableDispersion: mobile.matches
         ? config.disableDispersionMobile
         : config.disableDispersionDesktop,

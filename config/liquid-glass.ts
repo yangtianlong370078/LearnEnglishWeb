@@ -10,6 +10,16 @@ export const liquidGlassConfig = {
    */
   edgeInsetPx: 1,
   refractionPx: 38,
+  /**
+   * 边缘扭曲轮廓（复刻 iOS 液态玻璃）：最外缘位移为 0、与背景无缝衔接，
+   * 进入边缘后迅速增强，在 bendPeak 处达到 refractionPx 的峰值后向内侧平滑归零。
+   * bendPeak：峰值位置，占扭曲带宽度的比例（0–1），越小越贴近外缘。
+   *   edgeBendPeak: 0.26
+   * bendSharpness：轮廓锐度，越大扭曲越集中在峰值附近、衰减越快。
+   *   edgeBendSharpness: 2.7
+   */
+  edgeBendPeak: 0.1,
+  edgeBendSharpness: 2.7,
   /** 附加菲涅尔反光强度（0–1），仅作用于透镜内侧。 
    * fresnelStrength: 0.12, 反光度
    * dispersionPx: 1.25,

@@ -14,6 +14,10 @@ export type LiquidGlassRendererOptions = {
   refractionPx: number;
   fresnelStrength: number;
   dispersionPx: number;
+  /** Position of peak refraction across the edge band, in (0, 1). */
+  bendPeak: number;
+  /** Narrowness of the refraction hump; larger values decay faster. */
+  bendSharpness: number;
   disableDispersion: boolean;
 };
 
@@ -62,6 +66,7 @@ uniform float uEdgeWidth;
 uniform float uEdgeInset;
 uniform float uRefraction;
 uniform float uFresnel;
+uniform vec3 uBend;
 ${dispersion ? "uniform float uDispersion;" : ""}
 in vec2 vLocal;
 flat in vec4 vCard;
@@ -81,10 +86,15 @@ void main() {
   vec2 sideNormal = mix(vec2(0.0, sign(point.y)), vec2(sign(point.x), 0.0), step(rounded.y, rounded.x));
   vec2 arcNormal = normalize(arc + vec2(0.0001)) * sign(point);
   vec2 normal = mix(sideNormal, arcNormal, step(0.0, max(rounded.x, rounded.y)));
-  vec2 uv = (vCard.xy + vLocal - normal * uRefraction * lens * lens) / uViewport;
+  // iOS-style edge bend: zero refraction at the outer rim keeps the glass
+  // seamless with the background, peaks just inside the rim, then eases back
+  // to zero toward the center. Sampling inward spreads content outward.
+  float t = clamp((inside - uEdgeInset) / edgeWidth, 0.0, 1.0);
+  float bend = pow(t, uBend.x) * pow(1.0 - t, uBend.y) * uBend.z;
+  vec2 uv = (vCard.xy + vLocal - normal * uRefraction * bend) / uViewport;
   vec3 color;
 #ifdef DISPERSION
-  vec2 separation = normal * uDispersion * lens / uViewport;
+  vec2 separation = normal * uDispersion * bend / uViewport;
   color = vec3(texture(uBackground, uv + separation).r,
                texture(uBackground, uv).g,
                texture(uBackground, uv - separation).b);
@@ -92,7 +102,7 @@ void main() {
   color = texture(uBackground, uv).rgb;
 #endif
   float light = 0.25 + 0.75 * max(0.0, dot(normal, vec2(-0.6, -0.8)));
-  float fresnel = clamp(uFresnel * lens * lens * lens * light, 0.0, 1.0);
+  float fresnel = clamp(uFresnel * bend * bend * light, 0.0, 1.0);
   color = mix(color, vec3(1.0), fresnel);
   // The WebGL canvas uses premultiplied alpha when copied to card canvases.
   outColor = vec4(color * alpha, alpha);
@@ -116,7 +126,10 @@ export function createLiquidGlassRenderer(
     !numericOptions.every((value) => Number.isFinite(value) && value >= 0) ||
     options.maxDpr <= 0 ||
     options.maxPixels < 9 ||
-    options.edgeWidthPx <= 0
+    options.edgeWidthPx <= 0 ||
+    options.bendPeak <= 0 ||
+    options.bendPeak >= 1 ||
+    options.bendSharpness <= 0
   ) {
     throw new Error("Invalid liquid glass renderer options");
   }
@@ -269,11 +282,19 @@ export function createLiquidGlassRenderer(
     const atlasSize = uniform("uAtlasSize");
     const viewportSize = uniform("uViewport");
 
+    // Hump exponents place the peak at bendPeak across the band; bendNorm
+    // rescales the profile so refractionPx remains the exact peak offset.
+    const bendA = options.bendPeak * options.bendSharpness;
+    const bendB = (1 - options.bendPeak) * options.bendSharpness;
+    const bendNorm =
+      1 / (Math.pow(options.bendPeak, bendA) * Math.pow(1 - options.bendPeak, bendB));
+
     gl.uniform1i(uniform("uBackground"), 0);
     gl.uniform1f(uniform("uEdgeWidth"), options.edgeWidthPx);
     gl.uniform1f(uniform("uEdgeInset"), options.edgeInsetPx);
     gl.uniform1f(uniform("uRefraction"), options.refractionPx);
     gl.uniform1f(uniform("uFresnel"), options.fresnelStrength);
+    gl.uniform3f(uniform("uBend"), bendA, bendB, bendNorm);
     if (dispersion) gl.uniform1f(uniform("uDispersion"), options.dispersionPx);
 
     const maxTexture = gl.getParameter(gl.MAX_TEXTURE_SIZE) as number;
