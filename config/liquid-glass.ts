@@ -30,7 +30,7 @@ export const liquidGlassConfig = {
    * disableDispersionDesktop: false,
    * disableDispersionMobile: true,
   */
-  disableDispersionDesktop: false,
+  disableDispersionDesktop: true,
   disableDispersionMobile: true,
   /** 小屏或粗指针设备使用移动端预算。 */
   mobileBreakpointPx: 768,

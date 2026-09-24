@@ -117,11 +117,23 @@ export function Providers({ children, themeProps }: ProvidersProps) {
 
         if (Math.abs(next - applied) <= 0.01) continue;
 
+        // 无需补偿（高度已是整数）：移除行内 padding 而非写入 0px，
+        // 否则会覆盖卡片本来的 CSS/Tailwind 底部内边距（如 GlassCard 的 p-4），
+        // 导致底部留白塌陷；移除后交给样式表接管即可。
+        if (next <= 0.01) {
+          if (applied !== 0) {
+            el.style.paddingBottom = "";
+            appliedPb.set(el, 0);
+          }
+
+          continue;
+        }
+
         el.style.paddingBottom = `${next}px`;
 
         // 写入后同步重测：border-box 没跟随变化则回退并锁定，避免振荡
         if (Math.abs(el.getBoundingClientRect().height - (raw + next)) > 0.01) {
-          el.style.paddingBottom = "0px";
+          el.style.paddingBottom = "";
           appliedPb.set(el, 0);
           latchH.set(el, el.getBoundingClientRect().height);
         } else {

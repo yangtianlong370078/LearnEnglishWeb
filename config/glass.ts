@@ -5,7 +5,7 @@ export const glassConfig = {
   /** 普通玻璃和卡片的模糊半径，单位 px；导航栏和弹窗使用对应模式的半径。 */
   blurPx: 8,
   /** 液态玻璃的模糊半径，单位 px；普通玻璃和卡片继续使用 blurPx。 */
-  liquidBlurPx: 4,
+  liquidBlurPx: 6,
   /** 基础饱和度，单位 %，100 表示不增强。 */
   saturation: 140,
   /** 边框额外饱和度，单位 %，叠加在基础饱和度上。 */
