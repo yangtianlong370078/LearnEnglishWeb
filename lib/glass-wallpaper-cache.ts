@@ -1,8 +1,15 @@
-import { glassBlurPadding, glassConfig } from "@/config/glass";
+import { createGlassWallpaperWorker } from "./glass-wallpaper-worker";
+
+import {
+  getGlassBlurPadding,
+  getGlassBlurPx,
+  glassConfig,
+} from "@/config/glass";
 
 type Wallpaper = {
   base: string;
   border: string;
+  blurPx: number;
   // Keep the decoded resources alive for cached theme changes, including the
   // first CSS paint after an object URL is installed.
   decoded: HTMLImageElement[];
@@ -75,6 +82,24 @@ function canvasBlob(canvas: HTMLCanvasElement, lossy: boolean) {
   );
 }
 
+async function decodeWallpaper(base: Blob, border: Blob, blurPx: number) {
+  const baseUrl = URL.createObjectURL(base);
+  const borderUrl = URL.createObjectURL(border);
+
+  try {
+    const decoded = await Promise.all([
+      decodeImage(baseUrl),
+      decodeImage(borderUrl),
+    ]);
+
+    return { base: baseUrl, border: borderUrl, blurPx, decoded };
+  } catch (error) {
+    URL.revokeObjectURL(baseUrl);
+    URL.revokeObjectURL(borderUrl);
+    throw error;
+  }
+}
+
 /** Neutral-gray noise tile used to dither smooth gradients. */
 function ditherTile(document: Document) {
   const tile = document.createElement("canvas");
@@ -110,8 +135,15 @@ export function createGlassWallpaperCache(document: Document) {
   const requests = new Set<ThemeRequest>();
   let requestedKey = "";
   let activeKey = "";
+  let activeBlurPx: number | undefined;
   let timer = 0;
   let disposed = false;
+  let warmupFrame = 0;
+  let warmupIdle = 0;
+  let warmupTimer = 0;
+  let worker: ReturnType<typeof createGlassWallpaperWorker>;
+  let canPrewarm = true;
+  let warmup: { key: string; cancelled: boolean } | undefined;
 
   async function render(
     width: number,
@@ -119,6 +151,8 @@ export function createGlassWallpaperCache(document: Document) {
     scale: number,
     dark: boolean,
     photo: boolean,
+    blurPx: number,
+    blurPadding: number,
   ): Promise<Wallpaper | undefined> {
     const source = document.createElement("canvas");
 
@@ -203,7 +237,7 @@ export function createGlassWallpaperCache(document: Document) {
     }
 
     // Repeat edge pixels before convolution, as in the modal source filter.
-    const pad = Math.ceil(glassBlurPadding * scale);
+    const pad = Math.ceil(blurPadding * scale);
     const expanded = document.createElement("canvas");
 
     expanded.width = source.width + 2 * pad;
@@ -231,7 +265,7 @@ export function createGlassWallpaperCache(document: Document) {
     base.height = h;
     const paint = base.getContext("2d")!;
 
-    paint.filter = `blur(${glassConfig.blurPx * scale}px) saturate(${glassConfig.saturation}%)`;
+    paint.filter = `blur(${blurPx * scale}px) saturate(${glassConfig.saturation}%)`;
     paint.drawImage(expanded, -pad, -pad);
     // Dither after the blur so its grain survives: 8-bit radial gradients
     // band, and the saturate filters widen those steps into visible bands.
@@ -260,21 +294,8 @@ export function createGlassWallpaperCache(document: Document) {
       base.width = 0;
       border.width = 0;
     });
-    const baseUrl = URL.createObjectURL(baseBlob);
-    const borderUrl = URL.createObjectURL(borderBlob);
 
-    try {
-      const decoded = await Promise.all([
-        decodeImage(baseUrl),
-        decodeImage(borderUrl),
-      ]);
-
-      return { base: baseUrl, border: borderUrl, decoded };
-    } catch (error) {
-      URL.revokeObjectURL(baseUrl);
-      URL.revokeObjectURL(borderUrl);
-      throw error;
-    }
+    return decodeWallpaper(baseBlob, borderBlob, blurPx);
   }
 
   function release(entry: Wallpaper) {
@@ -290,8 +311,10 @@ export function createGlassWallpaperCache(document: Document) {
     root.style.setProperty("--glass-cached-border", `url("${result.border}")`);
     root.setAttribute("data-glass-wallpaper-ready", "");
     activeKey = key;
+    activeBlurPx = result.blurPx;
     cache.delete(key);
     cache.set(key, result);
+    schedulePrewarm();
   }
 
   function trim() {
@@ -303,7 +326,7 @@ export function createGlassWallpaperCache(document: Document) {
     }
   }
 
-  function getTarget() {
+  function getTarget(mode = root.dataset.glassMode) {
     const width = root.clientWidth;
     const height = view.innerHeight;
     const scale = view.devicePixelRatio;
@@ -315,9 +338,131 @@ export function createGlassWallpaperCache(document: Document) {
       background = change.background ?? background;
     }
     const photo = background === "magnificent";
-    const key = [width, height, scale, dark, photo].join(",");
+    const blurPx = getGlassBlurPx(mode);
+    const blurPadding = getGlassBlurPadding(mode);
+    const key = [width, height, scale, dark, photo, blurPx].join(",");
 
-    return { width, height, scale, dark, photo, key };
+    return { width, height, scale, dark, photo, blurPx, blurPadding, key };
+  }
+
+  function cancelPrewarm(keepKey?: string) {
+    view.cancelAnimationFrame(warmupFrame);
+    if (warmupIdle) view.cancelIdleCallback(warmupIdle);
+    view.clearTimeout(warmupTimer);
+    warmupFrame = warmupIdle = warmupTimer = 0;
+    if (!warmup || warmup.key === keepKey) return;
+    warmup.cancelled = true;
+    pending.delete(warmup.key);
+    warmup = undefined;
+    worker?.cancel();
+  }
+
+  function schedulePrewarm() {
+    if (disposed || !canPrewarm || warmup) return;
+    cancelPrewarm();
+    // Let the current texture paint first. Background preparation never enters
+    // the foreground render path or runs its convolution on the main thread.
+    warmupFrame = view.requestAnimationFrame(() => {
+      warmupFrame = 0;
+      if (view.requestIdleCallback) {
+        warmupIdle = view.requestIdleCallback(() => {
+          warmupIdle = 0;
+          prewarmOtherMode();
+        });
+      } else {
+        warmupTimer = view.setTimeout(() => {
+          warmupTimer = 0;
+          prewarmOtherMode();
+        }, 100);
+      }
+    });
+  }
+
+  function prewarmOtherMode() {
+    if (disposed || !canPrewarm || warmup || pending.size || requests.size)
+      return;
+    const current = getTarget();
+
+    // Liquid mode is only available with the photo background.
+    if (
+      !current.photo ||
+      current.key !== activeKey ||
+      !root.hasAttribute("data-glass-wallpaper-ready")
+    )
+      return;
+    const alternate = getTarget(
+      current.blurPx === glassConfig.liquidBlurPx ? "glass" : "liquid",
+    );
+
+    if (alternate.key === current.key || cache.has(alternate.key)) return;
+    worker ??= createGlassWallpaperWorker();
+    if (!worker) {
+      canPrewarm = false;
+
+      return;
+    }
+    const renderer = worker;
+    const job = { key: alternate.key, cancelled: false };
+
+    warmup = job;
+    const task = loadImage(
+      `/images/bg01_${alternate.dark ? "dark" : "light"}.jpeg`,
+    )
+      .then(async (image) => {
+        if (disposed || job.cancelled) return;
+        const blobs = await renderer.render(image, {
+          ...alternate,
+          saturation: glassConfig.saturation,
+          borderSaturation: glassConfig.borderSaturation,
+          borderBrightness: glassConfig.borderBrightness,
+          losslessWallpaper: glassConfig.losslessWallpaper,
+        });
+
+        if (disposed || job.cancelled) return;
+        const result = await decodeWallpaper(
+          blobs.base,
+          blobs.border,
+          alternate.blurPx,
+        );
+
+        if (disposed || job.cancelled) {
+          release(result);
+
+          return;
+        }
+        cache.set(job.key, result);
+        // A user can select this mode while its prewarm is still finishing.
+        // Reuse that work, but never change the active mode just to prewarm it.
+        commitRequests(job.key, result);
+        trim();
+      })
+      .catch(() => {
+        if (job.cancelled || disposed) return;
+        // Unsupported worker filters or a blocked worker only disable this
+        // optimization. The requested mode can still render through Canvas.
+        canPrewarm = false;
+        renderer.dispose();
+        worker = undefined;
+      })
+      .finally(() => {
+        if (pending.get(job.key) === task) pending.delete(job.key);
+        if (warmup === job) {
+          warmup = undefined;
+          renderer.dispose();
+          if (worker === renderer) worker = undefined;
+        }
+        if (
+          !disposed &&
+          !job.cancelled &&
+          requestedKey === job.key &&
+          !cache.has(job.key)
+        ) {
+          requestedKey = "";
+          update();
+        }
+      });
+
+    pending.set(job.key, task);
   }
 
   function commitRequests(key: string, result?: Wallpaper) {
@@ -347,7 +492,17 @@ export function createGlassWallpaperCache(document: Document) {
 
   function update() {
     if (disposed) return;
-    const { width, height, scale, dark, photo, key } = getTarget();
+    const { width, height, scale, dark, photo, blurPx, blurPadding, key } =
+      getTarget();
+
+    // A new foreground request supersedes speculative work for another size,
+    // theme, or mode. Selecting the in-flight prewarm itself reuses its task.
+    if (key !== requestedKey) cancelPrewarm(key);
+
+    // A mode change must use its own blur immediately. The CSS source fallback
+    // already has the new radius while a matching texture renders and decodes.
+    if (activeBlurPx !== blurPx)
+      root.removeAttribute("data-glass-wallpaper-ready");
 
     // Other root classes (for example scrollbar state) do not change the
     // wallpaper. A rapid theme round trip also reuses its in-flight render.
@@ -360,12 +515,17 @@ export function createGlassWallpaperCache(document: Document) {
     const cached = cache.get(key);
 
     if (cached) {
-      if (key !== activeKey || requests.size) commitRequests(key, cached);
+      if (
+        key !== activeKey ||
+        requests.size ||
+        !root.hasAttribute("data-glass-wallpaper-ready")
+      )
+        commitRequests(key, cached);
 
       return;
     }
     if (pending.has(key)) return;
-    const task = render(width, height, scale, dark, photo)
+    const task = render(width, height, scale, dark, photo, blurPx, blurPadding)
       .then((result) => {
         if (!result) {
           commitRequests(key);
@@ -384,7 +544,10 @@ export function createGlassWallpaperCache(document: Document) {
       // A failed refresh keeps the displayed texture. A pending theme change
       // still commits through the source fallback so controls cannot get stuck.
       .catch(() => commitRequests(key))
-      .finally(() => pending.delete(key));
+      .finally(() => {
+        if (pending.get(key) === task) pending.delete(key);
+        if (!disposed && activeKey === getTarget().key) schedulePrewarm();
+      });
 
     pending.set(key, task);
   }
@@ -421,6 +584,7 @@ export function createGlassWallpaperCache(document: Document) {
   coordinators.set(document, coordinate);
 
   function resize() {
+    cancelPrewarm();
     requestedKey = "";
     view.clearTimeout(timer);
     timer = view.setTimeout(update, 100);
@@ -430,13 +594,15 @@ export function createGlassWallpaperCache(document: Document) {
 
   observer.observe(root, {
     attributes: true,
-    attributeFilter: ["class", "data-bg-theme"],
+    attributeFilter: ["class", "data-bg-theme", "data-glass-mode"],
   });
   view.addEventListener("resize", resize);
   update();
 
   return () => {
     disposed = true;
+    cancelPrewarm();
+    worker?.dispose();
     if (coordinators.get(document) === coordinate)
       coordinators.delete(document);
     // A route may remove the final glass surface while its theme provider stays

@@ -26,6 +26,7 @@ class Element {
   attributes = new Set();
   className = "";
   style = {};
+  dataset = {};
   bounds = { top: 0, bottom: 150, width: 300, height: 150 };
   boundsReads = 0;
   queryCount = 0;
@@ -119,6 +120,7 @@ function setup() {
   const element = (name) => new Element(name, document);
   document.createElement = element;
   document.body = element("body");
+  document.documentElement = element("html");
   const shell = element("shell");
   shell.className = "app-shell";
   const nav = element("nav");
@@ -173,7 +175,9 @@ function setup() {
         jobs.delete(job);
       },
     },
-    "@/config/glass": { glassBlurPadding: 32 },
+    "@/config/glass": {
+      getGlassBlurPadding: (mode) => (mode === "liquid" ? 16 : 32),
+    },
   };
   const exports = {};
   runInNewContext(source, {
@@ -221,6 +225,13 @@ function setup() {
     dispose,
     jobs,
     observers,
+    changeMode(mode) {
+      document.documentElement.dataset.glassMode = mode;
+      observers
+        .find((observer) => observer.target === document.documentElement)
+        .callback([]);
+      flush();
+    },
     surfaceChanged: () => surfaceChanged(),
     scroll: () => {
       listeners.get("scroll")();
@@ -237,6 +248,20 @@ const childList = (addedNodes = [], removedNodes = []) => ({
 const attributes = () => ({
   type: "attributes",
   attributeName: "data-glass-navigation-content",
+});
+
+test("switching glass modes updates navigation padding without scrolling", () => {
+  const h = setup();
+  const card = h.host("card");
+  card.bounds.top = 84;
+  h.flush();
+  assert.equal(h.activeFilters.has(card), true);
+  h.changeMode("liquid");
+  assert.equal(h.activeFilters.has(card), false);
+  h.changeMode("card");
+  assert.equal(h.activeFilters.has(card), true);
+  assert.equal(h.main.queryCount, 1, "mode changes retain the host cache");
+  h.dispose();
 });
 
 test("ordinary content replacements reuse hosts but still apply current geometry", () => {

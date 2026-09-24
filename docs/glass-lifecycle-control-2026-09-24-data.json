@@ -1,0 +1,351 @@
+{
+  "startedAt": "2026-09-24T07:59:16.618Z",
+  "baseURL": "http://127.0.0.1:8094",
+  "browser": "153.0.8010.53",
+  "profile": {
+    "name": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "dpr": 1,
+    "mobile": false
+  },
+  "rounds": 20,
+  "targetMode": "card",
+  "methodology": "One page, fictional courselearn data,20 glass→card→glass cycles (40 switches),8 rAF scroll steps per visit,viewport changes at10/20/30,GC only at like-for-like glass checkpoints. DOM/JS heap excludes GPU/decoded bitmap memory. Test-owned historical WebGL strong references cleared after checking each mode exit; active blob map stores metadata only; fixture records request strings outside the browser, and minor instrument metadata can grow. This checks short-run reuse/release, not long-term leaks, physical mobile battery, or hours of usage.",
+  "checkpoints": [
+    {
+      "label": "initial-glass",
+      "elapsedMs": 2994,
+      "jsHeapAfterGcMiB": 6.690082550048828,
+      "nodes": 1189,
+      "listeners": 469,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 938295,
+      "blobsCreated": 4,
+      "blobsRevoked": 0,
+      "maxBlobs": 4,
+      "workersCreated": 1,
+      "workersTerminated": 1,
+      "workersActive": 0,
+      "contextsCreated": 0,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "warmed-glass-baseline",
+      "elapsedMs": 5294,
+      "jsHeapAfterGcMiB": 7.799125671386719,
+      "nodes": 1274,
+      "listeners": 631,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 938295,
+      "blobsCreated": 4,
+      "blobsRevoked": 0,
+      "maxBlobs": 4,
+      "workersCreated": 1,
+      "workersTerminated": 1,
+      "workersActive": 0,
+      "contextsCreated": 0,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "after-10-cycles-glass",
+      "elapsedMs": 29564,
+      "jsHeapAfterGcMiB": 8.836307525634766,
+      "nodes": 2014,
+      "listeners": 770,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 879736,
+      "blobsCreated": 8,
+      "blobsRevoked": 4,
+      "maxBlobs": 6,
+      "workersCreated": 2,
+      "workersTerminated": 2,
+      "workersActive": 0,
+      "contextsCreated": 0,
+      "viewport": {
+        "width": 1400,
+        "height": 860
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "after-20-cycles-glass",
+      "elapsedMs": 54507,
+      "jsHeapAfterGcMiB": 9.260971069335938,
+      "nodes": 2754,
+      "listeners": 911,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 938252,
+      "blobsCreated": 12,
+      "blobsRevoked": 8,
+      "maxBlobs": 6,
+      "workersCreated": 3,
+      "workersTerminated": 3,
+      "workersActive": 0,
+      "contextsCreated": 0,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "restored-viewport-glass",
+      "elapsedMs": 55546,
+      "jsHeapAfterGcMiB": 9.259101867675781,
+      "nodes": 2754,
+      "listeners": 911,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 938252,
+      "blobsCreated": 12,
+      "blobsRevoked": 8,
+      "maxBlobs": 6,
+      "workersCreated": 3,
+      "workersTerminated": 3,
+      "workersActive": 0,
+      "contextsCreated": 0,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "final-glass-after-last-release",
+      "elapsedMs": 57860,
+      "jsHeapAfterGcMiB": 9.301651000976562,
+      "nodes": 2828,
+      "listeners": 925,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 938252,
+      "blobsCreated": 12,
+      "blobsRevoked": 8,
+      "maxBlobs": 6,
+      "workersCreated": 3,
+      "workersTerminated": 3,
+      "workersActive": 0,
+      "contextsCreated": 0,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    }
+  ],
+  "cycles": [
+    {
+      "round": 1,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 2,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 3,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 4,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 5,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 6,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 7,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 8,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 9,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 10,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": {
+        "viewport": {
+          "width": 1400,
+          "height": 860
+        },
+        "cacheReplaced": true
+      }
+    },
+    {
+      "round": 11,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 12,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 13,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 14,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 15,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 16,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 17,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 18,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 19,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 20,
+      "targetCanvases": 0,
+      "targetLiveContexts": 0,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "cacheReplaced": true
+      }
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "finalLiquid": {
+    "draws": 0,
+    "copies": 0,
+    "uploads": 0,
+    "maxInstances": 0,
+    "contexts": 0,
+    "liveContexts": 0,
+    "canvases": 0,
+    "mode": "card"
+  },
+  "finishedAt": "2026-09-24T08:00:14.479Z",
+  "elapsedMs": 57862
+}

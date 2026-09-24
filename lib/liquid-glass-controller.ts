@@ -18,7 +18,7 @@ type Surface = {
 // These surfaces intentionally sample a different source (login / page content).
 const excluded = ".login-scene, .navbar-root, .cl-navbar, .modal__dialog";
 
-/** Created only through the liquid-mode dynamic import. */
+/** Loaded ahead of hydration for a saved liquid preference. */
 export function createLiquidGlassController(
   document: Document,
   onUnavailable: () => void,
@@ -133,6 +133,9 @@ export function createLiquidGlassController(
         radius: 0,
         styleDirty: true,
       });
+      // The first render must not wait for IntersectionObserver delivery.
+      // measure() still rejects offscreen and zero-size surfaces.
+      visible.add(layer);
       intersection.observe(layer);
       resize.observe(layer);
     }

@@ -2,6 +2,16 @@
    compositor surfaces through backdrop-filter. Content stays unfiltered. */
 /* Glass defaults come from config/glass.ts via the root layout's CSS variables. */
 
+html {
+  --app-glass-blur: var(--app-glass-standard-blur);
+  --glass-blur-padding: var(--glass-standard-blur-padding);
+}
+
+html[data-glass-mode="liquid"] {
+  --app-glass-blur: var(--app-glass-liquid-blur);
+  --glass-blur-padding: var(--glass-liquid-blur-padding);
+}
+
 .login-scene {
   --app-background: linear-gradient(to bottom right, var(--color-blue-50), var(--color-indigo-50), var(--color-purple-50));
   --glass-background-size: var(--glass-viewport-width) var(--glass-viewport-height);

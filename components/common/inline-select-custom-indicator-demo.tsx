@@ -7,12 +7,14 @@ import { ListBox, Separator } from "@heroui/react";
 import { useEffect, useId, useRef, useState } from "react";
 import { InlineSelect } from "@heroui-pro/react";
 
-import GlassBorder, { GlassWarp } from "@/components/courselearn/glass-border";
 import { setGlassTheme } from "@/lib/glass-wallpaper-cache";
 import { getGlassMode, setGlassMode, useGlassMode } from "@/lib/glass-enhance";
+import {
+  BACKGROUND_THEME_STORAGE_KEY,
+  DEFAULT_BACKGROUND_THEME,
+  getStoredBackgroundTheme,
+} from "@/lib/theme-preferences";
 
-const STORAGE_KEY = "background-theme";
-const DEFAULT_THEME_ID = "magnificent";
 const GLASS_MODES = [
   { value: "card", label: "卡片" },
   { value: "glass", label: "玻璃" },
@@ -21,9 +23,13 @@ const GLASS_MODES = [
 
 function applyBackgroundTheme(themeId: string) {
   // Release liquid resources immediately, including a pending dynamic import.
-  if (themeId !== DEFAULT_THEME_ID && getGlassMode() === "liquid")
+  if (themeId !== DEFAULT_BACKGROUND_THEME && getGlassMode() === "liquid")
     setGlassMode("glass");
-  localStorage.setItem(STORAGE_KEY, themeId);
+  try {
+    localStorage.setItem(BACKGROUND_THEME_STORAGE_KEY, themeId);
+  } catch {
+    // The selected background still applies for this session.
+  }
 
   return setGlassTheme(document, { background: themeId }, () => {
     document.documentElement.setAttribute("data-bg-theme", themeId);
@@ -31,22 +37,25 @@ function applyBackgroundTheme(themeId: string) {
 }
 
 export default function InlineSelectCustomIndicatorDemo() {
-  const [role, setRole] = useState<Key | null>(DEFAULT_THEME_ID);
+  const [role, setRole] = useState<Key | null>(DEFAULT_BACKGROUND_THEME);
   const glassMode = useGlassMode();
   const modeGroupId = useId();
   const cancelTheme = useRef<(() => void) | undefined>(undefined);
 
   useEffect(() => {
-    const storedTheme = localStorage.getItem(STORAGE_KEY) ?? DEFAULT_THEME_ID;
+    const storedTheme = getStoredBackgroundTheme();
 
     setRole(storedTheme);
-    cancelTheme.current = applyBackgroundTheme(storedTheme);
+    // The head script already restored the background before the first paint.
+    // Only apply here as a fallback; mounting a picker must not delay the theme.
+    if (document.documentElement.getAttribute("data-bg-theme") !== storedTheme)
+      cancelTheme.current = applyBackgroundTheme(storedTheme);
 
     return () => cancelTheme.current?.();
   }, []);
 
   const handleThemeChange = (key: Key | null) => {
-    const themeId = String(key ?? DEFAULT_THEME_ID);
+    const themeId = String(key ?? DEFAULT_BACKGROUND_THEME);
 
     setRole(themeId);
     cancelTheme.current?.();
@@ -81,7 +90,9 @@ export default function InlineSelectCustomIndicatorDemo() {
                 <input
                   checked={glassMode === value}
                   className="peer sr-only"
-                  disabled={value === "liquid" && role !== DEFAULT_THEME_ID}
+                  disabled={
+                    value === "liquid" && role !== DEFAULT_BACKGROUND_THEME
+                  }
                   name={modeGroupId}
                   type="radio"
                   value={value}

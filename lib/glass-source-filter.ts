@@ -1,4 +1,8 @@
-import { glassBlurPadding, glassConfig } from "@/config/glass";
+import {
+  getGlassBlurPadding,
+  getGlassBlurPx,
+  glassConfig,
+} from "@/config/glass";
 
 const svgNamespace = "http://www.w3.org/2000/svg";
 let nextFilterId = 0;
@@ -53,9 +57,11 @@ export function createGlassSourceFilter(document: Document) {
     merge.append(node("feMergeNode", { in: `pad-${index}` }));
   }
   filter.prepend(source);
+  const blur = node("feGaussianBlur");
+
   filter.append(
     merge,
-    node("feGaussianBlur", { stdDeviation: String(glassConfig.blurPx) }),
+    blur,
     node("feColorMatrix", {
       type: "saturate",
       values: String(glassConfig.saturation / 100),
@@ -106,15 +112,18 @@ export function createGlassSourceFilter(document: Document) {
     const width = view.innerWidth;
     const height = view.innerHeight;
     const pixel = 1 / view.devicePixelRatio;
-    const viewport = [x, y, width, height, pixel].join(",");
+    const mode = document.documentElement.dataset.glassMode;
+    const blurPx = getGlassBlurPx(mode);
+    const viewport = [x, y, width, height, pixel, blurPx].join(",");
 
     if (viewport === lastViewport) return;
     lastViewport = viewport;
+    blur.setAttribute("stdDeviation", String(blurPx));
 
     // CSS SVG filters do not reliably implement edgeMode="duplicate". Repeat
     // the outermost device pixel explicitly, so blur never samples transparent
     // space outside the viewport. Padding follows the configured blur radius.
-    const pad = glassBlurPadding;
+    const pad = getGlassBlurPadding(mode);
     const patches = [
       [x, y, width, pixel, x, y - pad, width, pad],
       [x, y + height - pixel, width, pixel, x, y + height, width, pad],
@@ -162,8 +171,15 @@ export function createGlassSourceFilter(document: Document) {
   view.addEventListener("scroll", scheduleUpdate, { passive: true });
   view.visualViewport?.addEventListener("resize", scheduleUpdate);
   view.visualViewport?.addEventListener("scroll", scheduleUpdate);
+  const modeObserver = new MutationObserver(scheduleUpdate);
+
+  modeObserver.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-glass-mode"],
+  });
 
   return () => {
+    modeObserver.disconnect();
     view.cancelAnimationFrame(frame);
     view.removeEventListener("resize", scheduleUpdate);
     view.removeEventListener("scroll", scheduleUpdate);

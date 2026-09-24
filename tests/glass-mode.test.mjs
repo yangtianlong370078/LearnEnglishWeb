@@ -17,6 +17,7 @@ function compile(relativePath) {
 }
 
 const source = compile("../lib/glass-enhance.ts");
+const themeSource = compile("../lib/theme-preferences.ts");
 const configuration = {};
 runInNewContext(compile("../config/glass.ts"), { exports: configuration });
 
@@ -34,10 +35,12 @@ function setup({
   const events = [];
   const stores = [];
   const exports = {};
+  const themePreferences = {};
   const environment = {
     exports,
     require(name) {
       if (name === "@/config/glass") return configuration;
+      if (name === "@/lib/theme-preferences") return themePreferences;
       assert.equal(name, "react");
       return {
         useSyncExternalStore(subscribe, getSnapshot, getServerSnapshot) {
@@ -54,6 +57,8 @@ function setup({
         documentElement: {
           getAttribute: (name) => attributes.get(name) ?? null,
           setAttribute: (name, value) => attributes.set(name, value),
+          hasAttribute: (name) => attributes.has(name),
+          removeAttribute: (name) => attributes.delete(name),
           style: {
             setProperty(name, value) {
               writes.push([name, value]);
@@ -93,8 +98,10 @@ function setup({
         },
       },
     });
+    environment.window.localStorage = environment.localStorage;
   }
 
+  runInNewContext(themeSource, { ...environment, exports: themePreferences });
   runInNewContext(source, environment);
   return {
     api: exports,
@@ -175,6 +182,61 @@ test("the image background permits selecting and restoring liquid", () => {
   assert.equal(h.attributes.get("data-glass-mode"), "liquid");
   assert.equal(h.storage.get("glass-mode"), "liquid");
   assert.equal(h.events.at(-1).detail, "liquid");
+});
+
+test("invalid saved backgrounds normalize to the photo theme without disabling liquid", () => {
+  for (const background of ["obsolete", ""]) {
+    const h = setup({
+      stored: { "background-theme": background, "glass-mode": "liquid" },
+    });
+    h.attributes.set("data-bg-theme", "magnificent");
+    h.attributes.set("data-glass-mode", "liquid");
+    assert.equal(h.api.getGlassMode(), "liquid");
+    h.api.setGlassMode(h.api.getGlassMode());
+    assert.equal(h.attributes.get("data-glass-mode"), "liquid");
+    assert.equal(h.storage.get("glass-mode"), "liquid");
+    assert.equal(h.events.at(-1).detail, "liquid");
+  }
+});
+
+test("restoring liquid does not hide content while the renderer starts", () => {
+  const h = setup({ stored: { "glass-mode": "liquid" } });
+  h.attributes.set("data-glass-mode", "liquid");
+  h.api.setGlassMode(h.api.getGlassMode());
+  assert.equal(h.attributes.has("data-liquid-glass-pending"), false);
+  assert.equal(h.attributes.get("data-glass-mode"), "liquid");
+});
+
+test("leaving liquid publishes the applied replacement mode despite blocked storage", () => {
+  for (const mode of ["glass", "card"]) {
+    for (const writeThrows of [false, true]) {
+      const h = setup({ stored: { "glass-mode": "liquid" }, writeThrows });
+      h.attributes.set("data-glass-mode", "liquid");
+      h.api.useGlassMode();
+      const [store] = h.stores;
+      const observed = [];
+      store.subscribe(() =>
+        observed.push([
+          store.getSnapshot(),
+          h.attributes.get("data-glass-mode"),
+        ]),
+      );
+      h.api.setGlassMode(mode);
+      assert.deepEqual(observed, [[mode, mode]]);
+      assert.equal(h.attributes.get("data-glass-mode"), mode);
+      assert.equal(h.events.at(-1).detail, mode);
+    }
+  }
+});
+
+test("an incompatible background applies and publishes glass when liquid falls back", () => {
+  const h = setup({
+    stored: { "background-theme": "defalut", "glass-mode": "liquid" },
+  });
+  h.attributes.set("data-glass-mode", "liquid");
+  h.api.setGlassMode("liquid");
+  assert.equal(h.attributes.get("data-glass-mode"), "glass");
+  assert.equal(h.events.at(-1).detail, "glass");
 });
 
 test("the selected background takes precedence while the applied background is catching up", () => {
@@ -346,6 +408,37 @@ test("blocked localStorage writes keep the session state and fallback functional
   assert.equal(h.api.getGlassMode(), "card");
   assert.equal(h.api.getGlassEnhance(), false);
   assert.equal(h.events.at(-1).detail, "card");
+});
+
+test("automatic fallback and runtime remount preserve liquid while explicit user choices persist", () => {
+  const stored = { "glass-mode": "liquid", "glass-enhance": "on" };
+  for (const remount of [false, true]) {
+    const h = setup({ stored });
+    h.attributes.set("data-glass-mode", "liquid");
+    h.api.setGlassMode("glass", { persist: false });
+    if (remount) {
+      // Reinitializing an already-failed renderer must retain the session fallback.
+      h.api.setGlassMode(h.api.getGlassMode(), { persist: false });
+    }
+    assert.equal(h.api.getGlassMode(), "glass");
+    assert.equal(h.attributes.has("data-liquid-glass-pending"), false);
+    assert.equal(h.events.at(-1).detail, "glass");
+    assert.deepEqual(Object.fromEntries(h.storage), stored);
+    assert.equal(
+      setup({ stored: Object.fromEntries(h.storage) }).api.getGlassMode(),
+      "liquid",
+      "a new session retries the user's saved liquid preference",
+    );
+
+    h.api.setGlassMode("card");
+    assert.equal(h.storage.get("glass-mode"), "card");
+    assert.equal(h.storage.get("glass-enhance"), "off");
+    assert.equal(
+      setup({ stored: Object.fromEntries(h.storage) }).api.getGlassMode(),
+      "card",
+      "an explicit user choice replaces the saved preference",
+    );
+  }
 });
 
 test("the legacy setters still select the corresponding card and glass modes", () => {

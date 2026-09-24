@@ -8,6 +8,7 @@ import { siteConfig } from "@/config/site";
 import { fontSans } from "@/config/fonts";
 import { glassCssVariables } from "@/config/glass";
 import ConditionalLayout from "@/components/conditional-layout";
+import { DEFAULT_THEME, themeBootstrapScript } from "@/lib/theme-preferences";
 
 export const metadata: Metadata = {
   title: {
@@ -34,7 +35,13 @@ export default function RootLayout({
 }) {
   return (
     <html suppressHydrationWarning lang="zh-CN" style={glassCssVariables}>
-      <head />
+      <head>
+        {/* This must execute while parsing HTML, before any page content paints. */}
+        <script
+          dangerouslySetInnerHTML={{ __html: themeBootstrapScript }}
+          id="theme-bootstrap"
+        />
+      </head>
       <body
         suppressHydrationWarning
         className={clsx(
@@ -45,7 +52,7 @@ export default function RootLayout({
         <Providers
           themeProps={{
             attribute: "class",
-            defaultTheme: "system",
+            defaultTheme: DEFAULT_THEME,
             enableSystem: true,
           }}
         >

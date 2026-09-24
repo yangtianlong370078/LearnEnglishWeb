@@ -2,7 +2,7 @@
 import { subscribeGlassSurfaceChanges } from "./glass-surface-source";
 import { cancelGlassFrame, scheduleGlassFrame } from "./glass-frame";
 
-import { glassBlurPadding } from "@/config/glass";
+import { getGlassBlurPadding } from "@/config/glass";
 
 /** Filter only content currently crossing the sticky header. */
 export function registerGlassNavigation(nav: HTMLElement) {
@@ -60,6 +60,9 @@ export function registerGlassNavigation(nav: HTMLElement) {
     const header = nav.getBoundingClientRect();
     const active = view.scrollY > 0;
     const modal = document.body.hasAttribute("data-glass-modal-open");
+    const blurPadding = getGlassBlurPadding(
+      document.documentElement.dataset.glassMode,
+    );
     const candidates: { host: HTMLElement; bounds: DOMRect }[] = [];
 
     if (active && !modal) {
@@ -70,8 +73,8 @@ export function registerGlassNavigation(nav: HTMLElement) {
         const bounds = host.getBoundingClientRect();
 
         if (
-          bounds.top < header.bottom + glassBlurPadding &&
-          bounds.bottom > header.top - glassBlurPadding
+          bounds.top < header.bottom + blurPadding &&
+          bounds.bottom > header.top - blurPadding
         )
           candidates.push({ host, bounds });
       }
@@ -165,6 +168,10 @@ export function registerGlassNavigation(nav: HTMLElement) {
   overlays.observe(document.body, {
     attributes: true,
     attributeFilter: ["data-glass-modal-open"],
+  });
+  overlays.observe(document.documentElement, {
+    attributes: true,
+    attributeFilter: ["data-glass-mode"],
   });
   view.addEventListener("scroll", schedule, { passive: true });
   view.addEventListener("resize", schedule);

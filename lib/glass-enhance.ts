@@ -3,6 +3,10 @@
 import { useSyncExternalStore } from "react";
 
 import { glassConfig } from "@/config/glass";
+import {
+  BACKGROUND_THEME_STORAGE_KEY,
+  getStoredBackgroundTheme,
+} from "@/lib/theme-preferences";
 
 const LEGACY_STORAGE_KEY = "glass-enhance";
 const STORAGE_KEY = "glass-mode";
@@ -21,7 +25,8 @@ function allowedGlassMode(mode: GlassMode): GlassMode {
 
   try {
     // The selection is saved before the matching wallpaper finishes loading.
-    background = localStorage.getItem("background-theme") ?? background;
+    if (localStorage.getItem(BACKGROUND_THEME_STORAGE_KEY) !== null)
+      background = getStoredBackgroundTheme();
   } catch {
     // Use the applied theme when persistent storage is unavailable.
   }
@@ -84,17 +89,22 @@ export function getGlassMode(): GlassMode {
   }
 }
 
-export function setGlassMode(mode: GlassMode) {
+export function setGlassMode(
+  mode: GlassMode,
+  { persist = true }: { persist?: boolean } = {},
+) {
   mode = allowedGlassMode(mode);
   const root = document.documentElement;
   const enabled = mode !== "card";
   const enhance = enabled ? "on" : "off";
 
-  try {
-    localStorage.setItem(STORAGE_KEY, mode);
-    localStorage.setItem(LEGACY_STORAGE_KEY, enhance);
-  } catch {
-    // The current session still works when persistent storage is unavailable.
+  if (persist) {
+    try {
+      localStorage.setItem(STORAGE_KEY, mode);
+      localStorage.setItem(LEGACY_STORAGE_KEY, enhance);
+    } catch {
+      // The current session still works when persistent storage is unavailable.
+    }
   }
 
   root.setAttribute("data-glass-mode", mode);

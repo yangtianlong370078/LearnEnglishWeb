@@ -5,6 +5,12 @@ import { Toast } from "@heroui/react";
 
 import { setGlassTheme } from "@/lib/glass-wallpaper-cache";
 import LiquidGlassRuntime from "@/components/common/liquid-glass-runtime";
+import {
+  DEFAULT_THEME,
+  getStoredTheme,
+  THEME_STORAGE_KEY,
+  type Theme,
+} from "@/lib/theme-preferences";
 
 export interface ProvidersProps {
   children: React.ReactNode;
@@ -15,7 +21,6 @@ export interface ProvidersProps {
   };
 }
 
-type Theme = "light" | "dark" | "system";
 type ResolvedTheme = "light" | "dark";
 
 interface ThemeContextValue {
@@ -24,7 +29,6 @@ interface ThemeContextValue {
   setTheme: React.Dispatch<React.SetStateAction<Theme>>;
 }
 
-const STORAGE_KEY = "theme";
 const ThemeContext = React.createContext<ThemeContextValue | null>(null);
 
 function getSystemTheme(): ResolvedTheme {
@@ -35,16 +39,6 @@ function getSystemTheme(): ResolvedTheme {
     : "light";
 }
 
-function getStoredTheme(defaultTheme: Theme): Theme {
-  if (typeof window === "undefined") return defaultTheme;
-
-  const stored = localStorage.getItem(STORAGE_KEY);
-
-  return stored === "light" || stored === "dark" || stored === "system"
-    ? stored
-    : defaultTheme;
-}
-
 function applyTheme(resolved: ResolvedTheme) {
   return setGlassTheme(document, { dark: resolved === "dark" }, () => {
     document.documentElement.classList.toggle("dark", resolved === "dark");
@@ -53,7 +47,7 @@ function applyTheme(resolved: ResolvedTheme) {
 }
 
 export function Providers({ children, themeProps }: ProvidersProps) {
-  const defaultTheme = themeProps?.defaultTheme ?? "system";
+  const defaultTheme = themeProps?.defaultTheme ?? DEFAULT_THEME;
   const enableSystem = themeProps?.enableSystem ?? true;
   const [theme, setThemeState] = React.useState<Theme>(() =>
     getStoredTheme(defaultTheme),
@@ -204,7 +198,11 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   }, []);
 
   React.useEffect(() => {
-    localStorage.setItem(STORAGE_KEY, theme);
+    try {
+      localStorage.setItem(THEME_STORAGE_KEY, theme);
+    } catch {
+      // Keep theme switching functional when persistent storage is unavailable.
+    }
 
     return applyTheme(resolvedTheme);
   }, [resolvedTheme, theme]);

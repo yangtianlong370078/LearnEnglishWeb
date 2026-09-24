@@ -1,0 +1,564 @@
+{
+  "startedAt": "2026-09-24T07:55:25.146Z",
+  "baseURL": "http://127.0.0.1:8094",
+  "browser": "153.0.8010.53",
+  "profile": {
+    "name": "desktop",
+    "viewport": {
+      "width": 1440,
+      "height": 900
+    },
+    "dpr": 1,
+    "mobile": false
+  },
+  "rounds": 40,
+  "methodology": "One page, fictional courselearn data,40 glass→liquid→glass cycles (80 switches),8 rAF scroll steps per liquid visit,viewport changes at10/20/30,GC only at like-for-like glass checkpoints. DOM/JS heap excludes GPU/decoded bitmap memory. Test-owned historical WebGL strong references cleared after checking each mode exit; active blob map stores metadata only. This checks short-run reuse/release, not long-term leaks, physical mobile battery, or hours of usage.",
+  "checkpoints": [
+    {
+      "label": "initial-glass",
+      "elapsedMs": 3013,
+      "jsHeapAfterGcMiB": 6.689964294433594,
+      "nodes": 1189,
+      "listeners": 469,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 938433,
+      "blobsCreated": 4,
+      "blobsRevoked": 0,
+      "maxBlobs": 4,
+      "workersCreated": 1,
+      "workersTerminated": 1,
+      "workersActive": 0,
+      "contextsCreated": 0,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "warmed-glass-baseline",
+      "elapsedMs": 5402,
+      "jsHeapAfterGcMiB": 7.860599517822266,
+      "nodes": 1274,
+      "listeners": 631,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 938433,
+      "blobsCreated": 4,
+      "blobsRevoked": 0,
+      "maxBlobs": 4,
+      "workersCreated": 1,
+      "workersTerminated": 1,
+      "workersActive": 0,
+      "contextsCreated": 1,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "after-10-cycles-glass",
+      "elapsedMs": 31778,
+      "jsHeapAfterGcMiB": 8.964813232421875,
+      "nodes": 2014,
+      "listeners": 771,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 879605,
+      "blobsCreated": 8,
+      "blobsRevoked": 4,
+      "maxBlobs": 6,
+      "workersCreated": 2,
+      "workersTerminated": 2,
+      "workersActive": 0,
+      "contextsCreated": 11,
+      "viewport": {
+        "width": 1400,
+        "height": 860
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "after-20-cycles-glass",
+      "elapsedMs": 58519,
+      "jsHeapAfterGcMiB": 9.40438461303711,
+      "nodes": 2754,
+      "listeners": 911,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 938537,
+      "blobsCreated": 12,
+      "blobsRevoked": 8,
+      "maxBlobs": 6,
+      "workersCreated": 3,
+      "workersTerminated": 3,
+      "workersActive": 0,
+      "contextsCreated": 21,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "after-30-cycles-glass",
+      "elapsedMs": 84724,
+      "jsHeapAfterGcMiB": 9.823028564453125,
+      "nodes": 3494,
+      "listeners": 1051,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 879541,
+      "blobsCreated": 16,
+      "blobsRevoked": 12,
+      "maxBlobs": 6,
+      "workersCreated": 4,
+      "workersTerminated": 4,
+      "workersActive": 0,
+      "contextsCreated": 31,
+      "viewport": {
+        "width": 1400,
+        "height": 860
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "after-40-cycles-glass",
+      "elapsedMs": 111103,
+      "jsHeapAfterGcMiB": 10.12630844116211,
+      "nodes": 4234,
+      "listeners": 1191,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 879541,
+      "blobsCreated": 16,
+      "blobsRevoked": 12,
+      "maxBlobs": 6,
+      "workersCreated": 4,
+      "workersTerminated": 4,
+      "workersActive": 0,
+      "contextsCreated": 41,
+      "viewport": {
+        "width": 1400,
+        "height": 860
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "restored-viewport-glass",
+      "elapsedMs": 112162,
+      "jsHeapAfterGcMiB": 10.119319915771484,
+      "nodes": 4234,
+      "listeners": 1190,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 840144,
+      "blobsCreated": 18,
+      "blobsRevoked": 14,
+      "maxBlobs": 6,
+      "workersCreated": 4,
+      "workersTerminated": 4,
+      "workersActive": 0,
+      "contextsCreated": 41,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    },
+    {
+      "label": "final-glass-after-last-release",
+      "elapsedMs": 114633,
+      "jsHeapAfterGcMiB": 10.149864196777344,
+      "nodes": 4308,
+      "listeners": 1205,
+      "mode": "glass",
+      "wallpaperReady": true,
+      "blobCount": 4,
+      "blobEncodedBytes": 938031,
+      "blobsCreated": 20,
+      "blobsRevoked": 16,
+      "maxBlobs": 6,
+      "workersCreated": 5,
+      "workersTerminated": 5,
+      "workersActive": 0,
+      "contextsCreated": 42,
+      "viewport": {
+        "width": 1440,
+        "height": 900
+      },
+      "canvases": 0,
+      "liveContexts": 0
+    }
+  ],
+  "cycles": [
+    {
+      "round": 1,
+      "liquidCanvases": 10,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 2,
+      "liquidCanvases": 10,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 3,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 4,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 5,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 6,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 7,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 8,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 9,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 10,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": {
+        "viewport": {
+          "width": 1400,
+          "height": 860
+        },
+        "cacheReplaced": true
+      }
+    },
+    {
+      "round": 11,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 12,
+      "liquidCanvases": 10,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 13,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 14,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 15,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 16,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 17,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 18,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 19,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 20,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": {
+        "viewport": {
+          "width": 1440,
+          "height": 900
+        },
+        "cacheReplaced": true
+      }
+    },
+    {
+      "round": 21,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 22,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 23,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 24,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 25,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 26,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 27,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 28,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 29,
+      "liquidCanvases": 10,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 30,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": {
+        "viewport": {
+          "width": 1400,
+          "height": 860
+        },
+        "cacheReplaced": true
+      }
+    },
+    {
+      "round": 31,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 32,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 33,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 34,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 35,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 36,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 37,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 38,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 39,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    },
+    {
+      "round": 40,
+      "liquidCanvases": 11,
+      "liquidLiveContexts": 1,
+      "glassCanvases": 0,
+      "glassLiveContexts": 0,
+      "resize": null
+    }
+  ],
+  "errors": [],
+  "passed": true,
+  "finalLiquid": {
+    "draws": 330,
+    "copies": 3430,
+    "uploads": 45,
+    "maxInstances": 13,
+    "contexts": 1,
+    "liveContexts": 1,
+    "canvases": 11,
+    "mode": "liquid"
+  },
+  "finishedAt": "2026-09-24T07:57:19.781Z",
+  "elapsedMs": 114635
+}

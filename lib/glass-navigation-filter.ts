@@ -1,4 +1,8 @@
-import { glassBlurPadding, glassConfig } from "@/config/glass";
+import {
+  getGlassBlurPadding,
+  getGlassBlurPx,
+  glassConfig,
+} from "@/config/glass";
 
 let sequence = 0;
 
@@ -47,13 +51,17 @@ export function createGlassNavigationFilter(host: HTMLElement) {
     node("feMergeNode", { in: "sharp" }),
     node("feMergeNode", { in: "strip-output" }),
   );
+  const blur = node("feGaussianBlur", {
+    in: "strip-input",
+    stdDeviation: String(
+      getGlassBlurPx(document.documentElement.dataset.glassMode),
+    ),
+    result: "blur",
+  });
+
   filter.append(
     input,
-    node("feGaussianBlur", {
-      in: "strip-input",
-      stdDeviation: String(glassConfig.blurPx),
-      result: "blur",
-    }),
+    blur,
     node("feColorMatrix", {
       in: "blur",
       type: "saturate",
@@ -90,17 +98,22 @@ export function createGlassNavigationFilter(host: HTMLElement) {
   let previousHeight = NaN;
   let previousHeaderHeight = NaN;
   let previousY = NaN;
+  let previousBlurPx = NaN;
 
   return {
     update(bounds: DOMRect, header: DOMRect) {
       const y = header.top - bounds.top;
-      const pad = glassBlurPadding;
+      const mode = document.documentElement.dataset.glassMode;
+      const blurPx = getGlassBlurPx(mode);
+      const pad = getGlassBlurPadding(mode);
 
       if (
         bounds.width !== previousWidth ||
         bounds.height !== previousHeight ||
-        header.height !== previousHeaderHeight
+        header.height !== previousHeaderHeight ||
+        blurPx !== previousBlurPx
       ) {
+        blur.setAttribute("stdDeviation", String(blurPx));
         rect(
           filter,
           -pad,
@@ -120,6 +133,7 @@ export function createGlassNavigationFilter(host: HTMLElement) {
         previousWidth = bounds.width;
         previousHeight = bounds.height;
         previousHeaderHeight = header.height;
+        previousBlurPx = blurPx;
       } else if (y !== previousY) {
         // Ordinary scrolling changes only the strip's vertical coordinate.
         // Keep invariant dimensions in JS instead of reading SVG attributes.
