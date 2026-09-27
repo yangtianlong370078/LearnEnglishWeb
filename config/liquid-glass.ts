@@ -9,7 +9,7 @@ export const liquidGlassConfig = {
    * refractionPx: 14,  扭曲的强度
    */
   edgeInsetPx: 1,
-  refractionPx: 38,
+  refractionPx: 30,
   /**
    * 边缘扭曲轮廓（复刻 iOS 液态玻璃）：最外缘位移为 0、与背景无缝衔接，
    * 进入边缘后迅速增强，在 bendPeak 处达到 refractionPx 的峰值后向内侧平滑归零。
