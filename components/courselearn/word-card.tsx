@@ -605,45 +605,81 @@ function WordCardInner(
       {/* Keep the same blur layer mounted when the answer tint changes. */}
       <ConfettiBurst fireKey={confettiKey} />
 
-      <span
-        aria-hidden="true"
-        className={`pointer-events-none absolute !absolute !-left-[10px] !-top-[10px] ${resultState !== "idle" ? "cl-result-badge" : ""}  ${resultState === "correct" ? "is-correct" : "is-wrong"}  `}
-      >
-
-        {resultState !== "idle" && (
-          <svg fill="none" viewBox="0 0 24 24">
-            {resultState === "correct" ? (
-              <path
-                d="M5 12.5l4.5 4.5L19 7.5"
-                stroke="currentColor"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2.8"
-              />
-            ) : (
-              <>
-                <path
-                  d="M7.5 7.5l9 9"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeWidth="2.8"
-                />
-                <path
-                  className="cl-badge-cross-2"
-                  d="M16.5 7.5l-9 9"
-                  stroke="currentColor"
-                  strokeLinecap="round"
-                  strokeWidth="2.8"
-                />
-              </>
-            )}
-          </svg>
-        )}
-
+      {/* 悬浮字标：沿用原有弹入与勾叉描线动画，不占用卡片内容空间。 */}
+      <span aria-atomic="true" className="sr-only" role="status">
+        {resultState === "correct"
+          ? "回答正确"
+          : resultState === "wrong"
+            ? "回答错误"
+            : ""}
       </span>
-
-      {/* 校验结果角标：左上徽章（对勾 / 叉号描边绘制动画），避开右上角的翻译/练习按钮 */}
-      {/* 内容层需 relative z-[1]：absolute 定位的 warp 玻璃层会盖住 static 内容 */}
+      {resultState !== "idle" && (
+        <span
+          aria-hidden="true"
+          className={`cl-result-badge ${resultState === "correct" ? "is-correct" : "is-wrong"}`}
+        >
+          <svg
+            className="cl-result-badge-surface"
+            fill="none"
+            focusable="false"
+            height="48"
+            viewBox="0 0 136 48"
+            width="136"
+          >
+            {/* 外框、文字基线与勾叉共用 SVG 旋转，保持角度一致并直接矢量绘制。 */}
+            <g transform="rotate(-4.3 68 24)">
+              <path
+                className="cl-result-badge-depth"
+                d="M2 10H122L134 22V42H12L2 32Z"
+              />
+              <path
+                className="cl-result-badge-face"
+                d="M2 8H122L134 20V40H12L2 30Z"
+                strokeLinejoin="round"
+                strokeWidth="1"
+              />
+              <text className="cl-result-badge-word" x="12" y="32">
+                {resultState === "correct" ? "Nice." : "Oops."}
+              </text>
+              <svg
+                className="cl-result-badge-icon"
+                fill="none"
+                height="24"
+                viewBox="0 0 24 24"
+                width="24"
+                x="100"
+                y="12"
+              >
+                {resultState === "correct" ? (
+                  <path
+                    d="M5 12.5l4.5 4.5L19 7.5"
+                    stroke="currentColor"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth="2.8"
+                  />
+                ) : (
+                  <>
+                    <path
+                      d="M7.5 7.5l9 9"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeWidth="2.8"
+                    />
+                    <path
+                      className="cl-badge-cross-2"
+                      d="M16.5 7.5l-9 9"
+                      stroke="currentColor"
+                      strokeLinecap="round"
+                      strokeWidth="2.8"
+                    />
+                  </>
+                )}
+              </svg>
+            </g>
+          </svg>
+        </span>
+      )}
 
       {/* 内容层需 relative z-[1]：absolute 定位的 warp 玻璃层会盖住 static 内容 */}
       <div className={`rounded-3xl relative z-[1] overflow-hidden  ${cardStateClass} `}>

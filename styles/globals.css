@@ -680,7 +680,7 @@ background-image: linear-gradient(145deg, oklch(0.65 0.19 32 / 0.24) 0%, oklch(0
 }
 
 
-/* ── 校验结果角标：右上圆形徽章 ── */
+/* ── 校验结果字标：切角浮签，保留原有弹入与描线动画 ── */
 
 /* 弹性入场：从缩放过冲到回弹定格，带轻微旋转  */
 @keyframes cl-badge-pop {
@@ -716,96 +716,65 @@ background-image: linear-gradient(145deg, oklch(0.65 0.19 32 / 0.24) 0%, oklch(0
 }
 
 .cl-result-badge {
+  --cl-badge-accent: var(--success, #16a34a);
+  --cl-badge-ink: color-mix(in srgb, var(--cl-badge-accent) 32%, #10251c);
+  --cl-badge-paper: color-mix(in srgb, var(--cl-badge-accent) 28%, #fff);
   position: absolute;
-  top: -11px;
-  left: -11px;
+  top: -16px;
+  left: 12px;
   z-index: 30;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 34px;
-  height: 34px;
-  border-radius: 9999px;
-  color: #fff;
+  width: 136px;
+  height: 48px;
+  color: var(--cl-badge-ink);
   pointer-events: none;
-  animation: cl-badge-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) both;
-  will-change: transform, opacity;
+  user-select: none;
+  /* 入场结束后恢复原生文字/矢量绘制，不保留缩放合成层。 */
+  animation: cl-badge-pop 0.55s cubic-bezier(0.34, 1.56, 0.64, 1) backwards;
 }
 
-/* 玻璃高光：左上径向提亮，营造通透的釉质感 */
-.cl-result-badge::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  background: radial-gradient(
-    130% 95% at 30% 12%,
-    rgb(255 255 255 / 0.5),
-    rgb(255 255 255 / 0.08) 48%,
-    transparent 65%
-  );
+/* SVG 内部统一旋转外框与文字，避免分别倾斜造成基线不一致。 */
+.cl-result-badge-surface {
+  display: block;
+  width: 136px;
+  height: 48px;
 }
 
-/* 底部内阴影：增加立体厚度 */
-.cl-result-badge::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: inherit;
-  box-shadow: inset 0 -3px 6px rgb(0 0 0 / 0.14);
+.cl-result-badge-depth {
+  fill: var(--cl-badge-ink);
 }
 
-.cl-result-badge.is-correct {
-  background: linear-gradient(
-    140deg,
-    #5eead4 -20%,
-    #4ade80 15%,
-    var(--success, #16a34a) 62%,
-    #15803d 100%
-  );
-  box-shadow:
-    0 0 0 2.5px rgb(255 255 255 / 0.65),
-    0 6px 20px -4px color-mix(in srgb, var(--success, #16a34a) 75%, transparent),
-    0 2px 6px rgb(0 0 0 / 0.14);
+.cl-result-badge-face {
+  fill: var(--cl-badge-paper);
+  stroke: color-mix(in srgb, var(--cl-badge-ink) 24%, var(--cl-badge-paper));
+}
+
+.cl-result-badge-word {
+  fill: currentColor;
+  font-family: "Segoe UI Black", "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+  font-size: 30px;
+  font-style: italic;
+  font-synthesis: none;
+  font-weight: 900;
+  letter-spacing: -1.5px;
 }
 
 .cl-result-badge.is-wrong {
-  background: linear-gradient(
-    140deg,
-    #fda4af -20%,
-    #fb7185 15%,
-    var(--danger, #dc2626) 62%,
-    #b91c1c 100%
-  );
-  box-shadow:
-    0 0 0 2.5px rgb(255 255 255 / 0.65),
-    0 6px 20px -4px color-mix(in srgb, var(--danger, #dc2626) 75%, transparent),
-    0 2px 6px rgb(0 0 0 / 0.14);
+  --cl-badge-accent: var(--danger, #dc2626);
+  --cl-badge-ink: color-mix(in srgb, var(--cl-badge-accent) 32%, #391a24);
 }
 
-.dark .cl-result-badge.is-correct,
-.dark .cl-result-badge.is-wrong {
-  box-shadow:
-    0 0 0 2.5px rgb(255 255 255 / 0.28),
-    0 6px 20px -4px rgb(0 0 0 / 0.45),
-    0 2px 6px rgb(0 0 0 / 0.3);
+.dark .cl-result-badge {
+  --cl-badge-paper: color-mix(in srgb, var(--cl-badge-accent) 48%, #fff);
 }
 
-.cl-result-badge svg {
-  position: relative;
-  width: 17px;
-  height: 17px;
-  filter: drop-shadow(0 1px 1.5px rgb(0 0 0 / 0.22));
-}
-
-.cl-result-badge path {
+.cl-result-badge-icon path {
   stroke-dasharray: 28;
   stroke-dashoffset: 28;
   animation: cl-badge-draw 0.32s 0.2s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
 /* 叉号第二笔稍后出现，形成连续书写感 */
-.cl-result-badge path.cl-badge-cross-2 {
+.cl-result-badge-icon path.cl-badge-cross-2 {
   animation-delay: 0.34s;
 }
 
