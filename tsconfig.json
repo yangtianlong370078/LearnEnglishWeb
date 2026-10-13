@@ -24,6 +24,9 @@
       }
     ],
     "paths": {
+      "@heroui-pro/react": [
+        "./config/heroui-pro.ts"
+      ],
       "@/*": [
         "./*"
       ]
