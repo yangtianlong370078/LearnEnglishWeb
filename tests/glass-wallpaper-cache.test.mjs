@@ -157,6 +157,12 @@ function setup({
             return workerSupported ? createWorker() : undefined;
           },
         };
+      if (name === "./theme-preferences")
+        return {
+          getStoredWallpaperName: (mode) =>
+            mode === "dark" ? "bg01_dark.jpeg" : "bg01_light.jpeg",
+          getWallpaperUrl: (mode, file) => `/images/${mode}/${file}`,
+        };
       assert.equal(name, "@/config/glass");
       return config;
     },

@@ -1,4 +1,5 @@
 import { createGlassWallpaperWorker } from "./glass-wallpaper-worker";
+import { getStoredWallpaperName, getWallpaperUrl } from "./theme-preferences";
 
 import {
   getGlassBlurPadding,
@@ -156,6 +157,7 @@ export function createGlassWallpaperCache(document: Document) {
     scale: number,
     dark: boolean,
     photo: boolean,
+    wallpaper: string,
     blurPx: number,
     blurPadding: number,
     job: Job,
@@ -163,9 +165,7 @@ export function createGlassWallpaperCache(document: Document) {
     // Do not allocate full-size drawing buffers while a photo is loading, and
     // do not start convolution if a newer request has superseded this one.
     const image = photo
-      ? await loadImage(
-          `/images/${dark ? "dark/bg01_dark" : "light/bg01_light"}.jpeg`,
-        )
+      ? await loadImage(getWallpaperUrl(dark ? "dark" : "light", wallpaper))
       : undefined;
 
     if (disposed || job.cancelled) return;
@@ -366,11 +366,24 @@ export function createGlassWallpaperCache(document: Document) {
       background = change.background ?? background;
     }
     const photo = background === "magnificent";
+    const wallpaper = getStoredWallpaperName(dark ? "dark" : "light");
     const blurPx = getGlassBlurPx(mode);
     const blurPadding = getGlassBlurPadding(mode);
-    const key = [width, height, scale, dark, photo, blurPx].join(",");
+    const key = [width, height, scale, dark, photo, wallpaper, blurPx].join(
+      ",",
+    );
 
-    return { width, height, scale, dark, photo, blurPx, blurPadding, key };
+    return {
+      width,
+      height,
+      scale,
+      dark,
+      photo,
+      wallpaper,
+      blurPx,
+      blurPadding,
+      key,
+    };
   }
 
   function cancelPreparation(keepKey?: string) {
@@ -419,7 +432,10 @@ export function createGlassWallpaperCache(document: Document) {
         try {
           const image = target.photo
             ? await loadImage(
-                `/images/${target.dark ? "dark/bg01_dark" : "light/bg01_light"}.jpeg`,
+                getWallpaperUrl(
+                  target.dark ? "dark" : "light",
+                  target.wallpaper,
+                ),
               )
             : undefined;
 
@@ -466,6 +482,7 @@ export function createGlassWallpaperCache(document: Document) {
       target.scale,
       target.dark,
       target.photo,
+      target.wallpaper,
       target.blurPx,
       target.blurPadding,
       job,
@@ -633,7 +650,13 @@ export function createGlassWallpaperCache(document: Document) {
 
   observer.observe(root, {
     attributes: true,
-    attributeFilter: ["class", "data-bg-theme", "data-glass-mode"],
+    attributeFilter: [
+      "class",
+      "data-bg-theme",
+      "data-glass-mode",
+      "data-wallpaper-light",
+      "data-wallpaper-dark",
+    ],
   });
   view.addEventListener("resize", resize);
   update();

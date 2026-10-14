@@ -5,6 +5,7 @@ const PUBLIC_PATHS = [
   "/login",
   "/_next",
   "/favicon.ico",
+  "/images", // 公开静态资源；next/image 优化器的内部请求不带登录 cookie
   "/api", // 接口代理请求不拦截
 ];
 
