@@ -7,6 +7,13 @@ const controllers = new WeakMap<
 >();
 const surfaceListeners = new WeakMap<Document, Set<() => void>>();
 
+/** Layer refs commit only after their host has hydrated, including Suspense.
+ * Imperative layout work must not touch other server-rendered hosts yet.
+ */
+export function getRegisteredGlassHosts(document: Document): HTMLElement[] {
+  return controllers.get(document)?.getHosts() ?? [];
+}
+
 /** Notify navigation when React replaces surfaces without changing layout. */
 export function subscribeGlassSurfaceChanges(
   document: Document,
@@ -109,7 +116,7 @@ function createController(document: Document) {
   layoutShift.observe(document.body);
 
   function measure() {
-    const width = document.documentElement.clientWidth;
+    const width = view.innerWidth;
     const height = view.innerHeight;
     const radii = Array.from(pendingBorders, (layer) => {
       const styles = view.getComputedStyle(layer);
@@ -161,6 +168,9 @@ function createController(document: Document) {
   view.addEventListener("resize", resizeViewport);
 
   return {
+    getHosts() {
+      return Array.from(surfaces.keys());
+    },
     add(layer: HTMLElement) {
       const host = layer.parentElement!;
       let surface = surfaces.get(host);

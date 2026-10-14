@@ -194,7 +194,7 @@ export function createLiquidGlassController(
     if (hostsDirty) collect();
     const start = view.performance.now();
     const viewport = {
-      width: root.clientWidth,
+      width: view.innerWidth,
       height: view.innerHeight,
       dpr: view.devicePixelRatio,
     };

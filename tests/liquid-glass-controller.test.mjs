@@ -95,6 +95,7 @@ async function setup() {
   const layers = [new Element(), new Element()];
   layers[1].bounds = { x: 180, y: 30, width: 150, height: 110 };
   const view = {
+    innerWidth: 400,
     innerHeight: 600,
     devicePixelRatio: 1,
     performance: { now: () => ++clock },
@@ -299,6 +300,16 @@ test("scroll reuses the static texture and skips copies for unchanged fixed card
     1,
     "New source repaints the fixed card too",
   );
+  h.dispose();
+});
+
+test("scrollbar width changes reuse the same liquid wallpaper viewport", async () => {
+  const h = await setup();
+  const draws = h.renderer.draws;
+  h.root.clientWidth = 385;
+  h.scroll();
+  assert.equal(h.renderer.draws, draws);
+  assert.equal(h.renderer.uploads, 1);
   h.dispose();
 });
 

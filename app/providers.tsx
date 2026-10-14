@@ -4,6 +4,10 @@ import * as React from "react";
 import { Toast } from "@heroui/react";
 
 import { setGlassTheme } from "@/lib/glass-wallpaper-cache";
+import {
+  getRegisteredGlassHosts,
+  subscribeGlassSurfaceChanges,
+} from "@/lib/glass-surface-source";
 import LiquidGlassRuntime from "@/components/common/liquid-glass-runtime";
 import {
   DEFAULT_THEME,
@@ -76,7 +80,9 @@ export function Providers({ children, themeProps }: ProvidersProps) {
   //   重新收敛；补偿未改变 border-box（stretch 非主导项）时回退并锁定
   React.useEffect(() => {
     const list = () =>
-      Array.from(document.querySelectorAll<HTMLElement>(".yinyinkuan"));
+      getRegisteredGlassHosts(document).filter((host) =>
+        host.classList.contains("yinyinkuan"),
+      );
 
     // 每个元素当前已补偿的 padding-bottom / 高度锁定值
     const appliedPb = new WeakMap<HTMLElement, number>();
@@ -173,6 +179,14 @@ export function Providers({ children, themeProps }: ProvidersProps) {
 
     observeAll();
 
+    // Hydrating a Suspense boundary attaches refs without inserting new DOM.
+    // Its cards become eligible only now, even if the provider mounted earlier.
+    const unsubscribeSurfaces = subscribeGlassSurfaceChanges(document, () => {
+      observeAll();
+      scheduleWidths();
+      scheduleHeights();
+    });
+
     // 新挂载的卡片：补充观察并重新取整
     const mutationObserver = new MutationObserver((records) => {
       // Absolute liquid-glass canvases do not affect card dimensions. Avoid
@@ -206,6 +220,7 @@ export function Providers({ children, themeProps }: ProvidersProps) {
       window.removeEventListener("resize", onResize);
       resizeObserver.disconnect();
       mutationObserver.disconnect();
+      unsubscribeSurfaces();
     };
   }, []);
 

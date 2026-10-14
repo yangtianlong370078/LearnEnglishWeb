@@ -90,6 +90,7 @@ function setup({
   const document = {
     documentElement: root,
     defaultView: {
+      innerWidth: 800,
       innerHeight: 600,
       devicePixelRatio: scale,
       addEventListener: (name, callback) => listeners.set(name, callback),
@@ -253,6 +254,7 @@ function setup({
     refresh: () => update(),
     resize(width, height = 600) {
       root.clientWidth = width;
+      document.defaultView.innerWidth = width;
       document.defaultView.innerHeight = height;
       listeners.get("resize")();
     },
@@ -457,6 +459,33 @@ test("resize interrupts current work immediately and batches successive sizes in
     assert.equal(h.created.length, allocated);
     assert.equal(h.created.length - h.revoked.length, 4);
     assert.equal(h.variables.get("--glass-cached-base"), current);
+    h.dispose();
+  }
+});
+
+test("scrollbar resize signals preserve foreground and prewarm jobs at the same window size", async () => {
+  for (const stage of ["foreground", "prewarm", "cached"]) {
+    const h = setup();
+    if (stage !== "foreground") await h.finishTexture();
+    if (stage !== "foreground") await startPrewarm(h);
+    if (stage === "cached") await h.finishTexture();
+    await h.flush();
+    const job = h.workerCalls.at(-1);
+    const calls = h.workerCalls.length;
+    const texture = h.variables.get("--glass-cached-base");
+    for (const width of [785, 800, 785, 800]) {
+      h.root.clientWidth = width;
+      h.listeners.get("resize")();
+      h.refresh();
+      await h.runTimers(100);
+      assert.equal(h.workerCalls.length, calls);
+      assert.equal(h.variables.get("--glass-cached-base"), texture);
+      if (stage !== "cached") assert.equal(job.instance.disposed, false);
+    }
+    if (stage !== "cached") await h.finishTexture();
+    assert.equal(h.ready(), true);
+    assert.equal(job.options.width, 800);
+    assert.equal(job.options.height, 600);
     h.dispose();
   }
 });

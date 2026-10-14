@@ -84,7 +84,8 @@ html[data-bg-theme="magnificent"] :is(.glass-warp, .glass-border-glow)::before,
 html[data-bg-theme="magnificent"] .glass-border::after {
   background-position:
     top left,
-    center;
+    calc((var(--glass-viewport-width) - var(--wallpaper-width)) / 2)
+    calc((var(--glass-viewport-height) - var(--wallpaper-height)) / 2);
 }
 
 html .login-scene .glass-warp::before {

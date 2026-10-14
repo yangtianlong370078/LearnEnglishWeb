@@ -352,7 +352,8 @@ export function createGlassWallpaperCache(document: Document) {
   }
 
   function getTarget(mode = root.dataset.glassMode) {
-    const width = root.clientWidth;
+    // Match the fixed page background, including any scrollbar gutter.
+    const width = view.innerWidth;
     const height = view.innerHeight;
     const scale = view.devicePixelRatio;
     let dark = root.classList.contains("dark");
@@ -617,6 +618,9 @@ export function createGlassWallpaperCache(document: Document) {
   coordinators.set(document, coordinate);
 
   function resize() {
+    // Scrollbar and scroll-lock changes can dispatch resize without changing
+    // the window. Keep both the published texture and any in-flight prewarm.
+    if (getTarget().key === requestedKey) return;
     cancelPreparation();
     requestedKey = "";
     view.clearTimeout(timer);

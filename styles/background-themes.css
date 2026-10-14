@@ -68,7 +68,12 @@ body {
 .app-shell::before {
   content: "";
   position: fixed;
-  inset: 0;
+  top: 0;
+  left: 0;
+  /* Viewport units include the scrollbar gutter; inset: 0 would shrink the
+     cover image whenever page content starts overflowing. */
+  width: 100vw;
+  height: 100dvh;
   z-index: -10;
   pointer-events: none;
   background: var(--app-background);
@@ -79,7 +84,9 @@ body {
 
 html[data-bg-theme="magnificent"] {
   /* Match cover against the viewport, even inside a transformed card. */
-  --wallpaper-ratio: 1.7647058824;
+  /* bg01_light.jpeg is 5136 × 3504. Keep the CSS fallback's cover geometry
+     identical to the decoded image used by the wallpaper cache. */
+  --wallpaper-ratio: 1.4657534247;
   --wallpaper-width: max(var(--glass-viewport-width), calc(var(--glass-viewport-height) * var(--wallpaper-ratio)));
   --wallpaper-height: max(var(--glass-viewport-height), calc(var(--glass-viewport-width) / var(--wallpaper-ratio)));
   --glass-background-size: var(--glass-viewport-width) var(--glass-viewport-height), var(--wallpaper-width) var(--wallpaper-height);
