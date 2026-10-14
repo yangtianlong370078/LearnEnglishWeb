@@ -92,12 +92,12 @@ html[data-bg-theme="magnificent"] {
   --glass-background-size: var(--glass-viewport-width) var(--glass-viewport-height), var(--wallpaper-width) var(--wallpaper-height);
   --app-background:
     linear-gradient(to bottom, rgb(255 255 255 / 0.04), rgb(255 255 255 / 0.12)),
-    url("/images/bg01_light.jpeg") center / cover no-repeat;
+    url("/images/light/bg01_light.jpeg") center / cover no-repeat;
 }
 
 html.dark[data-bg-theme="magnificent"] {
   --wallpaper-ratio: 1.7843137255;
   --app-background:
     linear-gradient(to bottom, rgb(5 10 24 / 0.16), rgb(5 10 24 / 0.32)),
-    url("/images/bg01_dark.jpeg") center / cover no-repeat;
+    url("/images/dark/bg01_dark.jpeg") center / cover no-repeat;
 }

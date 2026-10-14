@@ -234,7 +234,7 @@ test("saved liquid preloads the selected photo without delaying content or sched
         node.as === "image",
     );
     assert.equal(preloads.length, 1);
-    assert.equal(preloads[0].href, `/images/bg01_${theme}.jpeg`);
+    assert.equal(preloads[0].href, `/images/${theme}/bg01_${theme}.jpeg`);
     assert.equal(h.timers.length, 0);
     assert.deepEqual(Object.fromEntries(h.storage), stored);
   }

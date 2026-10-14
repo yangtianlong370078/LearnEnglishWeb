@@ -183,7 +183,7 @@ async function fixture(browser, options = {}) {
       return route.fallback();
     });
   if (options.failWallpaper || options.delayWallpaper)
-    await context.route("**/images/bg01_*.jpeg", async (route) => {
+    await context.route("**/images/**/bg01_*.jpeg", async (route) => {
       intercepted.wallpapers++;
       if (options.failWallpaper) return route.abort();
       await new Promise((resolve) =>

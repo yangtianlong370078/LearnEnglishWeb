@@ -303,7 +303,7 @@ test("the requested mode renders first off-thread at full device resolution", as
       options.losslessWallpaper,
       configuration.glassConfig.losslessWallpaper,
     );
-    assert.equal(image.url, "/images/bg01_light.jpeg");
+    assert.equal(image.url, "/images/light/bg01_light.jpeg");
     assert.deepEqual(
       h.filters,
       [],
@@ -423,7 +423,7 @@ test("theme changes commit atomically with their decoded matching texture", asyn
   assert.equal(committed, false);
   assert.equal(h.ready(), true);
   assert.equal(h.variables.get("--glass-cached-base"), light);
-  assert.equal(h.workerCalls.at(-1).image.url, "/images/bg01_dark.jpeg");
+  assert.equal(h.workerCalls.at(-1).image.url, "/images/dark/bg01_dark.jpeg");
   await h.finishTexture();
   assert.equal(committed, true);
   assert.notEqual(h.variables.get("--glass-cached-base"), light);

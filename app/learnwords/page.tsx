@@ -447,7 +447,7 @@ export default function LearnWordsPage() {
                       {cat.courseInfos.map((course) => (
                         <Card
                           key={course.courseId}
-                          className="group relative overflow-hidden transition-transform gap-4 duration-300 "
+                          className="group relative overflow-hidden transition-transform gap-4 rounded-2xl duration-300 "
                         >
                           <PieChartWithBreakdownDemo
                             courseId={course.courseId}

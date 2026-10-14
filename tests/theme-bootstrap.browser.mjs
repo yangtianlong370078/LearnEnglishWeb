@@ -162,7 +162,9 @@ function assertAppearance(actual, expected, label) {
   assert.equal(actual.background, expected.bg, `${label}: data-bg-theme`);
   if (expected.bg === "magnificent") {
     assert.ok(
-      actual.appBackground.includes(`/images/bg01_${expected.mode}.jpeg`),
+      actual.appBackground.includes(
+        `/images/${expected.mode}/bg01_${expected.mode}.jpeg`,
+      ),
       `${label}: selected wallpaper`,
     );
     assert.ok(

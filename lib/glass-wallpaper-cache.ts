@@ -163,7 +163,9 @@ export function createGlassWallpaperCache(document: Document) {
     // Do not allocate full-size drawing buffers while a photo is loading, and
     // do not start convolution if a newer request has superseded this one.
     const image = photo
-      ? await loadImage(`/images/bg01_${dark ? "dark" : "light"}.jpeg`)
+      ? await loadImage(
+          `/images/${dark ? "dark/bg01_dark" : "light/bg01_light"}.jpeg`,
+        )
       : undefined;
 
     if (disposed || job.cancelled) return;
@@ -417,7 +419,7 @@ export function createGlassWallpaperCache(document: Document) {
         try {
           const image = target.photo
             ? await loadImage(
-                `/images/bg01_${target.dark ? "dark" : "light"}.jpeg`,
+                `/images/${target.dark ? "dark/bg01_dark" : "light/bg01_light"}.jpeg`,
               )
             : undefined;
 

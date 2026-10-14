@@ -62,7 +62,7 @@ export const themeBootstrapScript = `(() => {
     const preload = document.createElement("link");
     preload.rel = "preload";
     preload.as = "image";
-    preload.href = "/images/bg01_" + (dark ? "dark" : "light") + ".jpeg";
+    preload.href = "/images/" + (dark ? "dark/bg01_dark" : "light/bg01_light") + ".jpeg";
     document.head.append(preload);
   }
 })();`;
