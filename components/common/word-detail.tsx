@@ -473,7 +473,7 @@ export default function WordDetail({ word, onDataLoaded }: WordDetailProps) {
 
   return (
     <div className="w-full">
-      <ScrollShadow className="max-h-[50vh]">
+      <ScrollShadow className="max-h-[40vh]">
         {/* 音标行 */}
         <div className="flex flex-wrap gap-3">
           {/* 英式发音 */}
