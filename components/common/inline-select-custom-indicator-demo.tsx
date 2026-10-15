@@ -253,7 +253,7 @@ export default function InlineSelectCustomIndicatorDemo() {
           ) : picker &&
             pickerImages?.mode === picker &&
             pickerImages.images.length ? (
-            <div className="grid max-h-[60vh] grid-cols-2 gap-3 overflow-y-auto pr-1 sm:grid-cols-3">
+            <div className="grid max-h-[60vh] grid-cols-2 gap-3 overflow-y-auto p-1 sm:grid-cols-3">
               {pickerImages.images.map((name) => (
                 <button
                   key={name}
