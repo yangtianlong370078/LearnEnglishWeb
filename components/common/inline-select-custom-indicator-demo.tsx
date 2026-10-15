@@ -3,7 +3,7 @@
 import type { Key } from "@heroui/react";
 
 import { ChevronRight } from "@gravity-ui/icons";
-import { Button, ListBox, Modal, Separator, Spinner } from "@heroui/react";
+import { Button, ListBox, Modal, Separator, Spinner, ScrollShadow } from "@heroui/react";
 import Image from "next/image";
 import { useEffect, useId, useRef, useState } from "react";
 import { InlineSelect } from "@heroui-pro/react";
@@ -30,7 +30,7 @@ const GLASS_MODES = [
   { value: "liquid", label: "液态玻璃" },
 ] as const;
 
-const finishPopoverTransitionCleanup = () => {};
+const finishPopoverTransitionCleanup = () => { };
 
 function releasePopoverTransitions(node: HTMLDivElement | null) {
   if (node) return;
@@ -158,6 +158,8 @@ export default function InlineSelectCustomIndicatorDemo() {
         <InlineSelect.Popover
           ref={releasePopoverTransitions}
           className="w-[260px]"
+          // Keep the theme popover below the image picker's entire overlay.
+          style={{ zIndex: 50 }}
         >
           <fieldset className="m-0 min-w-0 border-0 p-2">
             <legend className="sr-only">卡片效果</legend>
@@ -235,6 +237,8 @@ export default function InlineSelectCustomIndicatorDemo() {
       <ModalBackdrop
         containerClassName="w-full max-w-2xl rounded-3xl"
         isOpen={picker !== null}
+        // Raise the overlay root so its scrim also covers the theme popover.
+        style={{ zIndex: 51 }}
         onOpenChange={(open) => {
           if (!open) setPicker(null);
         }}
@@ -253,13 +257,12 @@ export default function InlineSelectCustomIndicatorDemo() {
           ) : picker &&
             pickerImages?.mode === picker &&
             pickerImages.images.length ? (
-            <div className="grid max-h-[60vh] grid-cols-2 gap-3 overflow-y-auto p-1 sm:grid-cols-3">
+            <ScrollShadow className="grid max-h-[60vh] grid-cols-2 gap-3 overflow-y-auto p-1 sm:grid-cols-3">
               {pickerImages.images.map((name) => (
                 <button
                   key={name}
-                  className={`cursor-[var(--cursor-interactive)] rounded-xl p-1 text-left transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${
-                    wallpapers[picker] === name ? "ring-2 ring-accent" : ""
-                  }`}
+                  className={`cursor-[var(--cursor-interactive)] rounded-xl p-1 text-left transition-colors hover:bg-black/5 dark:hover:bg-white/5 ${wallpapers[picker] === name ? "ring-2 ring-accent" : ""
+                    }`}
                   type="button"
                   onClick={() => handlePick(name)}
                 >
@@ -277,12 +280,13 @@ export default function InlineSelectCustomIndicatorDemo() {
                   </span>
                 </button>
               ))}
-            </div>
+            </ScrollShadow>
           ) : (
             <p className="py-10 text-center text-sm text-muted">
               /images/{picker ?? "light"}/ 目录下暂无图片
             </p>
           )}
+
         </div>
       </ModalBackdrop>
     </>
