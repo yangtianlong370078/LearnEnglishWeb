@@ -324,6 +324,12 @@ body[data-glass-source-blur] .app-shell {
   filter: var(--glass-source-filter);
 }
 
+/* Portaled page controls sit outside app-shell. Blur these covered sources
+   for the modal's entire mounted lifetime, including its exit animation. */
+body[data-glass-source-blur] [data-glass-modal-source] {
+  filter: blur(var(--app-glass-blur)) saturate(var(--app-glass-saturation));
+}
+
 body[data-glass-source-blur] .app-shell::before {
   position: absolute;
   inset: auto;

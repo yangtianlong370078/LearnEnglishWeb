@@ -158,6 +158,7 @@ export default function InlineSelectCustomIndicatorDemo() {
         <InlineSelect.Popover
           ref={releasePopoverTransitions}
           className="w-[260px]"
+          data-glass-modal-source=""
           // Keep the theme popover below the image picker's entire overlay.
           style={{ zIndex: 50 }}
         >
