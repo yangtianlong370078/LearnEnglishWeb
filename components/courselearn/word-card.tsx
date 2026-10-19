@@ -16,7 +16,17 @@ import {
   useState,
 } from "react";
 import { Button, Card, Dropdown, Tooltip } from "@heroui/react";
-import { Ellipsis, Xmark } from "@gravity-ui/icons";
+import {
+  Bookmark,
+  BookmarkFill,
+  BookOpen,
+  CircleCheckFill,
+  CircleQuestion,
+  Ellipsis,
+  Pencil,
+  TrashBin,
+  Xmark,
+} from "@gravity-ui/icons";
 
 import ConfettiBurst from "./confetti";
 import GlassCard from "@/components/common/glass-card";
@@ -700,7 +710,7 @@ function WordCardInner(
               <Dropdown>
                 <Button
                   isIconOnly
-                  aria-label="操作"
+                  
                   className="size-7 min-w-7 rounded-full bg-white/60 text-foreground/75 hover:bg-white/80 dark:bg-white/10 dark:text-foreground/90 dark:hover:bg-white/15"
                   isDisabled={actionsDisabled}
                   variant="ghost"
@@ -714,7 +724,10 @@ function WordCardInner(
                       textValue="编辑"
                       onAction={() => onOpenEdit?.(word)}
                     >
-                      编辑
+                      <span className="flex items-center gap-2">
+                        <Pencil className="size-4 shrink-0" />
+                        编辑
+                      </span>
                     </Dropdown.Item>
                     {word.myWord === true && (
                       <Dropdown.Item
@@ -723,7 +736,10 @@ function WordCardInner(
                         variant="danger"
                         onAction={() => onOpenDelete(word)}
                       >
-                        删除
+                        <span className="flex items-center gap-2">
+                          <TrashBin className="size-4 shrink-0" />
+                          删除
+                        </span>
                       </Dropdown.Item>
                     )}
                     <Dropdown.Item
@@ -731,7 +747,14 @@ function WordCardInner(
                       textValue={word.isCollect === 1 ? "移除强化区" : "加入强化区"}
                       onAction={() => onToggleCollect(word)}
                     >
-                      {word.isCollect === 1 ? "移除强化区" : "加入强化区"}
+                      <span className="flex items-center gap-2">
+                        {word.isCollect === 1 ? (
+                          <BookmarkFill className="size-4 shrink-0" />
+                        ) : (
+                          <Bookmark className="size-4 shrink-0" />
+                        )}
+                        {word.isCollect === 1 ? "移除强化区" : "加入强化区"}
+                      </span>
                     </Dropdown.Item>
                     {status !== 1 && (
                       <Dropdown.Item
@@ -739,7 +762,10 @@ function WordCardInner(
                         textValue="转入不认识"
                         onAction={() => onChangeStatus(word, 1)}
                       >
-                        转入不认识
+                        <span className="flex items-center gap-2">
+                          <CircleQuestion className="size-4 shrink-0" />
+                          转入不认识
+                        </span>
                       </Dropdown.Item>
                     )}
                     {status !== 2 && (
@@ -748,7 +774,10 @@ function WordCardInner(
                         textValue="转入学习中"
                         onAction={() => onChangeStatus(word, 2)}
                       >
-                        转入学习中
+                        <span className="flex items-center gap-2">
+                          <BookOpen className="size-4 shrink-0" />
+                          转入学习中
+                        </span>
                       </Dropdown.Item>
                     )}
                     {status !== 3 && (
@@ -757,13 +786,16 @@ function WordCardInner(
                         textValue="转入已掌握"
                         onAction={() => onChangeStatus(word, 3)}
                       >
-                        转入已掌握
+                        <span className="flex items-center gap-2">
+                          <CircleCheckFill className="size-4 shrink-0" />
+                          转入已掌握
+                        </span>
                       </Dropdown.Item>
                     )}
                   </Dropdown.Menu>
                 </Dropdown.Popover>
               </Dropdown>
-              <Tooltip.Content>操作</Tooltip.Content>
+            
             </Tooltip>
             <button
               aria-label="详情"
