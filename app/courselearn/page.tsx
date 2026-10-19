@@ -279,6 +279,7 @@ function CourseLearnClient() {
 
   const {
     actionPending,
+    actionWordId,
     actionError,
     deleteWord,
     resetActions,
@@ -537,7 +538,7 @@ function CourseLearnClient() {
                   ref={(el) => {
                     cardRefs.current[index] = el;
                   }}
-                  actionsDisabled={actionPending}
+                  actionsDisabled={actionWordId === word.lexiconId}
                   globalMode={globalMode}
                   index={index}
                   practiceOn={practiceOn}

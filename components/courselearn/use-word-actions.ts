@@ -16,6 +16,8 @@ export function useWordActions(
   applyActionResult: (word: LearnWord, kind: WordActionKind) => Promise<void>,
 ) {
   const [actionPending, setActionPending] = useState(false);
+  /** 正在执行操作的单词 id：仅禁用该卡片的操作按钮，其它卡片样式不变 */
+  const [actionWordId, setActionWordId] = useState<number | null>(null);
   const [actionError, setActionError] = useState<string | null>(null);
   const [deleteWord, setDeleteWord] = useState<LearnWord | null>(null);
   const actionInFlightRef = useRef(false);
@@ -47,6 +49,7 @@ export function useWordActions(
       if (actionInFlightRef.current) return false;
       actionInFlightRef.current = true;
       setActionPending(true);
+      setActionWordId(word.lexiconId);
       setActionError(null);
       flushRecords();
       try {
@@ -63,6 +66,7 @@ export function useWordActions(
       } finally {
         actionInFlightRef.current = false;
         setActionPending(false);
+        setActionWordId(null);
       }
     },
     [flushRecords, applyActionResult],
@@ -100,6 +104,7 @@ export function useWordActions(
 
   return {
     actionPending,
+    actionWordId,
     actionError,
     deleteWord,
     resetActions,
