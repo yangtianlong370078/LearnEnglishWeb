@@ -2,7 +2,7 @@
 
 import type { LearnStatus } from "@/types/courselearn";
 
-import { useLayoutEffect, useRef } from "react";
+import { useEffect, useLayoutEffect, useRef } from "react";
 
 import GlassCard from "@/components/common/glass-card";
 interface StatTabsProps {
@@ -10,6 +10,8 @@ interface StatTabsProps {
   brs: number;
   wlj: number;
   yzw: number;
+  /** 卡片飞入对应 Tab 后的数字徽章放大闪烁信号（key 变化触发重播） */
+  pulse?: { zt: LearnStatus; key: number } | null;
   onChange: (zt: LearnStatus) => void;
 }
 
@@ -32,13 +34,34 @@ export default function StatTabs({
   brs,
   wlj,
   yzw,
+  pulse,
   onChange,
 }: StatTabsProps) {
   const counts = { brs, wlj, yzw };
   const buttonRefs = useRef<Array<HTMLButtonElement | null>>([]);
+  const badgeRefs = useRef<Array<HTMLSpanElement | null>>([]);
   const pillRef = useRef<HTMLSpanElement>(null);
   /** 是否已完成首次测量（首次直接就位，不播放滑动动画） */
   const measuredRef = useRef(false);
+
+  // 卡片飞抵对应 Tab 后：数字徽章放大闪烁。
+  // 用 WAAPI 且仅 transform/opacity（合成线程属性）：该动画触发时正值
+  // 列表 FLIP 补位窗口，主线程繁忙，CSS/filter 动画会丢帧到看不见。
+  useEffect(() => {
+    if (!pulse) return;
+    const index = TABS.findIndex((t) => t.zt === pulse.zt);
+    const badge = badgeRefs.current[index];
+
+    if (!badge) return;
+    badge.animate(
+      [
+        { transform: "scale(1)", opacity: 1 },
+        { transform: "scale(1.5)", opacity: 0.65, offset: 0.35 },
+        { transform: "scale(1)", opacity: 1 },
+      ],
+      { duration: 550, easing: "cubic-bezier(0.22, 0.61, 0.36, 1)" },
+    );
+  }, [pulse]);
 
   // 选中项 / 数量（影响按钮宽度）变化时移动指示器；resize 时无动画归位
   useLayoutEffect(() => {
@@ -119,6 +142,7 @@ export default function StatTabs({
                 buttonRefs.current[i] = el;
               }}
               aria-pressed={isActive}
+              data-stat-tab={tab.zt}
               className={`inline-flex relative z-[1] shrink-0 items-center gap-2 whitespace-nowrap rounded-full pl-3 pr-2 py-2 text-sm font-medium transition-colors duration-300 ${
                 isActive
                   ? "text-foreground"
@@ -129,7 +153,10 @@ export default function StatTabs({
             >
               {tab.label}
               <span
-                className={`inline-flex min-w-[22px] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold tabular-nums transition-all duration-300 ${
+                ref={(el) => {
+                  badgeRefs.current[i] = el;
+                }}
+                className={`inline-flex min-w-[22px] items-center justify-center rounded-full px-1.5 py-0.5 text-[11px] font-semibold tabular-nums transition-colors duration-300 ${
                   isActive
                     ? "bg-accent text-accent-foreground shadow-sm shadow-accent/40"
                     : "bg-black/5 text-muted dark:bg-white/10"

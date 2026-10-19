@@ -36,6 +36,7 @@ import { useCourseLearnSettings } from "@/components/courselearn/use-course-lear
 import {
   useWordActions,
   type WordActionKind,
+  type WordActionMeta,
 } from "@/components/courselearn/use-word-actions";
 import { courseLearnApi } from "@/lib/api";
 import { requestGlassRepaint } from "@/lib/glass-surface-source";
@@ -85,6 +86,8 @@ function CourseLearnClient() {
   const [silentRefreshing, setSilentRefreshing] = useState(false);
   /** 正在播放「缩小渐隐」离场动画的单词 id */
   const [leavingId, setLeavingId] = useState<number | null>(null);
+  /** 卡片飞抵后，对应状态 Tab 数字徽章的放大闪烁信号（key 变化触发重播） */
+  const [tabPulse, setTabPulse] = useState<{ zt: LearnStatus; key: number } | null>(null);
 
   const [globalMode, setGlobalMode] = useState<LearnMode | null>(null);
   const [translationOn, setTranslationOn] = useState(false);
@@ -216,12 +219,66 @@ function CourseLearnClient() {
     [],
   );
 
+  /** 状态转移离场动画：卡片边缩小边飞向顶部对应的状态 Tab。
+   *  飞行用 transform（离场卡片允许壁纸随卡片走），fill: forwards 停在终点。
+   *  返回是否成功播放；找不到卡片或 Tab 元素时返回 false 走缩小渐隐兜底。 */
+  const flyCardToTab = useCallback(
+    async (word: LearnWord, target: LearnStatus) => {
+      const cardEl = gridWrapRef.current?.querySelector<HTMLElement>(
+        `[data-flip-id="${word.lexiconId}"]`,
+      );
+      const tabEl = document.querySelector<HTMLElement>(
+        `[data-stat-tab="${target}"]`,
+      );
+
+      if (!cardEl || !tabEl) return false;
+      const from = cardEl.getBoundingClientRect();
+      const to = tabEl.getBoundingClientRect();
+      const dx = to.left + to.width / 2 - (from.left + from.width / 2);
+      const dy = to.top + to.height / 2 - (from.top + from.height / 2);
+
+      cardEl.style.position = "relative";
+      cardEl.style.zIndex = "30";
+      cardEl.style.pointerEvents = "none";
+
+      const animation = cardEl.animate(
+        [
+          { transform: "none", opacity: 1 },
+          {
+            transform: `translate(${dx * 0.92}px, ${dy * 0.92}px) scale(0.35)`,
+            opacity: 0.9,
+            offset: 0.72,
+          },
+          {
+            transform: `translate(${dx}px, ${dy}px) scale(0.12)`,
+            opacity: 0,
+          },
+        ],
+        {
+          duration: 540,
+          easing: "cubic-bezier(0.5, 0, 0.84, 0.4)",
+          fill: "forwards",
+        },
+      );
+
+      try {
+        await animation.finished;
+      } catch {
+        /* 动画被取消（如组件卸载）：直接继续后续流程 */
+      }
+
+      return true;
+    },
+    [],
+  );
+
   /** 单词操作接口成功后的列表处理：
    *  - 非强化区课程的【加入/移除强化区】：就地更新收藏标记 + 轻提示，不刷新页面；
-   *  - 其余（删除 / 转入状态 / 强化区课程内移除收藏）：静默刷新，数据返回后操作的卡片
-   *    缩小渐隐，后续卡片平滑补位。 */
+   *  - 转入状态：静默刷新后卡片边缩小边飞向对应 Tab，飞抵后 Tab 数字放大闪烁；
+   *  - 删除 / 强化区课程内移除收藏：静默刷新，数据返回后卡片缩小渐隐，
+   *    后续卡片平滑补位。 */
   const applyActionResult = useCallback(
-    async (word: LearnWord, kind: WordActionKind) => {
+    async (word: LearnWord, kind: WordActionKind, meta?: WordActionMeta) => {
       const leavesList =
         kind !== "collect" ||
         (kc === COLLECT_COURSE_ID && word.isCollect === 1);
@@ -259,9 +316,17 @@ function CourseLearnClient() {
         const nextWords = data.data ?? [];
 
         if (!nextWords.some((w) => w.lexiconId === word.lexiconId)) {
-          // 第一步：操作的卡片在原地缩小渐隐
-          setLeavingId(word.lexiconId);
-          await wait(LEAVE_ANIMATION_MS);
+          // 第一步：离场动画——状态转移时飞向对应 Tab，删除/移除强化区原地缩小渐隐
+          const target = kind === "status" ? meta?.status : undefined;
+          const flown = target ? await flyCardToTab(word, target) : false;
+
+          if (flown && target) {
+            // 飞抵后：对应 Tab 的数字徽章放大闪烁一下
+            setTabPulse({ zt: target, key: Date.now() });
+          } else if (!flown) {
+            setLeavingId(word.lexiconId);
+            await wait(LEAVE_ANIMATION_MS);
+          }
         }
         // 第二步：换入新数据，后续卡片 FLIP 滑动补位
         swapWordsWithFlip(data, nextWords);
@@ -274,7 +339,7 @@ function CourseLearnClient() {
         setSilentRefreshing(false);
       }
     },
-    [kc, zt, pageIndex, reloadWords, swapWordsWithFlip],
+    [kc, zt, pageIndex, reloadWords, swapWordsWithFlip, flyCardToTab],
   );
 
   const {
@@ -492,6 +557,7 @@ function CourseLearnClient() {
         <StatTabs
           active={zt}
           brs={resp?.brs ?? 0}
+          pulse={tabPulse}
           wlj={resp?.wlj ?? 0}
           yzw={resp?.yzw ?? 0}
           onChange={handleZtChange}
