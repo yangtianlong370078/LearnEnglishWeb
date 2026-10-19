@@ -162,11 +162,15 @@ function CourseLearnClient() {
         const prev = before.get(Number(el.dataset.flipId));
 
         if (!prev) {
-          // 新卡片：仅淡入（scale 同样会重锚定壁纸）
+          // 新补位的卡片最后出场：先保持隐藏（fill: backwards 让延迟期间
+          // 应用首帧），等其它卡片滑动补位结束后再淡入；
+          // 仅淡入不用 scale（transform 会重锚定视口固定的玻璃壁纸）
           animations.push(
             el.animate([{ opacity: 0 }, { opacity: 1 }], {
-              duration: 360,
+              delay: 420,
+              duration: 320,
               easing: ease,
+              fill: "backwards",
             }),
           );
 
