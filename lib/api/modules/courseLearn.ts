@@ -3,6 +3,7 @@
  * 对应后端 /api/Word/Words、/api/Word/updcnoV2、/api/Whisper/Recognize
  */
 import type {
+  LearnStatus,
   NumberUpdateRecord,
   WhisperRecognizeResult,
   WordsQueryParams,
@@ -10,6 +11,46 @@ import type {
 } from "@/types/courselearn";
 
 import request from "../request";
+
+/** 兼容部分单词接口将 success 拼写为 succss 的响应。 */
+function normalizeWordActionResponse(data: string) {
+  const result = JSON.parse(data) as {
+    success?: boolean;
+    succss?: boolean;
+    msg?: string;
+  };
+
+  return { ...result, success: result.success ?? result.succss };
+}
+
+/** 删除课程中的自定义单词，使用课程内容 id。 */
+export async function deleteWord(courseContentId: number): Promise<void> {
+  await request.post("/Word/deletedc", null, {
+    params: { courseContentId },
+  });
+}
+
+/** 加入或移除强化区。 */
+export async function setCollect(
+  lexiconId: number,
+  isCollect: boolean,
+): Promise<void> {
+  await request.post("/Word/SetCollect", null, {
+    params: { lexiconId, isCollect },
+    transformResponse: normalizeWordActionResponse,
+  });
+}
+
+/** 将单词转入指定学习状态。 */
+export async function setWordStatus(
+  lexiconId: number,
+  zt: LearnStatus,
+): Promise<void> {
+  await request.post("/Word/szzt", null, {
+    params: { lexiconId, zt },
+    transformResponse: normalizeWordActionResponse,
+  });
+}
 
 /**
  * 分页查询课程单词列表。

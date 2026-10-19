@@ -8,7 +8,7 @@ export type LearnStatus = 1 | 2 | 3;
 
 /** 单条单词数据（/api/Word/Words 返回项） */
 export interface LearnWord {
-  id: number;
+  courseContentId: number;
   lexiconId: number;
   en: string;
   cn: string;

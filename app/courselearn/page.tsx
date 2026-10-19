@@ -19,7 +19,9 @@ import PaginationBar from "@/components/courselearn/pagination-bar";
 import SettingsModal from "@/components/courselearn/settings-modal";
 import StatTabs from "@/components/courselearn/stat-tabs";
 import WordCard from "@/components/courselearn/word-card";
+import WordGrid from "@/components/courselearn/word-grid";
 import {
+  WordDeleteModal,
   WordDetailModal,
   WordEditModal,
 } from "@/components/courselearn/word-modal";
@@ -30,6 +32,7 @@ import {
   nextNumber,
 } from "@/components/courselearn/lib";
 import { useCourseLearnSettings } from "@/components/courselearn/use-course-learn-settings";
+import { useWordActions } from "@/components/courselearn/use-word-actions";
 import { courseLearnApi } from "@/lib/api";
 
 const PAGE_SIZE = 12;
@@ -66,6 +69,7 @@ function CourseLearnClient() {
   const [words, setWords] = useState<LearnWord[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [reloadVersion, setReloadVersion] = useState(0);
 
   const [globalMode, setGlobalMode] = useState<LearnMode | null>(null);
   const [translationOn, setTranslationOn] = useState(false);
@@ -98,6 +102,19 @@ function CourseLearnClient() {
     void courseLearnApi.saveNumberRecords(records);
   }, []);
 
+  const reloadWords = useCallback(() => setReloadVersion((v) => v + 1), []);
+  const {
+    actionPending,
+    actionError,
+    deleteWord,
+    resetActions,
+    handleOpenDelete,
+    handleDeleteOpenChange,
+    handleToggleCollect,
+    handleChangeStatus,
+    handleConfirmDelete,
+  } = useWordActions(flushRecords, reloadWords);
+
   // ── 数据加载 ─────────────────────────────────────────────
   useEffect(() => {
     let ignore = false;
@@ -108,6 +125,13 @@ function CourseLearnClient() {
       .queryWords({ kc, zt, index: pageIndex, pageSize: PAGE_SIZE })
       .then((data) => {
         if (ignore) return;
+        const lastPage = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
+
+        if (pageIndex > lastPage) {
+          setPageIndex(lastPage);
+
+          return;
+        }
         setResp(data);
         setWords(data.data ?? []);
         cardRefs.current = [];
@@ -129,7 +153,7 @@ function CourseLearnClient() {
     return () => {
       ignore = true;
     };
-  }, [kc, zt, pageIndex]);
+  }, [kc, zt, pageIndex, reloadVersion]);
 
   // ── 页面不可见 / 失焦 / 关闭 时保存 ───────────────────────
   useEffect(() => {
@@ -159,10 +183,11 @@ function CourseLearnClient() {
       setGlobalMode(null);
       setDetailWord(null);
       setEditWord(null);
+      resetActions();
       setPageIndex(1);
       setZt(nextZt);
     },
-    [flushRecords, zt],
+    [flushRecords, resetActions, zt],
   );
 
   const handlePageChange = useCallback(
@@ -171,9 +196,10 @@ function CourseLearnClient() {
       setGlobalMode(null);
       setDetailWord(null);
       setEditWord(null);
+      resetActions();
       setPageIndex(page);
     },
-    [flushRecords],
+    [flushRecords, resetActions],
   );
 
   // ── 判定结果：累加练习次数并生成记录 ─────────────────────
@@ -307,58 +333,44 @@ function CourseLearnClient() {
           onToggleTranslation={() => setTranslationOn((v) => !v)}
         />
 
-        {loading ? (
-          <div
-            className="flex flex-1 items-center justify-center py-20"
-            data-glass-navigation-content=""
-          >
-            <Spinner size="lg" />
-          </div>
-        ) : error ? (
-          <div
-            className="flex flex-1 flex-col items-center justify-center gap-3 py-20 text-center"
-            data-glass-navigation-content=""
-          >
-            <p className="text-sm text-danger">{error}</p>
-            <button
-              className="rounded-xl bg-gradient-to-br from-accent to-accent/80 px-5 py-2 text-sm font-medium text-accent-foreground shadow-md shadow-accent/30 transition-all duration-300 hover:-translate-y-px hover:shadow-lg"
-              type="button"
-              onClick={() => setPageIndex((p) => p)}
-            >
-              重新加载
-            </button>
-          </div>
-        ) : words.length === 0 ? (
-          <div
-            className="flex flex-1 items-center justify-center py-20 text-sm text-muted"
-            data-glass-navigation-content=""
-          >
-            暂无单词
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {words.map((word, index) => (
-              <WordCard
-                key={`${word.lexiconId}-${index}`}
-                ref={(el) => {
-                  cardRefs.current[index] = el;
-                }}
-                globalMode={globalMode}
-                index={index}
-                practiceOn={practiceOn}
-                settings={settings}
-                translationOn={translationOn}
-                word={word}
-                onAdvance={handleAdvance}
-                onExclusiveStart={handleExclusiveStart}
-                onFocusRequest={handleFocusRequest}
-                onResult={handleResult}
-                onOpenDetail={handleOpenDetail}
-                onOpenEdit={handleOpenEdit}
-              />
-            ))}
-          </div>
+        {actionError && !deleteWord && (
+          <p className="text-sm text-danger" role="alert">
+            {actionError}
+          </p>
         )}
+
+        <WordGrid
+          empty={words.length === 0}
+          error={error}
+          loading={loading}
+          onRetry={reloadWords}
+        >
+          {words.map((word, index) => (
+            <WordCard
+              key={`${word.lexiconId}-${index}`}
+              ref={(el) => {
+                cardRefs.current[index] = el;
+              }}
+              actionsDisabled={actionPending}
+              globalMode={globalMode}
+              index={index}
+              practiceOn={practiceOn}
+              settings={settings}
+              status={zt}
+              translationOn={translationOn}
+              word={word}
+              onAdvance={handleAdvance}
+              onExclusiveStart={handleExclusiveStart}
+              onFocusRequest={handleFocusRequest}
+              onChangeStatus={handleChangeStatus}
+              onOpenDetail={handleOpenDetail}
+              onOpenDelete={handleOpenDelete}
+              onOpenEdit={handleOpenEdit}
+              onResult={handleResult}
+              onToggleCollect={handleToggleCollect}
+            />
+          ))}
+        </WordGrid>
 
         {!loading && !error && words.length > 0 && (
           <PaginationBar
@@ -381,6 +393,13 @@ function CourseLearnClient() {
       />
 
       {/* 页面级共享弹窗：所有单词卡片共用同一实例，点击后传入目标单词 */}
+      <WordDeleteModal
+        error={actionError}
+        isDeleting={actionPending}
+        word={deleteWord}
+        onConfirm={handleConfirmDelete}
+        onOpenChange={handleDeleteOpenChange}
+      />
       <WordDetailModal
         word={detailWord}
         onOpenChange={(open) => {

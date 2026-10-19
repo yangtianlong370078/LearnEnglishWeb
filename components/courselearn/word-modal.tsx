@@ -4,13 +4,72 @@ import type { LearnWord } from "@/types/courselearn";
 
 import { useEffect, useRef, useState } from "react";
 import { Button, InputGroup, Modal } from "@heroui/react";
-import { Xmark } from "@gravity-ui/icons";
+import { TrashBin, Xmark } from "@gravity-ui/icons";
 
 import WordDetail from "@/components/common/word-detail";
 import { post } from "@/lib/api";
 import { CnEnIcon, EditIcon, EnCnIcon } from "./mode-icons";
 
 import ModalBackdrop from "@/components/common/modal-backdrop";
+
+/** 页面级共享的单词删除确认弹窗。 */
+export function WordDeleteModal({
+  word,
+  isDeleting,
+  error,
+  onConfirm,
+  onOpenChange,
+}: {
+  word: LearnWord | null;
+  isDeleting: boolean;
+  error: string | null;
+  onConfirm: () => void;
+  onOpenChange: (open: boolean) => void;
+}) {
+  return (
+    <ModalBackdrop
+      isDismissable={!isDeleting}
+      isKeyboardDismissDisabled={isDeleting}
+      isOpen={word !== null}
+      placement="center"
+      size="sm"
+      onOpenChange={onOpenChange}
+    >
+      <Modal.Header>
+        <Modal.Icon className="bg-danger-soft text-danger-soft-foreground">
+          <TrashBin className="size-5" />
+        </Modal.Icon>
+        <Modal.Heading>删除单词</Modal.Heading>
+      </Modal.Header>
+      <Modal.Body>
+        <p className="text-sm leading-6 text-muted">
+          确定删除单词「{word?.en}」吗？删除后无法恢复。
+        </p>
+        {error && (
+          <p className="mt-2 text-sm text-danger" role="alert">
+            {error}
+          </p>
+        )}
+      </Modal.Body>
+      <Modal.Footer>
+        <Button
+          isDisabled={isDeleting}
+          variant="secondary"
+          onPress={() => onOpenChange(false)}
+        >
+          取消
+        </Button>
+        <Button
+          isDisabled={isDeleting}
+          variant="danger-soft"
+          onPress={onConfirm}
+        >
+          {isDeleting ? "删除中..." : "确认删除"}
+        </Button>
+      </Modal.Footer>
+    </ModalBackdrop>
+  );
+}
 
 /**
  * 页面级共享的单词【详情】弹窗：每页仅此一个实例。

@@ -3,6 +3,7 @@
 import type {
   CourseLearnSettings,
   LearnMode,
+  LearnStatus,
   LearnWord,
 } from "@/types/courselearn";
 
@@ -14,8 +15,8 @@ import {
   useRef,
   useState,
 } from "react";
-import { Card } from "@heroui/react";
-import { Xmark } from "@gravity-ui/icons";
+import { Button, Card, Dropdown, Tooltip } from "@heroui/react";
+import { Ellipsis, Xmark } from "@gravity-ui/icons";
 
 import ConfettiBurst from "./confetti";
 import GlassCard from "@/components/common/glass-card";
@@ -23,7 +24,6 @@ import RingProgress from "./ring-progress";
 import {
   CnEnIcon,
   DetailIcon,
-  EditIcon,
   EnCnIcon,
   MicrophoneIcon,
   PracticeIcon,
@@ -61,6 +61,8 @@ export interface WordCardHandle {
 
 interface WordCardProps {
   word: LearnWord;
+  status: LearnStatus;
+  actionsDisabled: boolean;
   index: number;
   settings: CourseLearnSettings;
   /** 全局翻译开关（全局学习按钮开启时接管卡片开关） */
@@ -79,8 +81,11 @@ interface WordCardProps {
   onExclusiveStart: (index: number) => void;
   /** 点击右上角【详情】：由父级打开页面级共享的单词详情弹窗 */
   onOpenDetail?: (word: LearnWord) => void;
-  /** 点击右上角【编辑/修改】：由父级打开页面级共享的单词编辑弹窗 */
+  /** 点击菜单【编辑】：由父级打开页面级共享的单词编辑弹窗 */
   onOpenEdit?: (word: LearnWord) => void;
+  onOpenDelete: (word: LearnWord) => void;
+  onToggleCollect: (word: LearnWord) => void;
+  onChangeStatus: (word: LearnWord, status: LearnStatus) => void;
 }
 
 type ResultState = "idle" | "correct" | "wrong";
@@ -91,6 +96,8 @@ const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 function WordCardInner(
   {
     word,
+    status,
+    actionsDisabled,
     index,
     settings,
     translationOn,
@@ -102,6 +109,9 @@ function WordCardInner(
     onExclusiveStart,
     onOpenDetail,
     onOpenEdit,
+    onOpenDelete,
+    onToggleCollect,
+    onChangeStatus,
   }: WordCardProps,
   ref: React.Ref<WordCardHandle>,
 ) {
@@ -683,18 +693,78 @@ function WordCardInner(
 
       {/* 内容层需 relative z-[1]：absolute 定位的 warp 玻璃层会盖住 static 内容 */}
       <div className={`rounded-3xl relative z-[1] overflow-hidden  ${cardStateClass} `}>
-        {/* 无学习按钮激活时：右上角显示【编辑/修改】与【详情】图标按钮 */}
+        {/* 无学习按钮激活时：显示【操作】菜单与【详情】图标按钮 */}
         {!effectiveMode && (
-          <div className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1.5">
-            <button
-              aria-label="编辑/修改"
-              className="inline-flex size-7 items-center justify-center rounded-full bg-white/60 text-foreground/75 transition-all duration-300 hover:-translate-y-px hover:bg-white/80 hover:shadow-sm dark:bg-white/10 dark:text-foreground/90 dark:hover:bg-white/15 dark:hover:shadow-none"
-              title="编辑/修改"
-              type="button"
-              onClick={() => onOpenEdit?.(word)}
-            >
-              <EditIcon className="size-3" />
-            </button>
+          <div className="absolute p-3 z-10 flex items-center w-full justify-between">
+            <Tooltip>
+              <Dropdown>
+                <Button
+                  isIconOnly
+                  aria-label="操作"
+                  className="size-7 min-w-7 rounded-full bg-white/60 text-foreground/75 hover:bg-white/80 dark:bg-white/10 dark:text-foreground/90 dark:hover:bg-white/15"
+                  isDisabled={actionsDisabled}
+                  variant="ghost"
+                >
+                  <Ellipsis className="size-4" />
+                </Button>
+                <Dropdown.Popover className="min-w-40" placement="bottom start">
+                  <Dropdown.Menu aria-label="单词操作">
+                    <Dropdown.Item
+                      id="edit"
+                      textValue="编辑"
+                      onAction={() => onOpenEdit?.(word)}
+                    >
+                      编辑
+                    </Dropdown.Item>
+                    {word.myWord === true && (
+                      <Dropdown.Item
+                        id="delete"
+                        textValue="删除"
+                        variant="danger"
+                        onAction={() => onOpenDelete(word)}
+                      >
+                        删除
+                      </Dropdown.Item>
+                    )}
+                    <Dropdown.Item
+                      id="collect"
+                      textValue={word.isCollect === 1 ? "移除强化区" : "加入强化区"}
+                      onAction={() => onToggleCollect(word)}
+                    >
+                      {word.isCollect === 1 ? "移除强化区" : "加入强化区"}
+                    </Dropdown.Item>
+                    {status !== 1 && (
+                      <Dropdown.Item
+                        id="status-1"
+                        textValue="转入不认识"
+                        onAction={() => onChangeStatus(word, 1)}
+                      >
+                        转入不认识
+                      </Dropdown.Item>
+                    )}
+                    {status !== 2 && (
+                      <Dropdown.Item
+                        id="status-2"
+                        textValue="转入学习中"
+                        onAction={() => onChangeStatus(word, 2)}
+                      >
+                        转入学习中
+                      </Dropdown.Item>
+                    )}
+                    {status !== 3 && (
+                      <Dropdown.Item
+                        id="status-3"
+                        textValue="转入已掌握"
+                        onAction={() => onChangeStatus(word, 3)}
+                      >
+                        转入已掌握
+                      </Dropdown.Item>
+                    )}
+                  </Dropdown.Menu>
+                </Dropdown.Popover>
+              </Dropdown>
+              <Tooltip.Content>操作</Tooltip.Content>
+            </Tooltip>
             <button
               aria-label="详情"
               className="inline-flex size-7 items-center justify-center rounded-full bg-white/60 text-foreground/75 transition-all duration-300 hover:-translate-y-px hover:bg-white/80 hover:shadow-sm dark:bg-white/10 dark:text-foreground/90 dark:hover:bg-white/15 dark:hover:shadow-none"
