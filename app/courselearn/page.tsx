@@ -10,8 +10,9 @@ import type {
 } from "@/types/courselearn";
 
 import { Suspense, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { flushSync } from "react-dom";
 import { useSearchParams } from "next/navigation";
-import { Spinner } from "@heroui/react";
+import { Spinner, toast } from "@heroui/react";
 
 import CourseLearnNavbar from "@/components/courselearn/course-learn-navbar";
 import GlobalToolbar from "@/components/courselearn/global-toolbar";
@@ -32,10 +33,20 @@ import {
   nextNumber,
 } from "@/components/courselearn/lib";
 import { useCourseLearnSettings } from "@/components/courselearn/use-course-learn-settings";
-import { useWordActions } from "@/components/courselearn/use-word-actions";
+import {
+  useWordActions,
+  type WordActionKind,
+} from "@/components/courselearn/use-word-actions";
 import { courseLearnApi } from "@/lib/api";
+import { requestGlassRepaint } from "@/lib/glass-surface-source";
 
 const PAGE_SIZE = 12;
+/** 强化区内置课程 id：在此课程下「移除强化区」会让单词离开当前列表 */
+const COLLECT_COURSE_ID = -100;
+/** 离场动画时长：与 globals.css 的 .cl-card-leaving 保持一致 */
+const LEAVE_ANIMATION_MS = 320;
+
+const wait = (ms: number) => new Promise((r) => setTimeout(r, ms));
 
 function toStatus(value: string | null): LearnStatus {
   const n = Number(value);
@@ -70,6 +81,10 @@ function CourseLearnClient() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reloadVersion, setReloadVersion] = useState(0);
+  /** 静默刷新中：操作接口成功后重新拉取数据，但保留当前页面内容 */
+  const [silentRefreshing, setSilentRefreshing] = useState(false);
+  /** 正在播放「缩小渐隐」离场动画的单词 id */
+  const [leavingId, setLeavingId] = useState<number | null>(null);
 
   const [globalMode, setGlobalMode] = useState<LearnMode | null>(null);
   const [translationOn, setTranslationOn] = useState(false);
@@ -86,6 +101,8 @@ function CourseLearnClient() {
   const cardRefs = useRef<Array<WordCardHandle | null>>([]);
   const recordsRef = useRef<Map<string, NumberUpdateRecord>>(new Map());
   const globalModeRef = useRef<LearnMode | null>(null);
+  /** 卡片网格容器：用于 FLIP 补位动画的位置测量 */
+  const gridWrapRef = useRef<HTMLDivElement>(null);
 
   globalModeRef.current = globalMode;
 
@@ -103,6 +120,159 @@ function CourseLearnClient() {
   }, []);
 
   const reloadWords = useCallback(() => setReloadVersion((v) => v + 1), []);
+
+  // ── 操作后的列表更新：FLIP 补位动画（「贪吃蛇」顶位效果） ──
+  /** 换入新一页数据：先记录各卡片旧位置，同步提交后让位移卡片平滑滑动补位、新卡片淡入 */
+  const swapWordsWithFlip = useCallback(
+    (data: WordsResponse, nextWords: LearnWord[]) => {
+      const grid = gridWrapRef.current?.querySelector<HTMLElement>("[data-cl-grid]");
+
+      if (!grid) {
+        cardRefs.current = [];
+        setResp(data);
+        setWords(nextWords);
+        setLeavingId(null);
+
+        return;
+      }
+
+      // First：更新前各卡片位置
+      const before = new Map<number, DOMRect>();
+
+      grid.querySelectorAll<HTMLElement>("[data-flip-id]").forEach((el) => {
+        before.set(Number(el.dataset.flipId), el.getBoundingClientRect());
+      });
+
+      // Last：同步提交新列表，确保 DOM 已就位
+      flushSync(() => {
+        cardRefs.current = [];
+        setResp(data);
+        setWords(nextWords);
+        setLeavingId(null);
+      });
+
+      // Invert & Play：仍在列表中的卡片从旧位置滑动到新位置，新卡片淡入。
+      // 注意用 left/top 相对偏移而非 transform（同 cl-shake 的做法）：
+      // transform 会把视口固定的玻璃壁纸重锚定到卡片，relative 偏移则让
+      // 壁纸保持视口锚定，浏览器逐帧重绘，移动过程中背景实时正确（同滚动）。
+      const ease = "cubic-bezier(0.22, 0.61, 0.36, 1)";
+      const animations: Animation[] = [];
+
+      grid.querySelectorAll<HTMLElement>("[data-flip-id]").forEach((el) => {
+        const prev = before.get(Number(el.dataset.flipId));
+
+        if (!prev) {
+          // 新卡片：仅淡入（scale 同样会重锚定壁纸）
+          animations.push(
+            el.animate([{ opacity: 0 }, { opacity: 1 }], {
+              duration: 360,
+              easing: ease,
+            }),
+          );
+
+          return;
+        }
+        const now = el.getBoundingClientRect();
+        const dx = prev.left - now.left;
+        const dy = prev.top - now.top;
+
+        if (dx === 0 && dy === 0) return;
+        el.style.position = "relative";
+        const animation = el.animate(
+          [
+            { left: `${dx}px`, top: `${dy}px` },
+            { left: "0px", top: "0px" },
+          ],
+          { duration: 420, easing: ease },
+        );
+
+        animations.push(animation);
+        // 结束后清理临时定位；动画被提前取消时也要还原
+        void animation.finished
+          .catch(() => {})
+          .finally(() => {
+            el.style.position = "";
+          });
+      });
+
+      // 动画期间每帧触发一次玻璃重绘：液态玻璃 canvas 随卡片位置实时重画
+      // （等同于滚动时的逐帧刷新），缓存壁纸模式的 nudge 亦兜底栅格缓存。
+      if (animations.length) {
+        let frame = requestAnimationFrame(function tick() {
+          requestGlassRepaint(document);
+          frame = requestAnimationFrame(tick);
+        });
+
+        void Promise.allSettled(animations.map((a) => a.finished)).then(() => {
+          cancelAnimationFrame(frame);
+          requestGlassRepaint(document);
+        });
+      }
+    },
+    [],
+  );
+
+  /** 单词操作接口成功后的列表处理：
+   *  - 非强化区课程的【加入/移除强化区】：就地更新收藏标记 + 轻提示，不刷新页面；
+   *  - 其余（删除 / 转入状态 / 强化区课程内移除收藏）：静默刷新，数据返回后操作的卡片
+   *    缩小渐隐，后续卡片平滑补位。 */
+  const applyActionResult = useCallback(
+    async (word: LearnWord, kind: WordActionKind) => {
+      const leavesList =
+        kind !== "collect" ||
+        (kc === COLLECT_COURSE_ID && word.isCollect === 1);
+
+      if (!leavesList) {
+        setWords((prev) =>
+          prev.map((w) =>
+            w.lexiconId === word.lexiconId
+              ? { ...w, isCollect: w.isCollect === 1 ? 0 : 1 }
+              : w,
+          ),
+        );
+        toast.success("操作成功", { timeout: 2000 });
+
+        return;
+      }
+
+      setSilentRefreshing(true);
+      try {
+        const data = await courseLearnApi.queryWords({
+          kc,
+          zt,
+          index: pageIndex,
+          pageSize: PAGE_SIZE,
+        });
+        const lastPage = Math.max(1, Math.ceil(data.total / PAGE_SIZE));
+
+        if (pageIndex > lastPage) {
+          // 本页已空（如删掉了本页最后一个单词）：退回整页加载跳转到末页
+          setPageIndex(lastPage);
+
+          return;
+        }
+
+        const nextWords = data.data ?? [];
+
+        if (!nextWords.some((w) => w.lexiconId === word.lexiconId)) {
+          // 第一步：操作的卡片在原地缩小渐隐
+          setLeavingId(word.lexiconId);
+          await wait(LEAVE_ANIMATION_MS);
+        }
+        // 第二步：换入新数据，后续卡片 FLIP 滑动补位
+        swapWordsWithFlip(data, nextWords);
+        setCurrentIndex(0);
+        setDataVersion((v) => v + 1);
+      } catch {
+        // 静默刷新失败：退回原整页刷新
+        reloadWords();
+      } finally {
+        setSilentRefreshing(false);
+      }
+    },
+    [kc, zt, pageIndex, reloadWords, swapWordsWithFlip],
+  );
+
   const {
     actionPending,
     actionError,
@@ -113,7 +283,7 @@ function CourseLearnClient() {
     handleToggleCollect,
     handleChangeStatus,
     handleConfirmDelete,
-  } = useWordActions(flushRecords, reloadWords);
+  } = useWordActions(flushRecords, applyActionResult);
 
   // ── 数据加载 ─────────────────────────────────────────────
   useEffect(() => {
@@ -339,38 +509,63 @@ function CourseLearnClient() {
           </p>
         )}
 
-        <WordGrid
-          empty={words.length === 0}
-          error={error}
-          loading={loading}
-          onRetry={reloadWords}
-        >
-          {words.map((word, index) => (
-            <WordCard
-              key={`${word.lexiconId}-${index}`}
-              ref={(el) => {
-                cardRefs.current[index] = el;
-              }}
-              actionsDisabled={actionPending}
-              globalMode={globalMode}
-              index={index}
-              practiceOn={practiceOn}
-              settings={settings}
-              status={zt}
-              translationOn={translationOn}
-              word={word}
-              onAdvance={handleAdvance}
-              onExclusiveStart={handleExclusiveStart}
-              onFocusRequest={handleFocusRequest}
-              onChangeStatus={handleChangeStatus}
-              onOpenDetail={handleOpenDetail}
-              onOpenDelete={handleOpenDelete}
-              onOpenEdit={handleOpenEdit}
-              onResult={handleResult}
-              onToggleCollect={handleToggleCollect}
-            />
-          ))}
-        </WordGrid>
+        <div ref={gridWrapRef}>
+          <WordGrid
+            empty={words.length === 0}
+            error={error}
+            loading={loading}
+            onRetry={reloadWords}
+          >
+            {words.map((word, index) => (
+              <div
+                key={word.lexiconId}
+                className={
+                  leavingId === word.lexiconId ? "cl-card-leaving" : undefined
+                }
+                data-flip-id={word.lexiconId}
+                // 离场缩小渐隐期间：玻璃 canvas 随卡片一起缩小，豁免全局
+                // motion 挂起，避免动画触发所有卡片的液态玻璃重绘（同抖动）
+                data-glass-motion-ignore={
+                  leavingId === word.lexiconId ? "" : undefined
+                }
+              >
+                <WordCard
+                  ref={(el) => {
+                    cardRefs.current[index] = el;
+                  }}
+                  actionsDisabled={actionPending}
+                  globalMode={globalMode}
+                  index={index}
+                  practiceOn={practiceOn}
+                  settings={settings}
+                  status={zt}
+                  translationOn={translationOn}
+                  word={word}
+                  onAdvance={handleAdvance}
+                  onExclusiveStart={handleExclusiveStart}
+                  onFocusRequest={handleFocusRequest}
+                  onChangeStatus={handleChangeStatus}
+                  onOpenDetail={handleOpenDetail}
+                  onOpenDelete={handleOpenDelete}
+                  onOpenEdit={handleOpenEdit}
+                  onResult={handleResult}
+                  onToggleCollect={handleToggleCollect}
+                />
+              </div>
+            ))}
+          </WordGrid>
+        </div>
+
+        {/* 静默刷新指示：保留页面内容，仅浮动一个小加载标识 */}
+        {silentRefreshing && (
+          <div
+            className="fixed right-5 top-20 z-50 flex items-center gap-2 rounded-full bg-white/80 px-3.5 py-2 text-xs text-foreground/80 shadow-lg shadow-black/5 ring-1 ring-black/5 backdrop-blur-md dark:bg-white/10 dark:text-foreground/90 dark:ring-white/10"
+            role="status"
+          >
+            <Spinner size="sm" />
+            正在刷新…
+          </div>
+        )}
 
         {!loading && !error && words.length > 0 && (
           <PaginationBar

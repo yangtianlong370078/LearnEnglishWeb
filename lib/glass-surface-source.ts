@@ -14,6 +14,16 @@ export function getRegisteredGlassHosts(document: Document): HTMLElement[] {
   return controllers.get(document)?.getHosts() ?? [];
 }
 
+/** Force visible layers to repaint their viewport-fixed wallpaper and let
+ * surface listeners redraw. Use after imperative layout moves (e.g. FLIP
+ * animations) that leave no scroll/resize/intersection signal behind: a
+ * transformed ancestor re-anchors fixed backgrounds, and the browser keeps
+ * the stale raster once the transform is removed. */
+export function requestGlassRepaint(document: Document) {
+  controllers.get(document)?.requestRepaint();
+  notifySurfaceChanges(document);
+}
+
 /** Notify navigation when React replaces surfaces without changing layout. */
 export function subscribeGlassSurfaceChanges(
   document: Document,
@@ -171,6 +181,7 @@ function createController(document: Document) {
     getHosts() {
       return Array.from(surfaces.keys());
     },
+    requestRepaint: repaintVisibleLayers,
     add(layer: HTMLElement) {
       const host = layer.parentElement!;
       let surface = surfaces.get(host);

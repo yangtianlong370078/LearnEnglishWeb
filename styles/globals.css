@@ -642,6 +642,25 @@ input:-webkit-autofill:active {
   animation: cl-shake 0.5s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
 }
 
+/* 单词操作后的离场动画：原地缩小渐隐，随后由 FLIP 让后续卡片滑动补位。
+   时长须与 page.tsx 的 LEAVE_ANIMATION_MS 保持一致 */
+@keyframes cl-card-leave {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+
+  100% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+}
+
+.cl-card-leaving {
+  pointer-events: none;
+  animation: cl-card-leave 0.32s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
 /* 撒花：每个纸屑用 --tx/--ty/--rot 控制方向，共用同一关键帧 */
 @keyframes cl-confetti {
   0% {
