@@ -812,7 +812,7 @@ function WordCardInner(
         {/* 卡片级【翻译】/【练习】图标按钮：有学习按钮激活时显示；
             全局学习按钮开启时仅跟随全局开关展示，不可点击 */}
         {effectiveMode && (
-          <div className="absolute right-2.5 top-2.5 z-10 flex items-center gap-1.5">
+          <div className="absolute right-3 top-3 z-10 flex items-center gap-1.5">
             {!hideCardTranslation && (
               <button
                 aria-label="翻译"

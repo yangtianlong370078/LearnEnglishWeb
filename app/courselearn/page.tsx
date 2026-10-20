@@ -170,7 +170,7 @@ function CourseLearnClient() {
           // 仅淡入不用 scale（transform 会重锚定视口固定的玻璃壁纸）
           animations.push(
             el.animate([{ opacity: 0 }, { opacity: 1 }], {
-              delay: 420,
+              delay: 260,
               duration: 320,
               easing: ease,
               fill: "backwards",
