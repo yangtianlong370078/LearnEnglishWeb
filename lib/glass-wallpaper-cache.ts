@@ -13,9 +13,16 @@ type Wallpaper = {
   blurPx: number;
   // Keep the decoded resources alive for cached theme changes, including the
   // first CSS paint after an object URL is installed.
-  decoded: HTMLImageElement[];
+  decoded: ReturnType<typeof decodeImage>[];
 };
-const images = new Map<string, Promise<HTMLImageElement>>();
+
+type Job = {
+  key: string;
+  cancelled: boolean;
+  foreground: boolean;
+  worker?: ReturnType<typeof createGlassWallpaperWorker>;
+  cancelDecode?: () => void;
+};
 
 type GlassThemeChange = { dark?: boolean; background?: string };
 type ThemeRequest = { change: GlassThemeChange; commit: () => void };
@@ -42,32 +49,53 @@ export function setGlassTheme(
 }
 
 function decodeImage(url: string) {
-  return new Promise<HTMLImageElement>((resolve, reject) => {
-    const image = new Image();
+  const image = new Image();
+  let disposed = false;
+  let rejectPending: ((error: unknown) => void) | undefined;
+
+  function clearHandlers() {
+    image.onload = image.onerror = null;
+  }
+
+  const ready = new Promise<HTMLImageElement>((resolve, reject) => {
+    rejectPending = reject;
+    const complete = () => {
+      if (disposed) return;
+      clearHandlers();
+      rejectPending = undefined;
+      resolve(image);
+    };
+    const fail = (error: unknown) => {
+      if (disposed) return;
+      clearHandlers();
+      rejectPending = undefined;
+      reject(error);
+    };
 
     image.decoding = "async";
     image.onload = () => {
+      clearHandlers();
       if (typeof image.decode === "function") {
-        void image.decode().then(() => resolve(image), reject);
-      } else resolve(image);
+        void image.decode().then(complete, fail);
+      } else complete();
     };
-    image.onerror = reject;
+    image.onerror = fail;
     image.src = url;
   });
-}
 
-function loadImage(url: string) {
-  let pending = images.get(url);
-
-  if (!pending) {
-    pending = decodeImage(url).catch((error) => {
-      images.delete(url);
-      throw error;
-    });
-    images.set(url, pending);
-  }
-
-  return pending;
+  return {
+    ready,
+    dispose() {
+      if (disposed) return;
+      disposed = true;
+      clearHandlers();
+      // Revoke alone does not release pixels held by a decoded <img>. Also
+      // cancel unfinished loads and settle their callers without waiting for IO.
+      image.removeAttribute("src");
+      rejectPending?.(new Error("Glass wallpaper image disposed"));
+      rejectPending = undefined;
+    },
+  };
 }
 
 function canvasBlob(canvas: HTMLCanvasElement, lossy: boolean) {
@@ -83,21 +111,31 @@ function canvasBlob(canvas: HTMLCanvasElement, lossy: boolean) {
   );
 }
 
-async function decodeWallpaper(base: Blob, border: Blob, blurPx: number) {
+async function decodeWallpaper(
+  base: Blob,
+  border: Blob,
+  blurPx: number,
+  job: Job,
+) {
   const baseUrl = URL.createObjectURL(base);
   const borderUrl = URL.createObjectURL(border);
+  const decoded = [decodeImage(baseUrl), decodeImage(borderUrl)];
+  const cancel = () => {
+    for (const image of decoded) image.dispose();
+  };
 
+  job.cancelDecode = cancel;
   try {
-    const decoded = await Promise.all([
-      decodeImage(baseUrl),
-      decodeImage(borderUrl),
-    ]);
+    await Promise.all(decoded.map((image) => image.ready));
 
     return { base: baseUrl, border: borderUrl, blurPx, decoded };
   } catch (error) {
+    cancel();
     URL.revokeObjectURL(baseUrl);
     URL.revokeObjectURL(borderUrl);
     throw error;
+  } finally {
+    job.cancelDecode = undefined;
   }
 }
 
@@ -132,6 +170,9 @@ export function createGlassWallpaperCache(document: Document) {
   const view = document.defaultView!;
   const root = document.documentElement;
   const cache = new Map<string, Wallpaper>();
+  // Original photos are much larger than encoded viewport textures. Keep only
+  // the two most recently used sources (e.g. light/dark), owned by this cache.
+  const images = new Map<string, ReturnType<typeof decodeImage>>();
   const requests = new Set<ThemeRequest>();
   let requestedKey = "";
   let activeKey = "";
@@ -143,13 +184,48 @@ export function createGlassWallpaperCache(document: Document) {
   let warmupTimer = 0;
   let canUseWorker = true;
 
-  type Job = {
-    key: string;
-    cancelled: boolean;
-    foreground: boolean;
-    worker?: ReturnType<typeof createGlassWallpaperWorker>;
-  };
   let activeJob: Job | undefined;
+
+  function clearImages() {
+    for (const image of Array.from(images.values())) image.dispose();
+    images.clear();
+  }
+
+  function loadImage(url: string, job: Job) {
+    let image = images.get(url);
+
+    if (image) images.delete(url);
+    else {
+      const created = decodeImage(url);
+
+      image = created;
+      void created.ready.catch(() => {
+        if (images.get(url) === created) images.delete(url);
+        created.dispose();
+      });
+    }
+    images.set(url, image);
+    for (const [key, entry] of Array.from(images)) {
+      if (images.size <= 2) break;
+      images.delete(key);
+      entry.dispose();
+    }
+
+    // A canceled job must stop awaiting a stalled source, even when rapid
+    // theme/size changes keep requesting the same URL. Decoded LRU entries
+    // still survive normally once this load stage has completed.
+    const source = image;
+    const cancel = () => {
+      if (images.get(url) === source) images.delete(url);
+      source.dispose();
+    };
+
+    job.cancelDecode = cancel;
+
+    return source.ready.finally(() => {
+      if (job.cancelDecode === cancel) job.cancelDecode = undefined;
+    });
+  }
 
   async function render(
     width: number,
@@ -165,7 +241,10 @@ export function createGlassWallpaperCache(document: Document) {
     // Do not allocate full-size drawing buffers while a photo is loading, and
     // do not start convolution if a newer request has superseded this one.
     const image = photo
-      ? await loadImage(getWallpaperUrl(dark ? "dark" : "light", wallpaper))
+      ? await loadImage(
+          getWallpaperUrl(dark ? "dark" : "light", wallpaper),
+          job,
+        )
       : undefined;
 
     if (disposed || job.cancelled) return;
@@ -319,13 +398,15 @@ export function createGlassWallpaperCache(document: Document) {
       });
 
       if (!disposed && !job.cancelled)
-        return decodeWallpaper(baseBlob, borderBlob, blurPx);
+        return decodeWallpaper(baseBlob, borderBlob, blurPx, job);
     } finally {
       for (const buffer of buffers) buffer.width = 0;
     }
   }
 
   function release(entry: Wallpaper) {
+    for (const image of entry.decoded) image.dispose();
+    entry.decoded.length = 0;
     URL.revokeObjectURL(entry.base);
     URL.revokeObjectURL(entry.border);
   }
@@ -393,6 +474,7 @@ export function createGlassWallpaperCache(document: Document) {
     warmupFrame = warmupIdle = warmupTimer = 0;
     if (!activeJob || activeJob.key === keepKey) return;
     activeJob.cancelled = true;
+    activeJob.cancelDecode?.();
     // Termination interrupts synchronous OffscreenCanvas work as well as an
     // encode in progress. A late bitmap/decode cannot populate the cache.
     activeJob.worker?.dispose();
@@ -436,6 +518,7 @@ export function createGlassWallpaperCache(document: Document) {
                   target.dark ? "dark" : "light",
                   target.wallpaper,
                 ),
+                job,
               )
             : undefined;
 
@@ -471,7 +554,7 @@ export function createGlassWallpaperCache(document: Document) {
         }
         if (disposed || job.cancelled) return;
         if (blobs)
-          return decodeWallpaper(blobs.base, blobs.border, target.blurPx);
+          return decodeWallpaper(blobs.base, blobs.border, target.blurPx, job);
       } else canUseWorker = false;
     }
     if (!job.foreground || disposed || job.cancelled) return;
@@ -574,6 +657,7 @@ export function createGlassWallpaperCache(document: Document) {
     // A new foreground request supersedes speculative work for another size,
     // theme, or mode. Selecting the in-flight prewarm itself reuses its task.
     if (key !== requestedKey) cancelPreparation(key);
+    if (!target.photo) clearImages();
     if (activeJob?.key === key) activeJob.foreground = true;
 
     // A mode change must use its own blur immediately. The CSS source fallback
@@ -664,6 +748,7 @@ export function createGlassWallpaperCache(document: Document) {
   return () => {
     disposed = true;
     cancelPreparation();
+    clearImages();
     if (coordinators.get(document) === coordinate)
       coordinators.delete(document);
     // A route may remove the final glass surface while its theme provider stays

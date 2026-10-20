@@ -472,7 +472,7 @@ export default function LearnWordsPage() {
   );
 
   return (
-    <div className="flex flex-col w-full gap-4">
+    <div className="flex flex-col w-full gap-4" data-glass-continuous-scroll="">
       {loading ? (
         <LearnWordsSkeleton />
       ) : error ? (

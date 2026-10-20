@@ -512,7 +512,10 @@ async function protectionChecks(page) {
       }
       return original.apply(this, args);
     };
-    let result = { throttled: false, canvases: -1, updates: 0 };
+    let result = {
+      throttled: false, canvases: -1, updates: 0,
+      continuous: !!document.querySelector("[data-glass-continuous-scroll]"),
+    };
     try {
       for (let i = 0; i < 60; i++) {
         scrollTo({ top: 2 * (i + 1), behavior: "instant" });
@@ -521,6 +524,7 @@ async function protectionChecks(page) {
           document.documentElement.hasAttribute("data-liquid-glass-throttled")
         ) {
           result = {
+            ...result,
             throttled: true,
             canvases: document.querySelectorAll(".liquid-glass-surface").length,
             updates: i + 1,
@@ -535,13 +539,12 @@ async function protectionChecks(page) {
   });
   assert.ok(
     slow.throttled,
-    "Sustained slow liquid rendering triggers the scroll fallback",
+    "Sustained slow liquid rendering triggers adaptive protection",
   );
-  assert.equal(
-    slow.canvases,
-    0,
-    "Throttled mode releases every liquid output canvas",
-  );
+  if (slow.continuous)
+    assert.ok(slow.canvases > 0, "Course lists retain liquid glass during throttling");
+  else
+    assert.equal(slow.canvases, 0, "Other routes preserve their scroll fallback");
   await page.waitForFunction(
     () =>
       !document.documentElement.hasAttribute("data-liquid-glass-throttled") &&

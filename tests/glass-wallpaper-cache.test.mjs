@@ -29,6 +29,7 @@ function setup({
   workerSupported = true,
   idleSupported = true,
   sameRadius = false,
+  deferPhotos = false,
 } = {}) {
   const config = {};
   runInNewContext(compile("../config/glass.ts"), { exports: config });
@@ -45,6 +46,9 @@ function setup({
   const listeners = new Map();
   const workerCalls = [];
   const workerState = { created: 0, disposed: 0 };
+  const imageElements = [];
+  const photoDecodes = [];
+  const wallpapers = { light: "bg01_light.jpeg", dark: "bg01_dark.jpeg" };
   let nextTask = 0;
   function createWorker() {
     const instance = { disposed: false };
@@ -159,8 +163,7 @@ function setup({
         };
       if (name === "./theme-preferences")
         return {
-          getStoredWallpaperName: (mode) =>
-            mode === "dark" ? "bg01_dark.jpeg" : "bg01_light.jpeg",
+          getStoredWallpaperName: (mode) => wallpapers[mode],
           getWallpaperUrl: (mode, file) => `/images/${mode}/${file}`,
         };
       assert.equal(name, "@/config/glass");
@@ -170,12 +173,25 @@ function setup({
     Image: class {
       width = 1920;
       height = 1080;
+      constructor() {
+        imageElements.push(this);
+      }
       set src(url) {
         this.url = url;
-        queueMicrotask(() => this.onload());
+        this.originalUrl = url;
+        queueMicrotask(() => this.onload?.());
+      }
+      removeAttribute(name) {
+        assert.equal(name, "src");
+        this.url = "";
       }
       decode() {
-        if (this.url.startsWith("/images/")) return Promise.resolve();
+        if (this.url.startsWith("/images/")) {
+          if (!deferPhotos) return Promise.resolve();
+          return new Promise((resolve, reject) =>
+            photoDecodes.push({ resolve, reject }),
+          );
+        }
         return new Promise((resolve, reject) =>
           decodes.push({ resolve, reject }),
         );
@@ -216,12 +232,15 @@ function setup({
     created,
     workerCalls,
     workerState,
+    imageElements,
+    photoDecodes,
     frames,
     idleCallbacks,
     timers,
     listeners,
     observedOptions,
     dispose,
+    remount: () => exports.createGlassWallpaperCache(document),
     flush,
     runFrames: () => runCallbacks(frames),
     runIdle: () => runCallbacks(idleCallbacks),
@@ -255,6 +274,10 @@ function setup({
     },
     changeMode(mode) {
       root.dataset.glassMode = mode;
+      update();
+    },
+    changeWallpaper(file, mode = "light") {
+      wallpapers[mode] = file;
       update();
     },
     refresh: () => update(),
@@ -684,4 +707,176 @@ test("a failed speculative decode does not loop or disturb current content", asy
   assert.equal(h.ready(), true);
   assert.deepEqual(h.filters, [expectedFilter("liquid")]);
   h.dispose();
+});
+
+test("browsing wallpapers bounds original photos and releases evicted decoded textures", async () => {
+  const h = setup();
+  await h.finishTexture();
+  for (let i = 0; i < 12; i++) {
+    h.changeWallpaper(`photo-${i}.jpeg`);
+    await h.finishTexture();
+    const sources = h.imageElements.filter((image) =>
+      image.url.startsWith("/images/"),
+    );
+    const textures = h.imageElements.filter((image) =>
+      image.url.startsWith("blob:"),
+    );
+    assert.ok(sources.length <= 2, "Retain at most two original photos");
+    assert.ok(textures.length <= 4, "Retain at most two decoded texture pairs");
+    assert.ok(h.created.length - h.revoked.length <= 4);
+    for (const image of h.imageElements) {
+      assert.equal(
+        image.onload,
+        null,
+        "Completed images do not retain cache callbacks",
+      );
+      assert.equal(image.onerror, null);
+    }
+  }
+  h.dispose();
+  assert.ok(h.imageElements.every((image) => image.url === ""));
+  assert.deepEqual(new Set(h.created), new Set(h.revoked));
+});
+
+test("worker and Canvas source hits reuse the photo and refresh its eviction order", async () => {
+  for (const workerSupported of [true, false]) {
+    const h = setup({ workerSupported });
+    await h.finishTexture();
+    const first = h.imageElements.find((image) =>
+      image.url.startsWith("/images/"),
+    );
+    h.changeWallpaper("second.jpeg");
+    await h.finishTexture();
+    const second = h.imageElements.find((image) =>
+      image.url.endsWith("second.jpeg"),
+    );
+    h.resize(810);
+    await h.runTimers(100);
+    await h.finishTexture();
+    h.changeWallpaper("bg01_light.jpeg");
+    await h.finishTexture();
+    assert.equal(
+      h.imageElements.filter((image) =>
+        image.originalUrl.startsWith("/images/"),
+      ).length,
+      2,
+    );
+    h.changeWallpaper("third.jpeg");
+    await h.finishTexture();
+    assert.ok(first.url, "Recently reused original survives eviction");
+    assert.equal(second.url, "", "Least recently used original is released");
+    h.dispose();
+  }
+});
+
+test("unmount releases originals and a remount cannot inherit a module-global photo cache", async () => {
+  const h = setup();
+  await h.finishTexture();
+  const original = h.imageElements.find((image) =>
+    image.url.startsWith("/images/"),
+  );
+  h.dispose();
+  assert.equal(original.url, "");
+  const release = h.remount();
+  await h.finishTexture();
+  const current = h.imageElements.find((image) =>
+    image.url.startsWith("/images/"),
+  );
+  assert.notEqual(current, original, "The remounted cache owns its source");
+  release();
+  assert.ok(h.imageElements.every((image) => image.url === ""));
+  assert.equal(h.listeners.size, 0);
+  assert.equal(h.frames.size, 0);
+  assert.equal(h.idleCallbacks.size, 0);
+});
+
+test("rapid wallpaper changes and unmount cancel unfinished photo decodes", async () => {
+  const h = setup({ deferPhotos: true });
+  await h.flush();
+  for (let i = 0; i < 12; i++) {
+    h.changeWallpaper(`pending-${i}.jpeg`);
+    await h.flush();
+    assert.equal(h.imageElements.filter((image) => image.url).length, 1);
+  }
+  h.dispose();
+  await h.flush();
+  assert.ok(
+    h.imageElements.every(
+      (image) => !image.url && !image.onload && !image.onerror,
+    ),
+  );
+  for (const decode of h.photoDecodes) decode.resolve();
+  await h.flush();
+  assert.equal(h.workerCalls.length, 0, "Late decodes never start a render");
+  assert.equal(h.workerState.created, h.workerState.disposed);
+  assert.equal(h.created.length, 0);
+});
+
+test("mode changes cancel stalled source loads even when every job requests the same URL", async () => {
+  for (const workerSupported of [true, false]) {
+    const h = setup({ deferPhotos: true, workerSupported });
+    await h.flush();
+    for (let i = 0; i < 12; i++) {
+      const previous = h.imageElements.at(-1);
+      h.changeMode(i % 2 ? "glass" : "liquid");
+      await h.flush();
+      assert.equal(
+        previous.url,
+        "",
+        "Canceled jobs release unfinished sources immediately",
+      );
+      assert.equal(h.imageElements.filter((image) => image.url).length, 1);
+    }
+    h.photoDecodes.at(-1).resolve();
+    await h.finishTexture();
+    for (const decode of h.photoDecodes) decode.resolve();
+    await h.flush();
+    assert.equal(h.ready(), true);
+    assert.equal(h.workerCalls.length, workerSupported ? 1 : 0);
+    h.dispose();
+    assert.ok(h.imageElements.every((image) => !image.url));
+  }
+});
+
+test("switching to an ambient background releases cached original photos", async () => {
+  const h = setup();
+  await h.finishTexture();
+  h.root.dataset.bgTheme = "defalut";
+  h.refresh();
+  assert.equal(
+    h.imageElements.filter((image) => image.url.startsWith("/images/")).length,
+    0,
+  );
+  await h.finishTexture();
+  assert.equal(h.ready(), true);
+  h.dispose();
+});
+
+test("a failed texture decode cancels its unfinished partner and releases both URLs", async () => {
+  const h = setup();
+  await h.flush();
+  h.workerCalls[0].resolve({ base: {}, border: {} });
+  await h.flush();
+  assert.equal(h.decodes.length, 2);
+  h.decodes[0].reject(new Error("Failed decode"));
+  await h.flush();
+  assert.equal(h.revoked.length, 2);
+  assert.equal(
+    h.imageElements.filter((image) => image.url.startsWith("blob:")).length,
+    0,
+  );
+  h.dispose();
+});
+
+test("dispose releases decoding textures immediately without waiting for decoder completion", async () => {
+  const h = setup();
+  await h.flush();
+  h.workerCalls[0].resolve({ base: {}, border: {} });
+  await h.flush();
+  assert.equal(h.created.length, 2);
+  h.dispose();
+  await h.flush();
+  assert.deepEqual(new Set(h.created), new Set(h.revoked));
+  assert.ok(h.imageElements.every((image) => image.url === ""));
+  assert.equal(h.ready(), false);
 });

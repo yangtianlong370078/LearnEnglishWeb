@@ -26,11 +26,20 @@ runInNewContext(
   { exports: resizeModule },
 );
 
-async function setup({ incrementalResize = false } = {}) {
+async function setup({
+  incrementalResize = false,
+  deferSourceImage = false,
+  continuousScroll = false,
+  adaptive = false,
+  drawCost = 0,
+} = {}) {
   const jobs = new Set(),
     observers = [],
     events = new Map();
   const renderer = { draws: 0, uploads: 0, disposed: false, canvas: {} };
+  const sourceImages = [];
+  const timers = new Map();
+  let nextTimer = 0;
   let clock = 0;
   class Element {
     style = {
@@ -115,6 +124,9 @@ async function setup({ incrementalResize = false } = {}) {
   root.style.getPropertyValue = () => source;
   root.setAttribute("data-glass-wallpaper-ready", "");
   const layers = [new Element(), new Element()];
+  if (continuousScroll)
+    layers[0].closest = (selector) =>
+      selector === "[data-glass-continuous-scroll]" ? body : null;
   if (incrementalResize) {
     layers[0].parentElement = new Element();
     layers[0].parentElement.setAttribute("data-glass-incremental-resize", "");
@@ -132,8 +144,12 @@ async function setup({ incrementalResize = false } = {}) {
     }),
     addEventListener: (name, fn) => events.set(name, fn),
     removeEventListener: (name) => events.delete(name),
-    clearTimeout() {},
-    setTimeout: () => 1,
+    clearTimeout: (id) => timers.delete(id),
+    setTimeout(callback, delay) {
+      const id = ++nextTimer;
+      timers.set(id, { callback, due: clock + delay });
+      return id;
+    },
     getComputedStyle: () => ({ borderTopLeftRadius: "24px" }),
   };
   const document = {
@@ -210,6 +226,8 @@ async function setup({ incrementalResize = false } = {}) {
           },
           render(items, viewport, regions) {
             renderer.draws++;
+            renderer.lastItems = items;
+            clock += drawCost;
             return items.map((item, index) => {
               if (regions) {
                 const region = regions[index];
@@ -255,14 +273,27 @@ async function setup({ incrementalResize = false } = {}) {
         desktop: { maxCards: 20, maxDpr: 1, maxPixels: 1_500_000 },
         edgeWidthPx: 20,
         edgeInsetPx: 1,
-        adaptive: { enabled: false, scrollEndDelayMs: 160 },
+        adaptive: {
+          enabled: adaptive,
+          slowFrameMs: 34,
+          workBudgetMs: 8,
+          consecutiveSlowFrames: 8,
+          scrollEndDelayMs: 160,
+        },
       },
     },
   };
   class Image {
+    constructor() {
+      sourceImages.push(this);
+    }
     set src(value) {
       this.url = value;
-      queueMicrotask(() => this.onload?.());
+      if (!deferSourceImage) queueMicrotask(() => this.onload?.());
+    }
+    removeAttribute(name) {
+      assert.equal(name, "src");
+      this.url = "";
     }
   }
   const exports = {};
@@ -292,12 +323,23 @@ async function setup({ incrementalResize = false } = {}) {
     body,
     layers,
     renderer,
+    sourceImages,
     dispose,
     jobs,
+    timers,
     flush,
-    scroll() {
-      events.get("scroll")();
+    advance(ms) {
+      clock += ms;
+      for (const [id, timer] of [...timers]) {
+        if (timer.due > clock) continue;
+        timers.delete(id);
+        timer.callback();
+      }
       flush();
+    },
+    scroll({ flushFrame = true } = {}) {
+      events.get("scroll")();
+      if (flushFrame) flush();
     },
     async changeSource() {
       source = 'url("blob:wallpaper-2")';
@@ -483,4 +525,97 @@ test("accordion height changes retain the canvas and repaint only the changed bo
   h.dispose();
   assert.equal(resumed.width, 0);
   assert.equal(final.width, 0);
+});
+
+test("source replacement and disposal cancel unfinished background image requests", async () => {
+  const h = await setup({ deferSourceImage: true });
+  const first = h.sourceImages[0];
+  assert.ok(first.url);
+  await h.changeSource();
+  assert.equal(first.url, "");
+  assert.equal(first.onload, null);
+  assert.equal(first.onerror, null);
+  const second = h.sourceImages[1];
+  assert.ok(second.url);
+  h.dispose();
+  assert.equal(second.url, "");
+  assert.equal(second.onload, null);
+  assert.equal(second.onerror, null);
+  assert.equal(h.renderer.uploads, 0);
+});
+
+test("scroll pressure keeps opted-in glass aligned on every frame and through scroll end", async () => {
+  for (const incrementalResize of [false, true]) {
+    const h = await setup({
+      continuousScroll: true, adaptive: true, drawCost: 12, incrementalResize,
+    });
+    const canvas = h.layers[0].children[0];
+    for (let i = 0; i < 8; i++) {
+      h.layers[0].bounds.y++;
+      h.scroll();
+    }
+    assert.ok(h.root.hasAttribute("data-liquid-glass-throttled"));
+    assert.equal(h.layers[0].children[0], canvas, "Slow frames keep the same presented canvas");
+    for (let i = 0; i < 10; i++) {
+      const copies = canvas.copies;
+      h.layers[0].bounds.y++;
+      h.scroll();
+      assert.equal(canvas.copies, copies + 1, "Every moving frame refreshes its glass without a timer delay");
+      assert.equal(h.renderer.lastItems.find((item) => item.id === 1).y, h.layers[0].bounds.y);
+      if (incrementalResize)
+        assert.equal(h.layers[0].parentElement.style["--liquid-glass-source-y"], `${-h.layers[0].bounds.y}px`);
+    }
+    const copies = canvas.copies;
+    for (let i = 0; i < 10; i++) {
+      h.layers[0].bounds.y++;
+      h.scroll({ flushFrame: false });
+    }
+    assert.equal(h.jobs.size, 1, "Input events in the same frame still share one measurement");
+    assert.equal(canvas.copies, copies);
+    h.flush();
+    assert.equal(canvas.copies, copies + 1, "One paint samples the latest position in the next frame");
+    assert.equal(h.renderer.lastItems.find((item) => item.id === 1).y, h.layers[0].bounds.y);
+    assert.equal(h.layers[0].children[0], canvas);
+    const settledCopies = canvas.copies;
+    h.advance(160);
+    assert.equal(h.root.hasAttribute("data-liquid-glass-throttled"), false);
+    assert.equal(h.layers[0].children[0], canvas, "Scroll end never replaces the canvas");
+    assert.equal(canvas.copies, settledCopies, "No redundant repaint when scrolling stops");
+    assert.equal(h.renderer.uploads, 1, "Scrolling never reloads the background");
+    assert.equal(h.timers.size, 0, "No idle timer loop remains");
+    h.dispose();
+  }
+});
+
+test("scroll retention is opt-in and other pages keep their existing slow-frame fallback", async () => {
+  const h = await setup({ adaptive: true, drawCost: 12 });
+  const canvas = h.layers[0].children[0];
+  for (let i = 0; i < 8; i++) {
+    h.layers[0].bounds.y++;
+    h.scroll();
+  }
+  assert.ok(h.root.hasAttribute("data-liquid-glass-throttled"));
+  assert.equal(h.layers[0].children.length, 0);
+  assert.equal(canvas.width, 0);
+  h.advance(160);
+  assert.ok(h.layers[0].children[0]);
+  h.dispose();
+});
+
+test("disposing a slow page cancels its pending frame and scroll-end timer", async () => {
+  const h = await setup({ continuousScroll: true, adaptive: true, drawCost: 12 });
+  for (let i = 0; i < 9; i++) {
+    h.layers[0].bounds.y++;
+    h.scroll();
+  }
+  h.layers[0].bounds.y++;
+  h.scroll({ flushFrame: false });
+  assert.equal(h.jobs.size, 1);
+  assert.equal(h.timers.size, 1);
+  const draws = h.renderer.draws;
+  h.dispose();
+  assert.equal(h.jobs.size, 0);
+  assert.equal(h.timers.size, 0);
+  h.advance(1000);
+  assert.equal(h.renderer.draws, draws);
 });

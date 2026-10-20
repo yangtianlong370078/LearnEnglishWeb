@@ -102,6 +102,7 @@ export function createLiquidGlassController(
   let previousItems: readonly LiquidGlassItem[] = [];
   let previousViewport: readonly number[] = [];
   let scrolling = false;
+  let continuousScroll = false;
   let throttled = false;
   let slowFrames = 0;
   let previousFrame = 0;
@@ -164,6 +165,12 @@ export function createLiquidGlassController(
       ),
     );
 
+    // Opt in per page: large course accordions keep their presented glass
+    // during slow scrolling while other routes retain their existing fallback.
+    continuousScroll = Array.from(layers).some((layer) =>
+      layer.closest("[data-glass-continuous-scroll]"),
+    );
+
     for (const [layer, surface] of Array.from(surfaces)) {
       if (layers.has(layer)) continue;
       removeCanvas(surface);
@@ -207,7 +214,7 @@ export function createLiquidGlassController(
     sourceReady = false;
     const version = ++sourceVersion;
 
-    if (pendingImage) pendingImage.onload = pendingImage.onerror = null;
+    cancelPendingImage();
     clear();
     if (!url) return;
     const image = new Image();
@@ -215,6 +222,7 @@ export function createLiquidGlassController(
     pendingImage = image;
     image.onload = () => {
       if (disposed || version !== sourceVersion) return;
+      image.onload = image.onerror = null;
       try {
         renderer.setBackground(image);
         sourceReady = true;
@@ -226,6 +234,13 @@ export function createLiquidGlassController(
     };
     image.onerror = fail;
     image.src = url;
+  }
+
+  function cancelPendingImage() {
+    if (!pendingImage) return;
+    pendingImage.onload = pendingImage.onerror = null;
+    pendingImage.removeAttribute("src");
+    pendingImage = undefined;
   }
 
   function measure() {
@@ -245,7 +260,7 @@ export function createLiquidGlassController(
     const suspended =
       !sourceReady ||
       document.hidden ||
-      throttled ||
+      (throttled && !continuousScroll) ||
       moving.size > 0 ||
       document.body.hasAttribute("data-glass-modal-open");
 
@@ -419,7 +434,7 @@ export function createLiquidGlassController(
         const interval = previousFrame ? start - previousFrame : 0;
 
         previousFrame = start;
-        if (config.adaptive.enabled && scrolling) {
+        if (config.adaptive.enabled && scrolling && !throttled) {
           const slow =
             elapsed > config.adaptive.workBudgetMs ||
             (interval > config.adaptive.slowFrameMs && interval < 250);
@@ -428,7 +443,7 @@ export function createLiquidGlassController(
           if (slowFrames >= config.adaptive.consecutiveSlowFrames) {
             throttled = true;
             root.setAttribute("data-liquid-glass-throttled", "");
-            clear();
+            if (!continuousScroll) clear();
           }
         }
       } catch {
@@ -438,6 +453,8 @@ export function createLiquidGlassController(
   }
 
   function schedule() {
+    // The shared rAF already coalesces scroll events. Delaying it further lets
+    // retained glass / border samples lag behind the moving card's position.
     if (!disposed) scheduleGlassFrame(view, measure);
   }
 
@@ -450,7 +467,7 @@ export function createLiquidGlassController(
       root.removeAttribute("data-liquid-glass-throttled");
       schedule();
     }, config.adaptive.scrollEndDelayMs);
-    if (!throttled) schedule();
+    if (!throttled || continuousScroll) schedule();
   }
 
   function invalidateStyles() {
@@ -548,8 +565,7 @@ export function createLiquidGlassController(
     if (disposed) return;
     disposed = true;
     sourceVersion++;
-    if (pendingImage) pendingImage.onload = pendingImage.onerror = null;
-    pendingImage = undefined;
+    cancelPendingImage();
     cancelGlassFrame(view, measure);
     view.clearTimeout(scrollTimer);
     view.removeEventListener("scroll", onScroll, true);
