@@ -3,6 +3,7 @@ import type { LiquidGlassItem } from "./liquid-glass-renderer";
 import { cancelGlassFrame, scheduleGlassFrame } from "./glass-frame";
 import { subscribeGlassSurfaceChanges } from "./glass-surface-source";
 import { createLiquidGlassRenderer } from "./liquid-glass-renderer";
+import { createLiquidGlassResizeSurface } from "./liquid-glass-resize";
 
 import { liquidGlassConfig as config } from "@/config/liquid-glass";
 
@@ -13,6 +14,8 @@ type Surface = {
   styleDirty: boolean;
   canvas?: HTMLCanvasElement;
   context?: CanvasRenderingContext2D;
+  incrementalResize: boolean;
+  resizeSurface?: ReturnType<typeof createLiquidGlassResizeSurface>;
   lastPaint?: readonly number[];
 };
 
@@ -21,6 +24,24 @@ const excluded = ".login-scene, .navbar-root, .cl-navbar, .modal__dialog";
 
 function sameNumbers(a: readonly number[], b: readonly number[]) {
   return a.length === b.length && a.every((value, index) => value === b[index]);
+}
+
+function sameItems(a: readonly LiquidGlassItem[], b: readonly LiquidGlassItem[]) {
+  return (
+    a.length === b.length &&
+    a.every((item, index) => {
+      const previous = b[index];
+
+      return (
+        item.id === previous.id &&
+        item.x === previous.x &&
+        item.y === previous.y &&
+        item.width === previous.width &&
+        item.height === previous.height &&
+        item.radius === previous.radius
+      );
+    })
+  );
 }
 
 /** Loaded ahead of hydration for a saved liquid preference. */
@@ -62,6 +83,11 @@ export function createLiquidGlassController(
   // No stylesheet selectors or extra DOM layers exist in the other modes.
   style.textContent = `
     .liquid-glass-surface { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; }
+    html[data-glass-wallpaper-ready] [data-liquid-glass-resize-active] > .glass-border::after,
+    html[data-glass-wallpaper-ready] [data-liquid-glass-resize-active] > .glass-border > .glass-border-glow::before {
+      background-attachment: scroll;
+      background-position: var(--liquid-glass-source-x) var(--liquid-glass-source-y);
+    }
     body[data-glass-modal-open] .liquid-glass-surface,
     [data-glass-navigation-active] > .glass-warp > .liquid-glass-surface { display: none; }
   `;
@@ -82,12 +108,19 @@ export function createLiquidGlassController(
   let scrollTimer = 0;
 
   const resize = new ResizeObserver((entries) => {
+    let incrementalResize = false;
+
     for (const entry of entries) {
       const surface = surfaces.get(entry.target as HTMLElement);
 
       if (surface) surface.styleDirty = true;
+      if (surface?.incrementalResize) incrementalResize = true;
     }
-    schedule();
+    // RO runs after animated layout, before paint. Finish the dirty rows now;
+    // waiting for the next rAF presents a stale bottom edge for one frame.
+    // These fixed, absolutely positioned canvases cannot change host layout.
+    if (incrementalResize) measure()();
+    else schedule();
   });
   const intersection = new IntersectionObserver((entries) => {
     for (const entry of entries) {
@@ -104,9 +137,12 @@ export function createLiquidGlassController(
   });
 
   function removeCanvas(surface: Surface) {
-    if (!surface.canvas) return;
-    surface.canvas.remove();
-    surface.canvas.width = surface.canvas.height = 0;
+    surface.resizeSurface?.dispose();
+    surface.resizeSurface = undefined;
+    if (surface.canvas) {
+      surface.canvas.remove();
+      surface.canvas.width = surface.canvas.height = 0;
+    }
     surface.canvas = undefined;
     surface.context = undefined;
     surface.lastPaint = undefined;
@@ -144,6 +180,9 @@ export function createLiquidGlassController(
         layer,
         radius: 0,
         styleDirty: true,
+        incrementalResize:
+          layer.parentElement?.hasAttribute("data-glass-incremental-resize") ??
+          false,
       };
 
       surfaces.set(layer, surface);
@@ -231,7 +270,10 @@ export function createLiquidGlassController(
           continue;
         // Very large accordion backgrounds cost pixels with little benefit;
         // their child cards still qualify and the parent keeps ordinary glass.
-        if (rect.width * rect.height > viewport.width * viewport.height * 1.5)
+        if (
+          !surface.incrementalResize &&
+          rect.width * rect.height > viewport.width * viewport.height * 1.5
+        )
           continue;
         if (surface.styleDirty) {
           const computed = view.getComputedStyle(layer);
@@ -266,24 +308,23 @@ export function createLiquidGlassController(
 
       if (
         sameNumbers(viewportState, previousViewport) &&
-        items.length === previousItems.length &&
-        items.every((item, index) => {
-          const previous = previousItems[index];
-
-          return (
-            item.id === previous.id &&
-            item.x === previous.x &&
-            item.y === previous.y &&
-            item.width === previous.width &&
-            item.height === previous.height &&
-            item.radius === previous.radius
-          );
-        })
+        sameItems(items, previousItems)
       )
         return;
       try {
-        const tiles = renderer.render(items, viewport);
-        const selected = new Set(tiles.map((tile) => tile.id));
+        const regularItems = items.filter(
+          (item) => !surfacesById.get(item.id)?.incrementalResize,
+        );
+        const previousRegular = previousItems.filter(
+          (item) => !surfacesById.get(item.id)?.incrementalResize,
+        );
+        const regularChanged =
+          !sameNumbers(viewportState, previousViewport) ||
+          !sameItems(regularItems, previousRegular);
+        const tiles = regularChanged
+          ? renderer.render(regularItems, viewport)
+          : [];
+        const selected = new Set(items.map((item) => item.id));
         const itemsById = new Map(items.map((item) => [item.id, item]));
 
         for (const surface of Array.from(painted)) {
@@ -353,7 +394,22 @@ export function createLiquidGlassController(
           );
           surface.lastPaint = paintState;
         }
-        const active = String(tiles.length);
+        // Copy ordinary atlas tiles first: each incremental update reuses the
+        // same WebGL context / canvas to draw just its changed rectangle.
+        for (const item of items) {
+          const surface = surfacesById.get(item.id)!;
+
+          if (!surface.incrementalResize) continue;
+          surface.resizeSurface ??= createLiquidGlassResizeSurface(
+            document,
+            surface.layer,
+            renderer,
+            { ...budget, ...config },
+          );
+          surface.resizeSurface.update(item, viewport);
+          painted.add(surface);
+        }
+        const active = String(items.length);
 
         if (root.getAttribute("data-liquid-glass-active") !== active)
           root.setAttribute("data-liquid-glass-active", active);

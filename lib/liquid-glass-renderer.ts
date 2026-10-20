@@ -34,6 +34,13 @@ export type LiquidGlassViewport = {
   dpr: number;
 };
 
+export type LiquidGlassRegion = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
 export type LiquidGlassRenderer = {
   canvas: HTMLCanvasElement;
   setBackground: (image: HTMLImageElement) => void;
@@ -41,6 +48,8 @@ export type LiquidGlassRenderer = {
   render: (
     items: readonly LiquidGlassItem[],
     viewport: LiquidGlassViewport,
+    /** Optional dirty rectangles in card-local CSS pixels. */
+    regions?: readonly LiquidGlassRegion[],
   ) => LiquidGlassVisibleTile[];
   dispose: () => void;
 };
@@ -382,6 +391,7 @@ export function createLiquidGlassRenderer(
     const render = (
       items: readonly LiquidGlassItem[],
       viewport: LiquidGlassViewport,
+      regions?: readonly LiquidGlassRegion[],
     ) => {
       assertReady();
       if (!background) throw new Error("Liquid glass wallpaper is unavailable");
@@ -395,6 +405,13 @@ export function createLiquidGlassRenderer(
       if (!items.length) return [];
 
       const scale = Math.min(viewport.dpr, options.maxDpr);
+      const allocations = regions
+        ? items.map((item, index) => ({
+            ...item,
+            width: regions[index].width,
+            height: regions[index].height,
+          }))
+        : items;
 
       // Scrolling changes screen coordinates, not atlas packing. Keep the
       // layout until card membership, dimensions or the pixel budget changes.
@@ -402,8 +419,8 @@ export function createLiquidGlassRenderer(
         !cachedAtlas ||
         scale !== cachedScale ||
         options.maxPixels !== cachedMaxPixels ||
-        items.length !== cachedItems.length ||
-        items.some((item, index) => {
+        allocations.length !== cachedItems.length ||
+        allocations.some((item, index) => {
           const previous = cachedItems[index];
 
           return (
@@ -414,12 +431,12 @@ export function createLiquidGlassRenderer(
         })
       ) {
         cachedAtlas = packLiquidGlassAtlas(
-          items,
+          allocations,
           scale,
           options.maxPixels,
           maxDimension,
         );
-        cachedItems = items.map(({ id, width, height }) => ({
+        cachedItems = allocations.map(({ id, width, height }) => ({
           id,
           width,
           height,
@@ -458,7 +475,26 @@ export function createLiquidGlassRenderer(
         ) {
           throw new Error("Invalid liquid glass card bounds");
         }
-        const tile = clipLiquidGlassTile(item, atlas.tiles[index], viewport);
+        const allocation = atlas.tiles[index];
+        const region = regions?.[index];
+        // Dirty rectangles are already clipped by the resize surface. Keep the
+        // full card bounds in aCard so the original lens / corner math applies.
+        const tile = region
+          ? {
+              ...allocation,
+              fullWidth: item.width,
+              fullHeight: item.height,
+              fullPixelWidth: allocation.width,
+              fullPixelHeight: allocation.height,
+              destinationPixels: {
+                x: 0,
+                y: 0,
+                width: allocation.width,
+                height: allocation.height,
+              },
+              destination: region,
+            }
+          : clipLiquidGlassTile(item, allocation, viewport);
 
         if (!tile) continue;
         const offset = visibleTiles.length * 13;

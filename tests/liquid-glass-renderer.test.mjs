@@ -139,3 +139,21 @@ test("scrolling clips pixels without reallocating the atlas or uploading the sta
   renderer.dispose();
   assert.equal(calls.filter(({ name }) => name === "deleteTexture").length, 1);
 });
+
+test("dirty rows allocate only the patch and retain the full card's lens geometry", () => {
+  const { calls, document } = createGraphicsStub();
+  const renderer = createLiquidGlassRenderer(document, options, () => {});
+  const viewport = { width: 1440, height: 1000, dpr: 1 };
+  const item = { id: 1, x: 100, y: 120, width: 1232, height: 10_000, radius: 24 };
+  const region = { x: 0, y: 180, width: 1232, height: 64 };
+
+  renderer.setBackground({ naturalWidth: 800, naturalHeight: 600 });
+  const tile = renderer.render([item], viewport, [region])[0];
+  assert.equal(tile.width, 1232, "A tall list cannot reduce patch resolution");
+  assert.equal(tile.height, 64);
+  assert.deepEqual({ ...tile.destination }, region);
+  const data = calls.filter(({ name }) => name === "bufferSubData").at(-1).args[2];
+  assert.deepEqual(Array.from(data.slice(4, 9)), [100, 120, 1232, 10_000, 24]);
+  assert.deepEqual(Array.from(data.slice(9, 13)), [0, 180, 1232, 64]);
+  renderer.dispose();
+});

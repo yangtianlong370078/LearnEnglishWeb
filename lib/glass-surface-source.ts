@@ -99,18 +99,24 @@ function createController(document: Document) {
   // cached at the old viewport position. After layout settles, alternate a
   // sub-pixel background-position nudge so those layers repaint in place.
   let repaintTimer = 0;
-  let repaintOdd = false;
 
   function repaintVisibleLayers() {
     repaintTimer = 0;
     if (disposed) return;
-    repaintOdd = !repaintOdd;
-    const nudge = repaintOdd ? "0.0156px" : "0px";
 
     for (const [host, layers] of Array.from(surfaces)) {
       if (!visible.has(host)) continue;
-      for (const layer of Array.from(layers))
+      for (const layer of Array.from(layers)) {
+        // Offscreen hosts skip updates, so a global phase can equal the value
+        // they already have on re-entry and fail to invalidate their raster.
+        // Inline style reads do not measure layout or add scroll-time work.
+        const nudge =
+          layer.style.getPropertyValue("--glass-repaint-nudge") === "0.0156px"
+            ? "0px"
+            : "0.0156px";
+
         layer.style.setProperty("--glass-repaint-nudge", nudge);
+      }
     }
   }
 

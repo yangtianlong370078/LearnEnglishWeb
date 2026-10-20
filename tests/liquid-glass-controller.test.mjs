@@ -17,14 +17,26 @@ const code = ts.transpileModule(
   },
 ).outputText;
 
-async function setup() {
+const resizeModule = {};
+runInNewContext(
+  ts.transpileModule(
+    readFileSync(new URL("../lib/liquid-glass-resize.ts", import.meta.url), "utf8"),
+    { compilerOptions: { module: ts.ModuleKind.CommonJS } },
+  ).outputText,
+  { exports: resizeModule },
+);
+
+async function setup({ incrementalResize = false } = {}) {
   const jobs = new Set(),
     observers = [],
     events = new Map();
   const renderer = { draws: 0, uploads: 0, disposed: false, canvas: {} };
   let clock = 0;
   class Element {
-    style = {};
+    style = {
+      setProperty(name, value) { this[name] = value; },
+      removeProperty(name) { delete this[name]; },
+    };
     attributes = new Map();
     children = [];
     isConnected = true;
@@ -48,6 +60,16 @@ async function setup() {
     append(node) {
       this.children.push(node);
       node.parent = this;
+    }
+    replaceChild(node, previous) {
+      assert.ok(node.copies > 0, "Paint the replacement before publishing it");
+      assert.ok(
+        this.children.includes(previous),
+        "Keep the previous frame until replacement",
+      );
+      this.children[this.children.indexOf(previous)] = node;
+      node.parent = this;
+      previous.parent = undefined;
     }
     remove() {
       if (this.parent)
@@ -93,6 +115,10 @@ async function setup() {
   root.style.getPropertyValue = () => source;
   root.setAttribute("data-glass-wallpaper-ready", "");
   const layers = [new Element(), new Element()];
+  if (incrementalResize) {
+    layers[0].parentElement = new Element();
+    layers[0].parentElement.setAttribute("data-glass-incremental-resize", "");
+  }
   layers[1].bounds = { x: 180, y: 30, width: 150, height: 110 };
   const view = {
     innerWidth: 400,
@@ -125,6 +151,7 @@ async function setup() {
         element.copies = 0;
         element.styleWrites = 0;
         element.resizes = 0;
+        element.visibleResizes = 0;
         for (const dimension of ["width", "height"]) {
           let value = 0;
           Object.defineProperty(element, dimension, {
@@ -132,6 +159,8 @@ async function setup() {
             set(next) {
               value = next;
               element.resizes++;
+              if (element.parent?.children.includes(element))
+                element.visibleResizes++;
             },
           });
         }
@@ -149,6 +178,9 @@ async function setup() {
           },
         );
         element.getContext = () => ({
+          clearRect(...args) {
+            element.lastClear = args;
+          },
           drawImage(...args) {
             element.copies++;
             element.lastCopy = args;
@@ -160,6 +192,7 @@ async function setup() {
     },
   };
   const modules = {
+    "./liquid-glass-resize": resizeModule,
     "./glass-frame": {
       scheduleGlassFrame: (_view, job) => jobs.add(job),
       cancelGlassFrame: (_view, job) => jobs.delete(job),
@@ -175,9 +208,18 @@ async function setup() {
           dispose() {
             renderer.disposed = true;
           },
-          render(items) {
+          render(items, viewport, regions) {
             renderer.draws++;
-            return items.map((item) => {
+            return items.map((item, index) => {
+              if (regions) {
+                const region = regions[index];
+                return {
+                  x: 1,
+                  y: 1,
+                  width: Math.round(region.width * viewport.dpr),
+                  height: Math.round(region.height * viewport.dpr),
+                };
+              }
               const clip = Math.max(0, -item.x);
               return {
                 id: item.id,
@@ -210,7 +252,9 @@ async function setup() {
     "@/config/liquid-glass": {
       liquidGlassConfig: {
         mobileBreakpointPx: 768,
-        desktop: { maxCards: 20 },
+        desktop: { maxCards: 20, maxDpr: 1, maxPixels: 1_500_000 },
+        edgeWidthPx: 20,
+        edgeInsetPx: 1,
         adaptive: { enabled: false, scrollEndDelayMs: 160 },
       },
     },
@@ -359,4 +403,84 @@ test("changing crops do not resize or reposition card canvases while scrolling",
   assert.equal(canvas.styleWrites, 0);
   assert.equal(canvas.copies, 6);
   h.dispose();
+});
+
+test("accordion height changes retain the canvas and repaint only the changed bottom band", async () => {
+  const h = await setup({ incrementalResize: true });
+  const first = h.layers[0].children[0];
+  const fixed = h.layers[1].children[0];
+  const host = h.layers[0].parentElement;
+  assert.equal(host.style["--liquid-glass-source-y"], "-20px");
+  assert.ok(host.hasAttribute("data-liquid-glass-resize-active"));
+  assert.equal(
+    first.visibleResizes,
+    0,
+    "Initial painting also happens off-DOM",
+  );
+
+  h.layers[0].bounds.height += 40;
+  h.scroll();
+  assert.equal(h.layers[0].children[0], first);
+  assert.equal(first.height, 664, "Reserve viewport rows once, not list height");
+  assert.equal(first.visibleResizes, 0);
+  assert.ok(first.lastClear[1] > 0, "Retain the original top pixels");
+  assert.equal(first.lastClear[1] + first.lastClear[3], 140);
+  assert.equal(h.layers[0].children.length, 1, "Only one canvas is presented");
+
+  h.layers[0].bounds.height += 40;
+  h.scroll();
+  assert.equal(h.layers[0].children[0], first, "Keep the presented canvas");
+  assert.equal(first.height, 664);
+  assert.equal(first.visibleResizes, 0);
+  assert.equal(h.renderer.draws, 4, "Only the accordion draws on height changes");
+  assert.equal(
+    h.layers[1].children[0],
+    fixed,
+    "Other surfaces keep their canvas",
+  );
+  assert.equal(fixed.copies, 1, "Unchanged surfaces need no additional copy");
+  assert.equal(h.renderer.uploads, 1);
+
+  h.layers[0].bounds.height = 10_000;
+  h.scroll();
+  assert.equal(first.height, 664, "Long lists keep a bounded pixel buffer");
+  assert.equal(h.layers[0].children[0], first, "Keep liquid above the old area cutoff");
+  const fullDraws = h.renderer.draws;
+  h.layers[0].bounds.height += 100;
+  h.scroll();
+  assert.equal(h.renderer.draws, fullDraws, "Offscreen extensions need no drawing");
+  h.layers[0].bounds.height = 120;
+  h.scroll();
+  assert.ok(first.lastClear[1] > 0);
+  assert.equal(first.lastClear[1] + first.lastClear[3], 120);
+
+  h.layers[0].bounds.y += 10;
+  h.scroll();
+  assert.equal(
+    h.layers[0].children[0],
+    first,
+    "Scrolling refreshes the same fixed-size canvas",
+  );
+  assert.equal(first.lastClear[1], 0, "Movement refreshes all visible samples");
+  assert.equal(host.style["--liquid-glass-source-y"], "-30px");
+  const draws = h.renderer.draws;
+  h.scroll();
+  assert.equal(
+    h.renderer.draws,
+    draws,
+    "Unchanged frames still skip rendering",
+  );
+
+  h.modal(true);
+  assert.equal(first.width, 0, "Suspension releases the reserved buffer");
+  assert.equal(host.hasAttribute("data-liquid-glass-resize-active"), false);
+  assert.equal(host.style["--liquid-glass-source-y"], undefined);
+  h.modal(false);
+  const resumed = h.layers[0].children[0];
+  h.layers[0].bounds.height += 40;
+  h.scroll();
+  const final = h.layers[0].children[0];
+  h.dispose();
+  assert.equal(resumed.width, 0);
+  assert.equal(final.width, 0);
 });

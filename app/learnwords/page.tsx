@@ -349,7 +349,7 @@ export default function LearnWordsPage() {
     categories: CategoryInfo[],
     menuMode: "full" | "remove",
   ) => (
-    <GlassCard data-glass-no-promotion="">
+    <GlassCard data-glass-incremental-resize="" data-glass-no-promotion="">
       <Accordion
         allowsMultipleExpanded
         className="w-full rounded-3xl overflow-hidden  "
