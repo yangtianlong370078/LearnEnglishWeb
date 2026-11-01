@@ -405,7 +405,9 @@
   fill: rgba(255, 255, 255, 0.1) !important;
 }
 
-
+.drawer__backdrop--opaque {
+    background-color: transparent !important;
+}
 
 /* 兜底：保留旧的 bg-content 规则（万一某些组件用） */
 .bg-content1 {
