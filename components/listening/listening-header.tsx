@@ -21,7 +21,7 @@ export default function ListeningHeader({
   onToggleLessons,
 }: ListeningHeaderProps) {
   return (
-    <header className="relative z-20 flex h-[68px] shrink-0 px-3 pt-3 sm:px-5">
+    <header className="relative z-20 flex h-[68px] shrink-0 mt-3 px-3 pt-3 sm:px-5">
       <GlassCard
         className="min-w-0 flex-1 rounded-3xl"
         data-glass-no-promotion=""
