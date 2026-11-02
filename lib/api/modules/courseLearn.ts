@@ -107,6 +107,10 @@ export async function recognizeSpeech(
   const res = await request.post<WhisperRecognizeResult>(
     "/Whisper/Recognize",
     form,
+    {
+      // 清除实例默认的 application/json，让浏览器生成 multipart 边界。
+      headers: { "Content-Type": undefined },
+    },
   );
 
   return res.data?.result === true;

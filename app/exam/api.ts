@@ -79,12 +79,16 @@ export const examApi = {
     });
   },
 
-  async recognizeSpeech(audioFile: Blob, word: string): Promise<boolean> {
+  async recognizeSpeech(
+    audioFile: Blob,
+    word: string,
+    asrModelType: string,
+  ): Promise<boolean> {
     const form = new FormData();
 
     form.append("audioFile", audioFile, "recording.webm");
     form.append("word", word);
-    form.append("type", "4");
+    form.append("type", asrModelType);
     const res = await request.post<WhisperRecognizeResult>(
       "/Whisper/Recognize",
       form,

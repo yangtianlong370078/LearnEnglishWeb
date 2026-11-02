@@ -193,7 +193,7 @@ export default function LessonList({
                         ? "shrink-0 text-accent"
                         : "shrink-0 text-muted"
                     }
-                    isDisabled={favoritePendingLessonId !== null}
+                    isDisabled={favoritePendingLessonId === lesson.id}
                     size="sm"
                     variant="ghost"
                     onPress={() => onToggleFavorite(lesson.id)}

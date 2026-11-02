@@ -351,7 +351,7 @@ function ListeningLearnClient() {
   );
 
   const queueShadowReplay = useCallback(
-    (delaySeconds: number, restartTime: number) => {
+    (delaySeconds: number, restartTime: number, targetIndex: number) => {
       clearShadowTimer();
       const generation = shadowGenerationRef.current;
 
@@ -361,9 +361,9 @@ function ListeningLearnClient() {
           if (generation !== shadowGenerationRef.current) return;
 
           const audio = audioRef.current;
-          const targetIndex = shadowTargetIndexRef.current;
 
-          if (!audio || targetIndex === null) return;
+          if (!audio) return;
+          shadowTargetIndexRef.current = targetIndex;
           shadowPendingRef.current = false;
           audio.currentTime = Math.max(0, restartTime);
           setCurrentTime(Math.max(0, restartTime));
@@ -389,7 +389,7 @@ function ListeningLearnClient() {
 
     if (completed < settings.shadowRepeatCount) {
       shadowCompletedRef.current = completed;
-      queueShadowReplay(replayGap, start);
+      queueShadowReplay(replayGap, start, currentIndex);
 
       return;
     }
@@ -398,9 +398,7 @@ function ListeningLearnClient() {
     const nextIndex = currentIndex + 1;
 
     if (nextIndex < lines.length) {
-      shadowTargetIndexRef.current = nextIndex;
-      setCurrentLineIndex(nextIndex);
-      queueShadowReplay(0, lines[nextIndex]?.start ?? 0);
+      queueShadowReplay(replayGap, lines[nextIndex]?.start ?? 0, nextIndex);
 
       return;
     }

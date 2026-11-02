@@ -21,8 +21,10 @@ interface ExamQuestionCardProps {
   answer: AnswerState;
   active: boolean;
   submitting: boolean;
+  maxAttempts: number;
   feedback?: ExamFeedback | null;
   dictationPlay: number;
+  dictationPlayCount: number;
   dictationPlaying: boolean;
   speechRecording: boolean;
   speechRecognizing: boolean;
@@ -42,8 +44,10 @@ export default function ExamQuestionCard({
   answer,
   active,
   submitting,
+  maxAttempts,
   feedback,
   dictationPlay,
+  dictationPlayCount,
   dictationPlaying,
   speechRecording,
   speechRecognizing,
@@ -55,6 +59,8 @@ export default function ExamQuestionCard({
 }: ExamQuestionCardProps) {
   const running = phase === "running";
   const completed = phase === "completed";
+  const dictationWaiting =
+    running && active && !answer.completed && !dictationPlaying;
   const correct = completed
     ? word.isOk === true
     : running && scoring === "realtime" && answer.completed
@@ -144,7 +150,7 @@ export default function ExamQuestionCard({
             {index + 1}
           </span>
           {running && mode === "speech" ? (
-            <span className="tabular-nums">已试 {answer.attempts}/3</span>
+            <span className="tabular-nums">已试 {answer.attempts}/{maxAttempts}</span>
           ) : null}
         </div>
 
@@ -165,7 +171,11 @@ export default function ExamQuestionCard({
               <button
                 aria-label="播放或重试听写发音"
                 className={`cl-mic-btn disabled:cursor-not-allowed disabled:opacity-60 ${
-                  dictationPlaying ? "is-playing" : running ? "is-waiting" : ""
+                  dictationPlaying
+                    ? "is-playing"
+                    : dictationWaiting
+                      ? "is-waiting"
+                      : ""
                 }`}
                 disabled={
                   !running ||
@@ -184,7 +194,7 @@ export default function ExamQuestionCard({
                   className={`size-6 ${
                     dictationPlaying
                       ? "cl-speaker-playing"
-                      : running
+                      : dictationWaiting
                         ? "cl-speaker-waiting"
                         : ""
                   }`}
@@ -194,7 +204,7 @@ export default function ExamQuestionCard({
               {running ? (
                 <span className="text-xs text-muted">
                   {dictationPlaying
-                    ? `第 ${dictationPlay}/3 次朗读`
+                    ? `第 ${dictationPlay}/${dictationPlayCount} 次朗读`
                     : "请准备听写"}
                 </span>
               ) : null}
@@ -212,7 +222,7 @@ export default function ExamQuestionCard({
                   submitting ||
                   !active ||
                   answer.completed ||
-                  answer.attempts >= 3 ||
+                  answer.attempts >= maxAttempts ||
                   speechRecognizing
                 }
                 type="button"
@@ -239,7 +249,7 @@ export default function ExamQuestionCard({
                   : speechRecording
                     ? "录音中，点击可提前结束"
                     : answer.attempts > 0 && !answer.completed
-                      ? `还可尝试 ${3 - answer.attempts} 次`
+                      ? `还可尝试 ${maxAttempts - answer.attempts} 次`
                       : "点击麦克风朗读单词"}
               </span>
             </>

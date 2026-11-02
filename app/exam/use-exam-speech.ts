@@ -1,6 +1,6 @@
 "use client";
 
-import type { AccentType } from "@/types/courselearn";
+import type { AccentType, AsrModelType } from "@/types/courselearn";
 
 import { useCallback, useEffect, useRef, useState } from "react";
 
@@ -10,6 +10,8 @@ import {
   buildAudioUrl,
   getAudioDurationMs,
 } from "@/components/courselearn/lib";
+import { startXunfeiRecognition } from "@/components/courselearn/xunfei";
+import type { XunfeiSession } from "@/components/courselearn/xunfei";
 
 /** 考试语音识别：手动开始/提前结束，切题或交卷时可作废旧任务。 */
 export function useExamSpeech() {
@@ -19,6 +21,7 @@ export function useExamSpeech() {
   const recorderRef = useRef<MediaRecorder | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const xunfeiRef = useRef<XunfeiSession | null>(null);
 
   const clearTimer = useCallback(() => {
     if (timerRef.current) clearTimeout(timerRef.current);
@@ -40,6 +43,11 @@ export function useExamSpeech() {
     }
     streamRef.current?.getTracks().forEach((track) => track.stop());
     streamRef.current = null;
+    // 停止讯飞会话
+    if (xunfeiRef.current) {
+      xunfeiRef.current.stop();
+      xunfeiRef.current = null;
+    }
     setIsRecording(false);
     setIsRecognizing(false);
   }, [clearTimer]);
@@ -51,20 +59,57 @@ export function useExamSpeech() {
     if (recorderRef.current?.state === "recording") {
       recorderRef.current.stop();
     }
+    // 讯飞会话也需要停止
+    if (xunfeiRef.current) {
+      xunfeiRef.current.stop();
+    }
     setIsRecording(false);
   }, [clearTimer]);
 
   const recognize = useCallback(
-    async (word: string, accent: AccentType): Promise<boolean | null> => {
+    async (
+      word: string,
+      accent: AccentType,
+      asrModelType: AsrModelType,
+    ): Promise<boolean | null> => {
       cancel();
       const runId = runRef.current;
       const url = buildAudioUrl(encodeURIComponent(word), accent);
       const duration = await getAudioDurationMs(url);
+      const recordMs = duration + 1000;
+
+      // 讯飞语音：前端直连
+      if (asrModelType === "2") {
+        try {
+          setIsRecording(true);
+          const session = await startXunfeiRecognition(word);
+
+          if (runRef.current !== runId) {
+            session.stop();
+            return null;
+          }
+
+          xunfeiRef.current = session;
+          timerRef.current = setTimeout(() => session.stop(), recordMs);
+          const correct = await session.result;
+
+          if (runRef.current !== runId) return null;
+          clearTimer();
+          xunfeiRef.current = null;
+          setIsRecording(false);
+          return correct;
+        } catch {
+          if (runRef.current !== runId) return null;
+          setIsRecording(false);
+          return false;
+        }
+      }
+
+      // 其他模型：录音后走后端 Whisper
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
 
       if (runRef.current !== runId) {
         stream.getTracks().forEach((track) => track.stop());
-
         return null;
       }
 
@@ -93,7 +138,6 @@ export function useExamSpeech() {
           setIsRecording(false);
           if (runRef.current !== runId) {
             resolve(null);
-
             return;
           }
 
@@ -103,7 +147,7 @@ export function useExamSpeech() {
           });
 
           void examApi
-            .recognizeSpeech(blob, word)
+            .recognizeSpeech(blob, word, asrModelType)
             .then((correct) => {
               if (runRef.current !== runId) resolve(null);
               else resolve(correct);
@@ -120,7 +164,7 @@ export function useExamSpeech() {
         recorder.start();
         timerRef.current = setTimeout(() => {
           if (recorder.state === "recording") recorder.stop();
-        }, duration + 1000);
+        }, recordMs);
       });
     },
     [cancel, clearTimer],

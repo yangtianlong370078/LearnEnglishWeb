@@ -1,6 +1,6 @@
 "use client";
 
-import type { ExamStatistics, ExamSummary } from "./types";
+import type { ExamMode, ExamStatistics, ExamSummary } from "./types";
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
@@ -23,26 +23,11 @@ function ExamCard({
   onDelete,
 }: {
   exam: ExamSummary;
-  onOpen: () => void;
+  onOpen: (mode: ExamMode) => void;
   onDelete: () => void;
 }) {
   return (
-    <GlassCard
-      aria-label={`打开${exam.name}`}
-      className="group cursor-pointer overflow-visible p-5 transition-shadow duration-300 hover:shadow-xl hover:shadow-accent/10"
-      role="button"
-      tabIndex={0}
-      onClick={onOpen}
-      onKeyDown={(event) => {
-        if (
-          event.target === event.currentTarget &&
-          (event.key === "Enter" || event.key === " ")
-        ) {
-          event.preventDefault();
-          onOpen();
-        }
-      }}
-    >
+    <GlassCard className="group overflow-visible p-5 transition-shadow duration-300 hover:shadow-xl hover:shadow-accent/10">
       <div className="relative z-[1]">
         <div className="flex items-start justify-between gap-3 pr-8">
           <div className="min-w-0">
@@ -83,9 +68,13 @@ function ExamCard({
             const score = exam[meta.scoreKey];
 
             return (
-              <div
+              <button
                 key={mode}
-                className="flex min-w-0 flex-col items-center gap-1.5 py-1"
+                aria-label={`以${meta.label}模式打开${exam.name}`}
+                className="flex min-w-0 flex-col items-center gap-1.5 rounded-xl py-1 transition-colors hover:bg-black/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent dark:hover:bg-white/[0.06]"
+                title={`进入${meta.label}模式`}
+                type="button"
+                onClick={() => onOpen(mode)}
               >
                 <span
                   className="inline-flex size-10 items-center justify-center rounded-2xl bg-[var(--cl-soft)] text-[var(--cl-ring3)] dark:text-[var(--cl-ring0)]"
@@ -103,7 +92,7 @@ function ExamCard({
                 <span className="text-sm font-bold tabular-nums text-foreground">
                   {completed ? score : "-"}
                 </span>
-              </div>
+              </button>
             );
           })}
         </div>
@@ -258,7 +247,9 @@ export default function ExamList() {
               key={exam.id}
               exam={exam}
               onDelete={() => setDeleteTarget(exam)}
-              onOpen={() => router.push(`/exam/${exam.id}`)}
+              onOpen={(mode) =>
+                router.push(`/exam/${exam.id}?mode=${mode}`)
+              }
             />
           ))}
         </div>

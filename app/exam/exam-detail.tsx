@@ -12,14 +12,16 @@ import type { ExamFeedback } from "./exam-question-card";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
-import { ArrowLeft, ClockArrowRotateLeft, Play } from "@gravity-ui/icons";
+import { ArrowLeft, ClockArrowRotateLeft, Gear, Play } from "@gravity-ui/icons";
 import { Button, Spinner, toast } from "@heroui/react";
 
 import { examApi } from "./api";
 import ExamModeIcon from "./mode-icon";
 import ExamQuestionCard from "./exam-question-card";
+import ExamSettingsModal from "./exam-settings-modal";
 import { ExamConfirmModal, StartExamModal } from "./exam-modals";
 import { useExamSpeech } from "./use-exam-speech";
+import { useExamSettings } from "./use-exam-settings";
 import {
   EXAM_MODES,
   EXAM_MODE_META,
@@ -30,7 +32,6 @@ import {
   scoreOf,
 } from "./utils";
 
-import { useCourseLearnSettings } from "@/components/courselearn/use-course-learn-settings";
 import {
   buildAudioUrl,
   getAudioDurationMs,
@@ -66,13 +67,127 @@ function playOnce(audio: HTMLAudioElement, url: string): Promise<void> {
   });
 }
 
-export default function ExamDetailPage({ examId }: { examId: number }) {
+const SCORE_BADGE_TONES = {
+  neutral: {
+    ring: "conic-gradient(from 210deg, #94a3b8, #f8fafc, #a8b3c2, #e2e8f0, #94a3b8)",
+    glow: "rgba(100, 116, 139, 0.22)",
+    accent: "#94a3b8",
+    text: "text-slate-600 dark:text-slate-300",
+  },
+  low: {
+    ring: "conic-gradient(from 210deg, #8f3047, #f3b3bd, #c4566d, #fff0f2, #8f3047)",
+    glow: "rgba(190, 74, 98, 0.3)",
+    accent: "#c4566d",
+    text: "text-[#9f354e] dark:text-[#ffb3c0]",
+  },
+  medium: {
+    ring: "conic-gradient(from 210deg, #9a661f, #f7dfa4, #c4933f, #fff4cf, #9a661f)",
+    glow: "rgba(196, 147, 63, 0.3)",
+    accent: "#c4933f",
+    text: "text-[#8a5a17] dark:text-[#f5d58a]",
+  },
+  high: {
+    ring: "conic-gradient(from 210deg, #176f63, #b8ead9, #3b9b83, #e3fff3, #176f63)",
+    glow: "rgba(59, 155, 131, 0.3)",
+    accent: "#3b9b83",
+    text: "text-[#167264] dark:text-[#8fe0c6]",
+  },
+} as const;
+
+function CurrentScoreBadge({ score }: { score: number | null }) {
+  const toneName =
+    score === null
+      ? "neutral"
+      : score < 60
+        ? "low"
+        : score < 80
+          ? "medium"
+          : "high";
+  const tone = SCORE_BADGE_TONES[toneName];
+
+  return (
+    <div
+      aria-atomic="true"
+      aria-label={
+        score === null
+          ? "当前分数暂未显示"
+          : `当前分数 ${score} 分，满分 100 分`
+      }
+      aria-live="polite"
+      className="relative grid size-[104px] shrink-0 place-items-center"
+      role="status"
+    >
+      <div
+        aria-hidden="true"
+        className="absolute inset-2 rounded-full opacity-70 blur-xl"
+        style={{ background: tone.glow }}
+      />
+      <div
+        aria-hidden="true"
+        className="absolute inset-0 rounded-full shadow-[0_10px_25px_-14px_rgba(15,23,42,0.45)]"
+        style={{ background: tone.ring }}
+      >
+        <div className="absolute inset-[3px] rounded-full border border-white/80 bg-white/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] dark:border-white/10 dark:bg-[#17181c] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]" />
+      </div>
+      <div
+        aria-hidden="true"
+        className="absolute inset-[9px] rounded-full border border-dashed opacity-25"
+        style={{ borderColor: tone.accent }}
+      />
+      <svg
+        aria-hidden="true"
+        className="absolute right-[13px] top-[11px] size-3 opacity-80"
+        viewBox="0 0 12 12"
+      >
+        <path
+          d="M6 0C6.7 3.6 8.4 5.3 12 6C8.4 6.7 6.7 8.4 6 12C5.3 8.4 3.6 6.7 0 6C3.6 5.3 5.3 3.6 6 0Z"
+          fill={tone.accent}
+        />
+      </svg>
+      <div className="relative flex flex-col items-center text-center">
+        <span className="text-[10px] font-medium tracking-[0.16em] text-muted">
+          当前分数
+        </span>
+        <div className={`mt-1 flex items-baseline ${tone.text}`}>
+          <span className="text-[34px] font-bold leading-none tracking-[-0.04em] tabular-nums">
+            {score ?? "-"}
+          </span>
+          {score !== null ? (
+            <span className="ml-1 text-[10px] font-semibold">分</span>
+          ) : null}
+        </div>
+        <span
+          aria-hidden="true"
+          className="mt-1.5 h-px w-5 opacity-60"
+          style={{ background: tone.accent }}
+        />
+        <span className="mt-1 text-[9px] font-medium tracking-wider text-muted">
+          满分 100
+        </span>
+      </div>
+    </div>
+  );
+}
+
+export default function ExamDetailPage({
+  examId,
+  initialMode = "en-cn",
+}: {
+  examId: number;
+  initialMode?: ExamMode;
+}) {
   const router = useRouter();
-  const { settings } = useCourseLearnSettings();
+  const {
+    settings,
+    setAccent,
+    setDictationPlayCount,
+    setRetryCount,
+    setAsrModelType,
+  } = useExamSettings();
   const speech = useExamSpeech();
   const [exam, setExam] = useState<ExamDetail | null>(null);
   const [items, setItems] = useState<ExamContent[]>([]);
-  const [mode, setMode] = useState<ExamMode>("en-cn");
+  const [mode, setMode] = useState<ExamMode>(initialMode);
   const [contentCompleted, setContentCompleted] = useState(false);
   const [loading, setLoading] = useState(true);
   const [contentLoading, setContentLoading] = useState(false);
@@ -85,6 +200,7 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
   const [starting, setStarting] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [submitConfirm, setSubmitConfirm] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
   const [feedback, setFeedback] = useState<Record<number, ExamFeedback>>({});
   const [dictation, setDictation] = useState({
     itemId: 0,
@@ -96,7 +212,7 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
   const answersRef = useRef<Record<number, AnswerState>>({});
   const currentIndexRef = useRef(0);
   const sessionRef = useRef<ExamSession | null>(null);
-  const modeRef = useRef<ExamMode>("en-cn");
+  const modeRef = useRef<ExamMode>(initialMode);
   const submittingRef = useRef(false);
   const autoSubmitRef = useRef(false);
   const contentRequestRef = useRef(0);
@@ -168,7 +284,7 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
     try {
       const [detail, content] = await Promise.all([
         examApi.detail(examId),
-        examApi.content(examId, EXAM_MODE_META["en-cn"].type),
+        examApi.content(examId, EXAM_MODE_META[initialMode].type),
       ]);
 
       setExam(detail);
@@ -179,7 +295,7 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
     } finally {
       setLoading(false);
     }
-  }, [examId]);
+  }, [examId, initialMode]);
 
   useEffect(() => {
     void loadPage();
@@ -286,7 +402,7 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
       const audio = audioRef.current;
 
       try {
-        for (let play = 1; play <= 3; play += 1) {
+        for (let play = 1; play <= settings.dictationPlayCount; play += 1) {
           if (dictationRunRef.current !== runId || !sessionRef.current) return;
           setDictation({ itemId: item.id, play, playing: true });
           await playOnce(audio, url);
@@ -313,7 +429,13 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
       await wait(350);
       if (sessionRef.current) advanceAfterAudio(index, config);
     },
-    [advanceAfterAudio, settings.accent, showFeedback, updateAnswer],
+    [
+      advanceAfterAudio,
+      settings.accent,
+      settings.dictationPlayCount,
+      showFeedback,
+      updateAnswer,
+    ],
   );
 
   runDictationRef.current = runDictation;
@@ -459,11 +581,15 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
     if (config.scoring === "realtime" && answer.completed) return;
 
     const correct = isAnswerCorrect(mode, item, answer);
+    const attempts = (answer.attempts ?? 0) + 1;
+    const completed = correct || attempts >= settings.retryCount;
 
-    updateAnswer(item.id, { ...answer, completed: true, correct });
+    updateAnswer(item.id, { ...answer, completed, correct, attempts });
     if (config.scoring === "realtime") showFeedback(item.id, correct);
     if (advanceTimerRef.current) clearTimeout(advanceTimerRef.current);
-    if (index < itemsRef.current.length - 1) {
+
+    // 只有完成（正确或达到最大重试次数）才自动跳转下一题
+    if (completed && index < itemsRef.current.length - 1) {
       advanceTimerRef.current = setTimeout(
         () => setCurrentIndex(index + 1),
         300,
@@ -479,7 +605,7 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
       !config ||
       index !== currentIndex ||
       answer.completed ||
-      answer.attempts >= 3
+      answer.attempts >= settings.retryCount
     )
       return;
     if (speech.isRecording) {
@@ -491,7 +617,11 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
     let correct = false;
 
     try {
-      const result = await speech.recognize(item.en, settings.accent);
+      const result = await speech.recognize(
+        item.en,
+        settings.accent,
+        settings.asrModelType,
+      );
 
       if (result === null) return;
       correct = result;
@@ -504,7 +634,7 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
     if (!sessionRef.current || modeRef.current !== "speech") return;
     const latest = answersRef.current[item.id] ?? answer;
     const attempts = latest.attempts + 1;
-    const completed = correct || attempts >= 3;
+    const completed = correct || attempts >= settings.retryCount;
 
     updateAnswer(item.id, { ...latest, correct, attempts, completed });
     if (config.scoring === "realtime") showFeedback(item.id, correct);
@@ -560,7 +690,16 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
           <ArrowLeft className="size-4" />
           返回试题
         </Button>
-        <span className="text-sm text-muted">{exam.count} 个单词</span>
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-muted">{exam.count} 个单词</span>
+          <Button
+            size="sm"
+            variant="ghost"
+            onPress={() => setSettingsOpen(true)}
+          >
+            <Gear className="size-4" />
+          </Button>
+        </div>
       </div>
 
       <GlassCard className="p-4 md:p-5">
@@ -604,12 +743,7 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
           </div>
 
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-4 xl:justify-end">
-            <div className="min-w-24 text-center">
-              <p className="text-xs text-muted">当前分数</p>
-              <p className="mt-1 text-3xl font-bold tabular-nums text-foreground">
-                {shownScore ?? "-"}
-              </p>
-            </div>
+            <CurrentScoreBadge score={shownScore} />
             {session ? (
               <div className="flex flex-col items-end gap-2">
                 <span
@@ -708,11 +842,13 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
                 dictationPlay={
                   dictation.itemId === item.id ? dictation.play : 0
                 }
+                dictationPlayCount={settings.dictationPlayCount}
                 dictationPlaying={
                   dictation.itemId === item.id && dictation.playing
                 }
                 feedback={feedback[item.id]}
                 index={index}
+                maxAttempts={settings.retryCount}
                 mode={mode}
                 phase={phase}
                 scoring={session?.scoring ?? "realtime"}
@@ -760,6 +896,15 @@ export default function ExamDetailPage({ examId }: { examId: number }) {
         title="确认交卷"
         onConfirm={() => void submitExamRef.current(false)}
         onOpenChange={setSubmitConfirm}
+      />
+      <ExamSettingsModal
+        isOpen={settingsOpen}
+        settings={settings}
+        onAccentChange={setAccent}
+        onAsrModelChange={setAsrModelType}
+        onDictationPlayCountChange={setDictationPlayCount}
+        onOpenChange={setSettingsOpen}
+        onRetryCountChange={setRetryCount}
       />
     </div>
   );
