@@ -806,8 +806,8 @@ background-image: linear-gradient(145deg, oklch(0.65 0.19 32 / 0.24) 0%, oklch(0
   animation-delay: 0.34s;
 }
 
-/* ── Exam 答题结果徽章：单层八瓣图标 ── */
-@keyframes exam-result-badge-enter {
+/* ── 共享答题结果徽章：单层八瓣图标 ── */
+@keyframes result-petal-badge-enter {
   from {
     opacity: 0;
     transform: translateY(-4px) scale(0.9);
@@ -819,8 +819,8 @@ background-image: linear-gradient(145deg, oklch(0.65 0.19 32 / 0.24) 0%, oklch(0
   }
 }
 
-.exam-result-badge {
-  --exam-badge-shadow: rgba(23, 102, 80, 0.24);
+.result-petal-badge {
+  --result-petal-shadow: rgba(23, 102, 80, 0.24);
   position: absolute;
   top: -13px;
   right: 14px;
@@ -829,22 +829,29 @@ background-image: linear-gradient(145deg, oklch(0.65 0.19 32 / 0.24) 0%, oklch(0
   height: 44px;
   pointer-events: none;
   user-select: none;
-  animation: exam-result-badge-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: result-petal-badge-enter 0.3s cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
-.exam-result-badge.is-wrong {
-  --exam-badge-shadow: rgba(156, 61, 83, 0.22);
+.result-petal-badge.is-wrong {
+  --result-petal-shadow: rgba(156, 61, 83, 0.22);
 }
 
-.exam-result-badge-mark {
+.courselearn-result-badge {
+  right: auto;
+  left: 12px;
+}
+
+.result-petal-badge-mark {
   display: block;
   width: 100%;
   height: 100%;
   overflow: visible;
-  filter: drop-shadow(0 5px 5px var(--exam-badge-shadow));
+  filter:
+    drop-shadow(0 2px 2px rgba(15, 23, 42, 0.1))
+    drop-shadow(0 7px 8px var(--result-petal-shadow));
 }
 
-.exam-result-badge-glyph {
+.result-petal-badge-glyph {
   fill: none;
   stroke: #fff;
   stroke-dasharray: 28;
@@ -852,7 +859,7 @@ background-image: linear-gradient(145deg, oklch(0.65 0.19 32 / 0.24) 0%, oklch(0
   animation: cl-badge-draw 0.32s 0.12s cubic-bezier(0.65, 0, 0.35, 1) both;
 }
 
-.exam-result-badge-glyph.exam-result-badge-cross-2 {
+.result-petal-badge-glyph.result-petal-badge-cross-2 {
   animation-delay: 0.22s;
 }
 

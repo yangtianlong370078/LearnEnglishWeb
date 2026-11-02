@@ -30,6 +30,7 @@ import {
 
 import ConfettiBurst from "./confetti";
 import GlassCard from "@/components/common/glass-card";
+import ResultPetalBadge from "@/components/common/result-petal-badge";
 import RingProgress from "./ring-progress";
 import {
   CnEnIcon,
@@ -634,71 +635,10 @@ function WordCardInner(
             : ""}
       </span>
       {resultState !== "idle" && (
-        <span
-          aria-hidden="true"
-          className={`cl-result-badge ${resultState === "correct" ? "is-correct" : "is-wrong"}`}
-        >
-          <svg
-            className="cl-result-badge-surface"
-            fill="none"
-            focusable="false"
-            height="48"
-            viewBox="0 0 136 48"
-            width="136"
-          >
-            {/* 外框、文字基线与勾叉共用 SVG 旋转，保持角度一致并直接矢量绘制。 */}
-            <g transform="rotate(-4.3 68 24)">
-              <path
-                className="cl-result-badge-depth"
-                d="M2 10H122L134 22V42H12L2 32Z"
-              />
-              <path
-                className="cl-result-badge-face"
-                d="M2 8H122L134 20V40H12L2 30Z"
-                strokeLinejoin="round"
-                strokeWidth="1"
-              />
-              <text className="cl-result-badge-word" x="12" y="32">
-                {resultState === "correct" ? "Nice." : "Oops."}
-              </text>
-              <svg
-                className="cl-result-badge-icon"
-                fill="none"
-                height="24"
-                viewBox="0 0 24 24"
-                width="24"
-                x="100"
-                y="12"
-              >
-                {resultState === "correct" ? (
-                  <path
-                    d="M5 12.5l4.5 4.5L19 7.5"
-                    stroke="currentColor"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2.8"
-                  />
-                ) : (
-                  <>
-                    <path
-                      d="M7.5 7.5l9 9"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeWidth="2.8"
-                    />
-                    <path
-                      className="cl-badge-cross-2"
-                      d="M16.5 7.5l-9 9"
-                      stroke="currentColor"
-                      strokeLinecap="round"
-                      strokeWidth="2.8"
-                    />
-                  </>
-                )}
-              </svg>
-            </g>
-          </svg>
-        </span>
+        <ResultPetalBadge
+          className="courselearn-result-badge"
+          correct={resultState === "correct"}
+        />
       )}
 
       {/* 内容层需 relative z-[1]：absolute 定位的 warp 玻璃层会盖住 static 内容 */}
