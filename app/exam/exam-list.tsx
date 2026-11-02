@@ -77,7 +77,7 @@ function ExamCard({
                 onClick={() => onOpen(mode)}
               >
                 <span
-                  className="inline-flex size-10 items-center justify-center rounded-2xl bg-[var(--cl-soft)] text-[var(--cl-ring3)] dark:text-[var(--cl-ring0)]"
+                  className="exam-mode-icon relative inline-flex size-10 items-center justify-center rounded-2xl text-[var(--cl-ring3)] dark:text-[var(--cl-ring0)]"
                   style={
                     {
                       "--cl-ring0": meta.theme.light,
@@ -86,7 +86,8 @@ function ExamCard({
                     } as React.CSSProperties
                   }
                 >
-                  <ExamModeIcon className="size-5" mode={mode} />
+                  <span aria-hidden="true" className="exam-mode-icon-inner" />
+                  <ExamModeIcon className="relative z-[1] size-5" mode={mode} />
                 </span>
                 <span className="text-[11px] text-muted">{meta.label}</span>
                 <span className="text-sm font-bold tabular-nums text-foreground">
@@ -247,9 +248,7 @@ export default function ExamList() {
               key={exam.id}
               exam={exam}
               onDelete={() => setDeleteTarget(exam)}
-              onOpen={(mode) =>
-                router.push(`/exam/${exam.id}?mode=${mode}`)
-              }
+              onOpen={(mode) => router.push(`/exam/${exam.id}?mode=${mode}`)}
             />
           ))}
         </div>

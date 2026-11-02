@@ -806,6 +806,41 @@ background-image: linear-gradient(145deg, oklch(0.65 0.19 32 / 0.24) 0%, oklch(0
   animation-delay: 0.34s;
 }
 
+/* ── Exam 列表模式图标：半透明渐变细描边 ── */
+.exam-mode-icon {
+  background-color: var(--cl-soft);
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.82),
+    var(--cl-soft) 50%,
+    rgba(255, 255, 255, 0.3)
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.34);
+}
+
+.exam-mode-icon-inner {
+  position: absolute;
+  inset: 1px;
+  border-radius: 15px;
+  background: var(--cl-soft);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.22);
+  pointer-events: none;
+}
+
+.dark .exam-mode-icon {
+  background-image: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.3),
+    var(--cl-soft) 52%,
+    rgba(255, 255, 255, 0.12)
+  );
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+.dark .exam-mode-icon-inner {
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
 /* ── 共享答题结果徽章：单层八瓣图标 ── */
 @keyframes result-petal-badge-enter {
   from {
