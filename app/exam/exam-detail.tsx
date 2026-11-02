@@ -67,27 +67,30 @@ function playOnce(audio: HTMLAudioElement, url: string): Promise<void> {
   });
 }
 
+const SCORE_PETAL_PATH =
+  "M52 3C55.93 3 59.69 6.96 63.78 8.05C67.86 9.14 73.1 7.6 76.5 9.56C79.9 11.53 81.18 16.84 84.17 19.83C87.16 22.82 92.47 24.1 94.44 27.5C96.4 30.9 94.86 36.14 95.95 40.22C97.04 44.31 101 48.07 101 52C101 55.93 97.04 59.69 95.95 63.78C94.86 67.86 96.4 73.1 94.44 76.5C92.47 79.9 87.16 81.18 84.17 84.17C81.18 87.16 79.9 92.47 76.5 94.44C73.1 96.4 67.86 94.86 63.78 95.95C59.69 97.04 55.93 101 52 101C48.07 101 44.31 97.04 40.22 95.95C36.14 94.86 30.9 96.4 27.5 94.44C24.1 92.47 22.82 87.16 19.83 84.17C16.84 81.18 11.53 79.9 9.56 76.5C7.6 73.1 9.14 67.86 8.05 63.78C6.96 59.69 3 55.93 3 52C3 48.07 6.96 44.31 8.05 40.22C9.14 36.14 7.6 30.9 9.56 27.5C11.53 24.1 16.84 22.82 19.83 19.83C22.82 16.84 24.1 11.53 27.5 9.56C30.9 7.6 36.14 9.14 40.22 8.05C44.31 6.96 48.07 3 52 3Z";
+
 const SCORE_BADGE_TONES = {
   neutral: {
-    ring: "conic-gradient(from 210deg, #94a3b8, #f8fafc, #a8b3c2, #e2e8f0, #94a3b8)",
+    petalColors: ["#94a3b8", "#f8fafc", "#a8b3c2", "#e2e8f0", "#94a3b8"],
     glow: "rgba(100, 116, 139, 0.22)",
     accent: "#94a3b8",
     text: "text-slate-600 dark:text-slate-300",
   },
   low: {
-    ring: "conic-gradient(from 210deg, #8f3047, #f3b3bd, #c4566d, #fff0f2, #8f3047)",
+    petalColors: ["#8f3047", "#f3b3bd", "#c4566d", "#fff0f2", "#8f3047"],
     glow: "rgba(190, 74, 98, 0.3)",
     accent: "#c4566d",
     text: "text-[#9f354e] dark:text-[#ffb3c0]",
   },
   medium: {
-    ring: "conic-gradient(from 210deg, #9a661f, #f7dfa4, #c4933f, #fff4cf, #9a661f)",
+    petalColors: ["#9a661f", "#f7dfa4", "#c4933f", "#fff4cf", "#9a661f"],
     glow: "rgba(196, 147, 63, 0.3)",
     accent: "#c4933f",
     text: "text-[#8a5a17] dark:text-[#f5d58a]",
   },
   high: {
-    ring: "conic-gradient(from 210deg, #176f63, #b8ead9, #3b9b83, #e3fff3, #176f63)",
+    petalColors: ["#176f63", "#b8ead9", "#3b9b83", "#e3fff3", "#176f63"],
     glow: "rgba(59, 155, 131, 0.3)",
     accent: "#3b9b83",
     text: "text-[#167264] dark:text-[#8fe0c6]",
@@ -117,23 +120,59 @@ function CurrentScoreBadge({ score }: { score: number | null }) {
       className="relative grid size-[104px] shrink-0 place-items-center"
       role="status"
     >
-      <div
+      <svg
         aria-hidden="true"
-        className="absolute inset-2 rounded-full opacity-70 blur-xl"
-        style={{ background: tone.glow }}
-      />
-      <div
-        aria-hidden="true"
-        className="absolute inset-0 rounded-full shadow-[0_10px_25px_-14px_rgba(15,23,42,0.45)]"
-        style={{ background: tone.ring }}
+        className="absolute inset-2 size-[88px] opacity-70 blur-xl"
+        viewBox="0 0 104 104"
       >
-        <div className="absolute inset-[3px] rounded-full border border-white/80 bg-white/95 shadow-[inset_0_1px_0_rgba(255,255,255,0.9)] dark:border-white/10 dark:bg-[#17181c] dark:shadow-[inset_0_1px_0_rgba(255,255,255,0.08)]" />
-      </div>
-      <div
+        <path d={SCORE_PETAL_PATH} fill={tone.glow} />
+      </svg>
+      <svg
         aria-hidden="true"
-        className="absolute inset-[9px] rounded-full border border-dashed opacity-25"
-        style={{ borderColor: tone.accent }}
-      />
+        className="absolute inset-0 size-full overflow-visible drop-shadow-[0_8px_6px_rgba(15,23,42,0.14)]"
+        viewBox="0 0 104 104"
+      >
+        <defs>
+          <linearGradient
+            gradientUnits="userSpaceOnUse"
+            id={`score-petal-gradient-${toneName}`}
+            x1="16"
+            x2="88"
+            y1="10"
+            y2="96"
+          >
+            {tone.petalColors.map((color, index) => (
+              <stop
+                key={`${color}-${index}`}
+                offset={index / (tone.petalColors.length - 1)}
+                stopColor={color}
+              />
+            ))}
+          </linearGradient>
+        </defs>
+        <path
+          d={SCORE_PETAL_PATH}
+          fill={`url(#score-petal-gradient-${toneName})`}
+        />
+        <g transform="translate(52 52) scale(0.94) translate(-52 -52)">
+          <path
+            className="fill-white/95 stroke-white/80 dark:fill-[#17181c] dark:stroke-white/10"
+            d={SCORE_PETAL_PATH}
+            strokeWidth="1"
+          />
+        </g>
+        <g transform="translate(52 52) scale(0.82) translate(-52 -52)">
+          <path
+            d={SCORE_PETAL_PATH}
+            fill="none"
+            stroke={tone.accent}
+            strokeDasharray="2 3"
+            strokeLinecap="round"
+            strokeOpacity="0.3"
+            strokeWidth="0.8"
+          />
+        </g>
+      </svg>
       <svg
         aria-hidden="true"
         className="absolute right-[13px] top-[11px] size-3 opacity-80"

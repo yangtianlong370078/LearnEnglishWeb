@@ -35,6 +35,49 @@ interface ExamQuestionCardProps {
   onActivate: () => void;
 }
 
+const EXAM_RESULT_PETAL_PATH =
+  "M24 1C26.49 1 28.75 4.86 31.46 5.98C34.17 7.11 38.5 5.98 40.26 7.74C42.02 9.5 40.89 13.83 42.02 16.54C43.14 19.25 47 21.51 47 24C47 26.49 43.14 28.75 42.02 31.46C40.89 34.17 42.02 38.5 40.26 40.26C38.5 42.02 34.17 40.89 31.46 42.02C28.75 43.14 26.49 47 24 47C21.51 47 19.25 43.14 16.54 42.02C13.83 40.89 9.5 42.02 7.74 40.26C5.98 38.5 7.11 34.17 5.98 31.46C4.86 28.75 1 26.49 1 24C1 21.51 4.86 19.25 5.98 16.54C7.11 13.83 5.98 9.5 7.74 7.74C9.5 5.98 13.83 7.11 16.54 5.98C19.25 4.86 21.51 1 24 1Z";
+
+function ExamResultBadge({ correct }: { correct: boolean }) {
+  return (
+    <span
+      aria-hidden="true"
+      className={`exam-result-badge ${correct ? "is-correct" : "is-wrong"}`}
+    >
+      <svg className="exam-result-badge-mark" viewBox="0 0 48 48">
+        <path
+          d={EXAM_RESULT_PETAL_PATH}
+          style={{ fill: correct ? "#2f8f76" : "#c85f74" }}
+        />
+        <g
+          strokeLinecap="round"
+          strokeLinejoin="round"
+          strokeWidth="2.5"
+          transform="translate(12 12)"
+        >
+          {correct ? (
+            <path
+              className="exam-result-badge-glyph"
+              d="M5 12.5L9.5 17L19 7.5"
+            />
+          ) : (
+            <>
+              <path
+                className="exam-result-badge-glyph"
+                d="M7.5 7.5L16.5 16.5"
+              />
+              <path
+                className="exam-result-badge-glyph exam-result-badge-cross-2"
+                d="M16.5 7.5L7.5 16.5"
+              />
+            </>
+          )}
+        </g>
+      </svg>
+    </span>
+  );
+}
+
 export default function ExamQuestionCard({
   word,
   index,
@@ -105,41 +148,7 @@ export default function ExamQuestionCard({
         {correct === true ? "回答正确" : correct === false ? "回答错误" : ""}
       </span>
       {resultBadge ? (
-        <span
-          aria-hidden="true"
-          className={`cl-result-badge ${resultBadge.correct ? "is-correct" : "is-wrong"}`}
-          style={{ left: "auto", right: 12 }}
-        >
-          <svg
-            className="cl-result-badge-surface"
-            height="48"
-            viewBox="0 0 136 48"
-            width="136"
-          >
-            <g transform="rotate(-4.3 68 24)">
-              <path
-                className="cl-result-badge-depth"
-                d="M2 10H122L134 22V42H12L2 32Z"
-              />
-              <path
-                className="cl-result-badge-face"
-                d="M2 8H122L134 20V40H12L2 30Z"
-              />
-              <text className="cl-result-badge-word" x="12" y="32">
-                {resultBadge.correct ? "Nice." : "Oops."}
-              </text>
-              <text
-                fill="currentColor"
-                fontSize="22"
-                fontWeight="700"
-                x="108"
-                y="31"
-              >
-                {resultBadge.correct ? "✓" : "×"}
-              </text>
-            </g>
-          </svg>
-        </span>
+        <ExamResultBadge key={resultBadge.key} correct={resultBadge.correct} />
       ) : null}
 
       <div
@@ -150,7 +159,9 @@ export default function ExamQuestionCard({
             {index + 1}
           </span>
           {running && mode === "speech" ? (
-            <span className="tabular-nums">已试 {answer.attempts}/{maxAttempts}</span>
+            <span className="tabular-nums">
+              已试 {answer.attempts}/{maxAttempts}
+            </span>
           ) : null}
         </div>
 
