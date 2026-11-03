@@ -156,7 +156,7 @@ function CurrentScoreBadge({ score }: { score: number | null }) {
         />
         <g transform="translate(52 52) scale(0.94) translate(-52 -52)">
           <path
-            className="fill-white/95 stroke-white/80 dark:fill-[#17181c] dark:stroke-white/10"
+            className="fill-white/75 stroke-white/60 dark:fill-[#17181c]/75 dark:stroke-white/15"
             d={SCORE_PETAL_PATH}
             strokeWidth="1"
           />
@@ -782,7 +782,9 @@ export default function ExamDetailPage({
           </div>
 
           <div className="flex shrink-0 flex-wrap items-center justify-between gap-4 xl:justify-end">
-            <CurrentScoreBadge score={shownScore} />
+            {shownScore !== null ? (
+              <CurrentScoreBadge score={shownScore} />
+            ) : null}
             {session ? (
               <div className="flex flex-col items-end gap-2">
                 <span

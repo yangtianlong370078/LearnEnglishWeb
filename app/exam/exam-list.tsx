@@ -138,8 +138,13 @@ function StatisticItem({
   unit: string;
   emphasized?: boolean;
 }) {
+  const scoreProgress =
+    emphasized && typeof value === "number" && Number.isFinite(value)
+      ? Math.min(100, Math.max(0, value)) / 100
+      : 0;
+
   return (
-    <div className="bg-white/[0.2] px-4 py-4 sm:px-5 dark:bg-white/[0.025]">
+    <div className="min-w-0 px-3 py-3 sm:px-4">
       <div className="flex min-h-7 items-center gap-2">
         <span
           aria-hidden="true"
@@ -147,16 +152,29 @@ function StatisticItem({
         >
           {icon}
         </span>
-        <p className="min-w-0 text-[11px] leading-4 text-muted">{label}</p>
+        <p className="min-w-0 text-[11px] font-medium leading-4 text-muted">
+          {label}
+        </p>
       </div>
       <p
-        className={`mt-2.5 flex items-baseline gap-1 text-[28px] font-semibold leading-none tracking-[-0.03em] tabular-nums ${emphasized ? "text-accent" : "text-foreground"}`}
+        className={`mt-3 flex items-baseline gap-1 text-[30px] font-semibold leading-none tracking-[-0.035em] tabular-nums ${emphasized ? "text-accent" : "text-foreground"}`}
       >
         {value}
         <span className="text-[10px] font-normal tracking-normal text-muted">
           {unit}
         </span>
       </p>
+      {emphasized ? (
+        <div
+          aria-hidden="true"
+          className="mt-3 h-1 overflow-hidden rounded-full bg-foreground/[0.07]"
+        >
+          <div
+            className="h-full w-full origin-left rounded-full bg-accent/60 transition-transform duration-500 ease-out motion-reduce:transition-none"
+            style={{ transform: `scaleX(${scoreProgress})` }}
+          />
+        </div>
+      ) : null}
     </div>
   );
 }
@@ -256,48 +274,77 @@ export default function ExamList() {
               创建试题
             </Button>
           </div>
-            <div className="mt-6 border border-black/[0.04] dark:border-white/[0.08] grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-black/[0.03] md:grid-cols-3 xl:grid-cols-6 dark:bg-white/[0.08]">
-              <StatisticItem
-              icon={<File className="size-4" />}
-              label="试题总数"
-              unit="份"
-              value={statistics?.totalExams ?? "—"}
-            />
-            <StatisticItem
-              icon={<BookOpen className="size-4" />}
-              label="考核单词（去重复）"
-              unit="个"
-              value={statistics?.totalWords ?? "—"}
-            />
-            <StatisticItem
-              emphasized
-              icon={<ExamModeIcon className="size-4" mode="en-cn" />}
-              label="英-中平均得分"
-              unit="分"
-              value={statistics ? statistics.enCnAverageScore : "—"}
-            />
-            <StatisticItem
-              emphasized
-              icon={<ExamModeIcon className="size-4" mode="cn-en" />}
-              label="中-英平均得分"
-              unit="分"
-              value={statistics ? statistics.cnEnAverageScore : "—"}
-            />
-            <StatisticItem
-              emphasized
-              icon={<ExamModeIcon className="size-4" mode="dictation" />}
-              label="听写平均得分"
-              unit="分"
-              value={statistics ? statistics.dictationAverageScore : "—"}
-            />
-              <StatisticItem
-                emphasized
-                icon={<ExamModeIcon className="size-4" mode="speech" />}
-                label="语音平均得分"
-                unit="分"
-                value={statistics ? statistics.speechAverageScore : "—"}
-              />
+          <section
+            aria-label="试题统计"
+            className="mt-6 overflow-hidden rounded-[22px] border border-black/[0.055] bg-white/[0.24] dark:border-white/[0.08] dark:bg-white/[0.025]"
+          >
+            <div className="grid xl:grid-cols-[minmax(0,0.8fr)_minmax(0,1.7fr)]">
+              <div className="border-b border-black/[0.055] p-3 sm:p-4 xl:border-b-0 xl:border-r dark:border-white/[0.07]">
+                <div className="flex items-center gap-2 px-3 pt-1 sm:px-4">
+                  <span className="size-1.5 rounded-full bg-foreground/30" />
+                  <h2 className="text-[11px] font-semibold tracking-[0.12em] text-foreground/60">
+                    学习积累
+                  </h2>
+                </div>
+                <div className="mt-1 grid grid-cols-2 divide-x divide-black/[0.055] dark:divide-white/[0.07]">
+                  <StatisticItem
+                    icon={<File className="size-4" />}
+                    label="试题总数"
+                    unit="份"
+                    value={statistics?.totalExams ?? "—"}
+                  />
+                  <StatisticItem
+                    icon={<BookOpen className="size-4" />}
+                    label="考核单词（去重复）"
+                    unit="个"
+                    value={statistics?.totalWords ?? "—"}
+                  />
+                </div>
+              </div>
+
+              <div className="p-3 sm:p-4">
+                <div className="flex items-center justify-between gap-3 px-3 pt-1 sm:px-4">
+                  <div className="flex items-center gap-2">
+                    <span className="size-1.5 rounded-full bg-accent/70" />
+                    <h2 className="text-[11px] font-semibold tracking-[0.12em] text-foreground/60">
+                      平均得分
+                    </h2>
+                  </div>
+                  <span className="text-[10px] text-muted">满分 100</span>
+                </div>
+                <div className="mt-1 grid grid-cols-2 gap-y-2 sm:grid-cols-4">
+                  <StatisticItem
+                    emphasized
+                    icon={<ExamModeIcon className="size-4" mode="en-cn" />}
+                    label="英-中"
+                    unit="分"
+                    value={statistics ? statistics.enCnAverageScore : "—"}
+                  />
+                  <StatisticItem
+                    emphasized
+                    icon={<ExamModeIcon className="size-4" mode="cn-en" />}
+                    label="中-英"
+                    unit="分"
+                    value={statistics ? statistics.cnEnAverageScore : "—"}
+                  />
+                  <StatisticItem
+                    emphasized
+                    icon={<ExamModeIcon className="size-4" mode="dictation" />}
+                    label="听写"
+                    unit="分"
+                    value={statistics ? statistics.dictationAverageScore : "—"}
+                  />
+                  <StatisticItem
+                    emphasized
+                    icon={<ExamModeIcon className="size-4" mode="speech" />}
+                    label="语音"
+                    unit="分"
+                    value={statistics ? statistics.speechAverageScore : "—"}
+                  />
+                </div>
+              </div>
             </div>
+          </section>
         </div>
       </GlassCard>
 
