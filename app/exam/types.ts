@@ -61,8 +61,10 @@ export interface ExamContent {
 export interface ExamStatistics {
   totalExams: number;
   totalWords: number;
-  completedModes: number;
-  averageScore: number;
+  enCnAverageScore: number;
+  cnEnAverageScore: number;
+  dictationAverageScore: number;
+  speechAverageScore: number;
 }
 
 export interface AnswerState {

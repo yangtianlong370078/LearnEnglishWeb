@@ -1,10 +1,11 @@
 "use client";
 
+import type { ReactNode } from "react";
 import type { ExamMode, ExamStatistics, ExamSummary } from "./types";
 
 import { useCallback, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { BookOpen, Clock, Plus, TrashBin } from "@gravity-ui/icons";
+import { BookOpen, Clock, File, Plus, TrashBin } from "@gravity-ui/icons";
 import { Button, Spinner, toast } from "@heroui/react";
 
 import { examApi } from "./api";
@@ -26,15 +27,20 @@ function ExamCard({
   onOpen: (mode: ExamMode) => void;
   onDelete: () => void;
 }) {
+  const completedCount = EXAM_MODES.filter(
+    (mode) => exam[EXAM_MODE_META[mode].completedKey],
+  ).length;
+
   return (
     <GlassCard className="group overflow-visible p-5 transition-shadow duration-300 hover:shadow-xl hover:shadow-accent/10">
       <div className="relative z-[1]">
         <div className="flex items-start justify-between gap-3 pr-8">
           <div className="min-w-0">
-            <h2 className="truncate text-lg font-bold text-foreground">
+           
+            <h2 className="truncate text-[17px] font-semibold leading-6 text-foreground">
               {exam.name}
             </h2>
-            <p className="mt-1 text-xs text-muted">{exam.createtime}</p>
+            <p className="mt-1 text-[11px] text-muted">{exam.createtime}</p>
           </div>
         </div>
         <button
@@ -50,55 +56,108 @@ function ExamCard({
           <TrashBin className="size-4" />
         </button>
 
-        <div className="mt-4 flex flex-wrap items-center gap-3 text-xs text-muted">
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.04] px-2.5 py-1 dark:bg-white/[0.06]">
-            <BookOpen className="size-3.5" />
+        <div className="mt-4 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-muted">
+          <span className="inline-flex items-center gap-1.5">
+            <BookOpen className="size-3.5 text-foreground/45" />
             {exam.examcount} 个单词
           </span>
-          <span className="inline-flex items-center gap-1.5 rounded-full bg-black/[0.04] px-2.5 py-1 dark:bg-white/[0.06]">
-            <Clock className="size-3.5" />
+          <span className="inline-flex items-center gap-1.5">
+            <Clock className="size-3.5 text-foreground/45" />
             {exam.limittime} 分钟
           </span>
         </div>
 
-        <div className="mt-4 grid grid-cols-4 gap-2 rounded-2xl bg-black/[0.025] p-2 dark:bg-white/[0.035]">
-          {EXAM_MODES.map((mode) => {
-            const meta = EXAM_MODE_META[mode];
-            const completed = exam[meta.completedKey];
-            const score = exam[meta.scoreKey];
+        <div className="mt-5 border-t border-black/[0.06] pt-4 dark:border-white/[0.08]">
+         
+          <div className="grid grid-cols-4 gap-1">
+            {EXAM_MODES.map((mode) => {
+              const meta = EXAM_MODE_META[mode];
+              const completed = exam[meta.completedKey];
+              const score = exam[meta.scoreKey];
 
-            return (
-              <button
-                key={mode}
-                aria-label={`以${meta.label}模式打开${exam.name}`}
-                className="flex min-w-0 flex-col items-center gap-1.5 rounded-xl py-1 transition-colors hover:bg-black/[0.04] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent dark:hover:bg-white/[0.06]"
-                title={`进入${meta.label}模式`}
-                type="button"
-                onClick={() => onOpen(mode)}
-              >
-                <span
-                  className="exam-mode-icon relative inline-flex size-10 items-center justify-center rounded-2xl text-[var(--cl-ring3)] dark:text-[var(--cl-ring0)]"
-                  style={
-                    {
-                      "--cl-ring0": meta.theme.light,
-                      "--cl-ring3": meta.theme.dark,
-                      "--cl-soft": meta.theme.soft,
-                    } as React.CSSProperties
-                  }
+              return (
+                <button
+                  key={mode}
+                  aria-label={`以${meta.label}模式打开${exam.name}`}
+                  className="flex min-w-0 flex-col items-center gap-1.5 rounded-2xl px-1 py-2 transition-[transform,background-color] duration-200 hover:-translate-y-0.5 hover:bg-black/[0.035] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent active:scale-[0.98] dark:hover:bg-white/[0.055]"
+                  title={`进入${meta.label}模式`}
+                  type="button"
+                  onClick={() => onOpen(mode)}
                 >
-                  <span aria-hidden="true" className="exam-mode-icon-inner" />
-                  <ExamModeIcon className="relative z-[1] size-5" mode={mode} />
-                </span>
-                <span className="text-[11px] text-muted">{meta.label}</span>
-                <span className="text-sm font-bold tabular-nums text-foreground">
-                  {completed ? score : "-"}
-                </span>
-              </button>
-            );
-          })}
+                  <span
+                    className={`exam-mode-icon relative inline-flex size-10 items-center justify-center rounded-2xl text-[var(--cl-ring3)] dark:text-[var(--cl-ring0)] ${completed ? "" : "opacity-60 saturate-50"}`}
+                    style={
+                      {
+                        "--cl-ring0": meta.theme.light,
+                        "--cl-ring3": meta.theme.dark,
+                        "--cl-soft": meta.theme.soft,
+                      } as React.CSSProperties
+                    }
+                  >
+                    <span aria-hidden="true" className="exam-mode-icon-inner" />
+                    <ExamModeIcon
+                      className="relative z-[1] size-5"
+                      mode={mode}
+                    />
+                  </span>
+                  <span className="text-[11px] text-muted">{meta.label}</span>
+                  <span className="flex h-6 items-baseline justify-center gap-0.5 tabular-nums">
+                    {completed ? (
+                      <>
+                        <span className="text-xl font-semibold leading-none text-foreground">
+                          {score}
+                        </span>
+                        <span className="text-[10px] text-muted">分</span>
+                      </>
+                    ) : (
+                      <span className="text-[10px] font-medium leading-6 text-muted">
+                        待完成
+                      </span>
+                    )}
+                  </span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
     </GlassCard>
+  );
+}
+
+function StatisticItem({
+  icon,
+  label,
+  value,
+  unit,
+  emphasized = false,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: number | string;
+  unit: string;
+  emphasized?: boolean;
+}) {
+  return (
+    <div className="bg-white/[0.2] px-4 py-4 sm:px-5 dark:bg-white/[0.025]">
+      <div className="flex min-h-7 items-center gap-2">
+        <span
+          aria-hidden="true"
+          className={`inline-flex size-7 shrink-0 items-center justify-center rounded-lg ${emphasized ? "bg-accent/10 text-accent" : "bg-foreground/[0.055] text-foreground/55"}`}
+        >
+          {icon}
+        </span>
+        <p className="min-w-0 text-[11px] leading-4 text-muted">{label}</p>
+      </div>
+      <p
+        className={`mt-2.5 flex items-baseline gap-1 text-[28px] font-semibold leading-none tracking-[-0.03em] tabular-nums ${emphasized ? "text-accent" : "text-foreground"}`}
+      >
+        {value}
+        <span className="text-[10px] font-normal tracking-normal text-muted">
+          {unit}
+        </span>
+      </p>
+    </div>
   );
 }
 
@@ -177,42 +236,68 @@ export default function ExamList() {
       data-glass-navigation-content=""
     >
       <GlassCard className="p-5 md:p-6">
-        <div className="relative z-[1] flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
-          <div>
-            <h1 className="text-2xl font-bold tracking-tight text-foreground">
-              试题
-            </h1>
-            <div className="mt-4 grid grid-cols-2 gap-5 sm:grid-cols-4 md:min-w-[540px]">
-              <div>
-                <p className="text-xs text-muted">试题总数</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
-                  {statistics?.totalExams ?? "-"}
-                </p>
+        <div className="relative z-[1]">
+          <div className="flex items-start justify-between gap-4">
+            <div>
+              <div className="flex items-center gap-2.5">
+                <span className="inline-flex size-8 items-center justify-center rounded-xl bg-accent/10 text-accent">
+                  <BookOpen className="size-4" />
+                </span>
+                <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+                  试题
+                </h1>
               </div>
-              <div>
-                <p className="text-xs text-muted">考核单词</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
-                  {statistics?.totalWords ?? "-"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-muted">已完成模式</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
-                  {statistics?.completedModes ?? "-"}
-                </p>
-              </div>
-              <div>
-                <p className="text-xs text-muted">平均得分</p>
-                <p className="mt-1 text-2xl font-bold tabular-nums text-foreground">
-                  {statistics ? statistics.averageScore : "-"}
-                </p>
-              </div>
+              <p className="mt-2 text-xs text-muted">
+                查看考试成果，继续未完成的试题
+              </p>
             </div>
+            <Button className="shrink-0" onPress={() => setCreateOpen(true)}>
+              <Plus className="size-4" />
+              创建试题
+            </Button>
           </div>
-          <Button className="shrink-0" onPress={() => setCreateOpen(true)}>
-            <Plus className="size-4" />
-            创建试题
-          </Button>
+            <div className="mt-6 border border-black/[0.04] dark:border-white/[0.08] grid grid-cols-2 gap-px overflow-hidden rounded-2xl bg-black/[0.03] md:grid-cols-3 xl:grid-cols-6 dark:bg-white/[0.08]">
+              <StatisticItem
+              icon={<File className="size-4" />}
+              label="试题总数"
+              unit="份"
+              value={statistics?.totalExams ?? "—"}
+            />
+            <StatisticItem
+              icon={<BookOpen className="size-4" />}
+              label="考核单词（去重复）"
+              unit="个"
+              value={statistics?.totalWords ?? "—"}
+            />
+            <StatisticItem
+              emphasized
+              icon={<ExamModeIcon className="size-4" mode="en-cn" />}
+              label="英-中平均得分"
+              unit="分"
+              value={statistics ? statistics.enCnAverageScore : "—"}
+            />
+            <StatisticItem
+              emphasized
+              icon={<ExamModeIcon className="size-4" mode="cn-en" />}
+              label="中-英平均得分"
+              unit="分"
+              value={statistics ? statistics.cnEnAverageScore : "—"}
+            />
+            <StatisticItem
+              emphasized
+              icon={<ExamModeIcon className="size-4" mode="dictation" />}
+              label="听写平均得分"
+              unit="分"
+              value={statistics ? statistics.dictationAverageScore : "—"}
+            />
+              <StatisticItem
+                emphasized
+                icon={<ExamModeIcon className="size-4" mode="speech" />}
+                label="语音平均得分"
+                unit="分"
+                value={statistics ? statistics.speechAverageScore : "—"}
+              />
+            </div>
         </div>
       </GlassCard>
 
