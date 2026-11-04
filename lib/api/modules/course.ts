@@ -43,6 +43,18 @@ export function saveCourse(
 }
 
 /**
+ * 向课程中添加单词
+ * @param courseId 课程 id
+ * @param en 单词
+ * @param cn 释义
+ */
+export function saveCourseContent(courseId: number, en: string, cn: string) {
+  return post<void>("/Course/SaveCoursecontent", null, {
+    params: { courseId, en, cn },
+  });
+}
+
+/**
  * 删除课程
  * @param setcourseId 当前选择的课程 id
  */

@@ -709,7 +709,7 @@ function WordCardInner(
                         </span>
                       </Dropdown.Item>
                     )}
-                    {status !== 2 && (
+                    {status !== 1 && status !== 2 && (
                       <Dropdown.Item
                         id="status-2"
                         textValue="转入学习中"
@@ -721,7 +721,7 @@ function WordCardInner(
                         </span>
                       </Dropdown.Item>
                     )}
-                    {status !== 3 && (
+                    {status !== 1 && status !== 3 && (
                       <Dropdown.Item
                         id="status-3"
                         textValue="转入已掌握"
@@ -802,7 +802,9 @@ function WordCardInner(
             </button>
           </div>
         )}
-        <Card.Content className="flex flex-col h-[220px]! rounded-3xl p-[20px] justify-between ">
+        <Card.Content
+          className={`flex flex-col rounded-3xl p-[20px] justify-between ${status === 1 ? "h-[190px]!" : "h-[220px]!"}`}
+        >
           {/* 主体：按模式渲染 */}
           <div className={`flex flex-col justify-center ${effectiveTranslationOn ? "mt-2 gap-0.5 " : "gap-2"} ${!effectiveMode ? "mt-2" : effectiveMode !== "en-cn" && effectiveMode !== "cn-en" ? "mb-3 mt-1 " : ""}   h-full items-center text-center`}>
             {renderBody()}
@@ -812,62 +814,85 @@ function WordCardInner(
             {renderBody()}
           </div> */}
 
-          {/* 四个学习按钮 + 环形进度 */}
+          {/* 【不认识】仅提供状态转移入口，其余状态保留四个学习按钮。 */}
           <div className="flex items-center mb-1 justify-center gap-3">
-            {MODE_ORDER.map((mode) => {
-              const field = MODE_FIELD[mode];
-              const percent = progressPercent(word[field]);
-              const active = effectiveMode === mode;
-              const theme = MODE_THEME[mode];
-
-              return (
-                <button
-                  key={mode}
-                  aria-label={MODE_LABEL[mode]}
-                  aria-pressed={active}
-                  className={`cl-mode-btn inline-flex flex-col items-center gap-1 transition-all duration-300 ${globalMode
-                    ? `cursor-not-allowed ${globalMode === mode ? "" : "opacity-40"}`
-                    : "cursor-pointer"
-                    }`}
-                  disabled={!!globalMode}
-                  style={
-                    {
-                      "--cl-ring0": theme.light,
-                      "--cl-ring": theme.from,
-                      "--cl-ring2": theme.to,
-                      "--cl-soft": theme.soft,
-                      "--cl-ring3": theme.dark,
-                    } as React.CSSProperties
-                  }
-                  type="button"
-                  onClick={() => handleModeButton(mode)}
+            {status === 1 ? (
+              <>
+                <Button
+                  className="rounded-full px-4"
+                  isDisabled={actionsDisabled}
+                  size="sm"
+                  variant="primary"
+                  onPress={() => onChangeStatus(word, 2)}
                 >
-                  <RingProgress
-                    className={`transition-transform duration-300 ${active ? "scale-105" : ""
+                  转入学习中
+                </Button>
+                <Button
+                  className="rounded-full px-4"
+                  isDisabled={actionsDisabled}
+                  size="sm"
+                  variant="secondary"
+                  onPress={() => onChangeStatus(word, 3)}
+                >
+                  转入已掌握
+                </Button>
+              </>
+            ) : (
+              MODE_ORDER.map((mode) => {
+                const field = MODE_FIELD[mode];
+                const percent = progressPercent(word[field]);
+                const active = effectiveMode === mode;
+                const theme = MODE_THEME[mode];
+
+                return (
+                  <button
+                    key={mode}
+                    aria-label={MODE_LABEL[mode]}
+                    aria-pressed={active}
+                    className={`cl-mode-btn inline-flex flex-col items-center gap-1 transition-all duration-300 ${globalMode
+                      ? `cursor-not-allowed ${globalMode === mode ? "" : "opacity-40"}`
+                      : "cursor-pointer"
                       }`}
-                    color="var(--cl-ring)"
-                    colorTo="var(--cl-ring2)"
-                    percent={percent}
-                    size={46}
-                    strokeWidth={3.5}
+                    disabled={!!globalMode}
+                    style={
+                      {
+                        "--cl-ring0": theme.light,
+                        "--cl-ring": theme.from,
+                        "--cl-ring2": theme.to,
+                        "--cl-soft": theme.soft,
+                        "--cl-ring3": theme.dark,
+                      } as React.CSSProperties
+                    }
+                    type="button"
+                    onClick={() => handleModeButton(mode)}
                   >
-                    <span
-                      className={`cl-mode-icon ${active ? "is-active" : ""}`}
+                    <RingProgress
+                      className={`transition-transform duration-300 ${active ? "scale-105" : ""
+                        }`}
+                      color="var(--cl-ring)"
+                      colorTo="var(--cl-ring2)"
+                      percent={percent}
+                      size={46}
+                      strokeWidth={3.5}
                     >
-                      {mode === "dictation" ? (
-                        <SpeakerIcon className="size-4" />
-                      ) : mode === "speech" ? (
-                        <MicrophoneIcon className="size-4" />
-                      ) : mode === "cn-en" ? (
-                        <CnEnIcon className="size-4" />
-                      ) : (
-                        <EnCnIcon className="size-4" />
-                      )}
-                    </span>
-                  </RingProgress>
-                </button>
-              );
-            })}
+                      <span
+                        className={`cl-mode-icon ${active ? "is-active" : ""}`}
+                      >
+                        {mode === "dictation" ? (
+                          <SpeakerIcon className="size-4" />
+                        ) : mode === "speech" ? (
+                          <MicrophoneIcon className="size-4" />
+                        ) : mode === "cn-en" ? (
+                          <CnEnIcon className="size-4" />
+                        ) : (
+                          <EnCnIcon className="size-4" />
+                        )}
+                      </span>
+                    </RingProgress>
+                  </button>
+                );
+              })
+            )}
           </div>
         </Card.Content>
       </div>

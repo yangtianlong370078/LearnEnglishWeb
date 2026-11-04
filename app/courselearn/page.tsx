@@ -563,16 +563,18 @@ function CourseLearnClient() {
           onChange={handleZtChange}
         />
 
-        <GlobalToolbar
-          globalMode={globalMode}
-          practiceDisabled={!globalMode}
-          practiceOn={practiceOn}
-          translationDisabled={translationDisabled}
-          translationOn={translationOn}
-          onGlobalModeChange={handleGlobalModeChange}
-          onTogglePractice={() => setPracticeOn((v) => !v)}
-          onToggleTranslation={() => setTranslationOn((v) => !v)}
-        />
+        {zt !== 1 && (
+          <GlobalToolbar
+            globalMode={globalMode}
+            practiceDisabled={!globalMode}
+            practiceOn={practiceOn}
+            translationDisabled={translationDisabled}
+            translationOn={translationOn}
+            onGlobalModeChange={handleGlobalModeChange}
+            onTogglePractice={() => setPracticeOn((v) => !v)}
+            onToggleTranslation={() => setTranslationOn((v) => !v)}
+          />
+        )}
 
         {actionError && !deleteWord && (
           <p className="text-sm text-danger" role="alert">

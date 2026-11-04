@@ -177,6 +177,14 @@ export default function LearnWordsPage() {
   const [deleteCourseName, setDeleteCourseName] = useState("");
   const [deleting, setDeleting] = useState(false);
 
+  // 添加单词弹框状态
+  const [addWordModalOpen, setAddWordModalOpen] = useState(false);
+  const [addWordCourseId, setAddWordCourseId] = useState(0);
+  const [addWordCourseName, setAddWordCourseName] = useState("");
+  const [wordEn, setWordEn] = useState("");
+  const [wordCn, setWordCn] = useState("");
+  const [addingWord, setAddingWord] = useState(false);
+
   // 从精选课程中选择并加入学习列表
   const [availableCourseModalOpen, setAvailableCourseModalOpen] =
     useState(false);
@@ -272,6 +280,35 @@ export default function LearnWordsPage() {
     setDeleteCourseId(id);
     setDeleteCourseName(name);
     setDeleteModalOpen(true);
+  };
+
+  // 打开「添加单词」弹框
+  const openAddWordModal = (id: number, name: string) => {
+    setAddWordCourseId(id);
+    setAddWordCourseName(name);
+    setWordEn("");
+    setWordCn("");
+    setAddWordModalOpen(true);
+  };
+
+  // 添加单词：调用 SaveCoursecontent 写入课程，成功后刷新统计数据
+  const handleAddWord = async () => {
+    const en = wordEn.trim();
+    const cn = wordCn.trim();
+
+    if (!en || !cn) return;
+
+    setAddingWord(true);
+    try {
+      await courseApi.saveCourseContent(addWordCourseId, en, cn);
+      setAddWordModalOpen(false);
+      await loadData();
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.error("添加单词失败:", err);
+    } finally {
+      setAddingWord(false);
+    }
   };
 
   // 确认删除课程：setcourseId 传当前选择的课程 id，成功后刷新页面
@@ -457,6 +494,7 @@ export default function LearnWordsPage() {
                             notLearned={course.notLearned}
                             menuMode={menuMode}
                             onEdit={openEditCourseModal}
+                            onAddWord={openAddWordModal}
                             onDelete={openDeleteCourseModal}
                           />
                         </Card>
@@ -831,6 +869,86 @@ export default function LearnWordsPage() {
             onPress={handleSaveCourse}
           >
             {saving ? "保存中..." : "保存"}
+          </Button>
+        </Modal.Footer>
+      </ModalBackdrop>
+
+      {/* 添加单词弹框（受控） */}
+      <ModalBackdrop
+        isDismissable={false}
+        isOpen={addWordModalOpen}
+        onOpenChange={setAddWordModalOpen}
+        placement="center"
+        size="md"
+      >
+        <Modal.Header>
+          <Modal.Icon className="bg-accent-soft text-accent-soft-foreground">
+            <BookOpen className="size-5" />
+          </Modal.Icon>
+          <Modal.Heading>添加单词</Modal.Heading>
+          <p className="mt-1.5 text-sm leading-5 text-muted">
+            将单词添加到课程【{addWordCourseName}】
+          </p>
+        </Modal.Header>
+        <Modal.Body className="flex flex-col gap-5 py-2">
+          <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
+            <label className="text-sm text-foreground" htmlFor="word-en-input">
+              单词
+            </label>
+
+            <InputGroup
+              style={
+                {
+                  "--field-border": "var(--border)",
+                } as React.CSSProperties
+              }
+              variant="secondary"
+            >
+              <InputGroup.Input
+                className="w-full max-w-[280px]"
+                id="word-en-input"
+                placeholder="输入英文单词"
+                value={wordEn}
+                onChange={(e) => setWordEn(e.target.value)}
+              />
+            </InputGroup>
+          </div>
+          <div className="grid grid-cols-[80px_1fr] items-center py-2 gap-3">
+            <label className="text-sm text-foreground" htmlFor="word-cn-input">
+              释义
+            </label>
+
+            <InputGroup
+              style={
+                {
+                  "--field-border": "var(--border)",
+                } as React.CSSProperties
+              }
+              variant="secondary"
+            >
+              <InputGroup.Input
+                className="w-full max-w-[280px]"
+                id="word-cn-input"
+                placeholder="输入中文释义"
+                value={wordCn}
+                onChange={(e) => setWordCn(e.target.value)}
+              />
+            </InputGroup>
+          </div>
+        </Modal.Body>
+        <Modal.Footer>
+          <Button slot="close" variant="secondary">
+            取消
+          </Button>
+          <Button
+            isDisabled={
+              addingWord ||
+              wordEn.trim().length === 0 ||
+              wordCn.trim().length === 0
+            }
+            onPress={handleAddWord}
+          >
+            {addingWord ? "添加中..." : "添加"}
           </Button>
         </Modal.Footer>
       </ModalBackdrop>

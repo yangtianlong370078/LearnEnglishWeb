@@ -1,7 +1,7 @@
 "use client";
 
 import { Fragment, type ReactNode } from "react";
-import { EllipsisVertical, Pencil, TrashBin } from "@gravity-ui/icons";
+import { EllipsisVertical, Pencil, Plus, TrashBin } from "@gravity-ui/icons";
 import {
   Card,
   Dropdown,
@@ -57,12 +57,14 @@ export interface PieChartWithBreakdownDemoProps {
   /**
    * 菜单显示模式：
    * - "none": 不显示 Dropdown
-   * - "full": 显示 编辑 + 删除
+   * - "full": 显示 添加单词 + 编辑 + 删除
    * - "remove": 仅显示 移除
    */
   menuMode?: PieChartMenuMode;
   /** 点击编辑时回调，回传当前课程 id 与名称 */
   onEdit?: (courseId: number, courseName: string) => void;
+  /** 点击添加单词时回调，回传当前课程 id 与名称 */
+  onAddWord?: (courseId: number, courseName: string) => void;
   /** 点击删除/移除时回调，回传当前课程 id 与名称 */
   onDelete?: (courseId: number, courseName: string) => void;
 }
@@ -122,6 +124,7 @@ export default function PieChartWithBreakdownDemo({
   emptyHint,
   menuMode = "full",
   onEdit,
+  onAddWord,
   onDelete,
 }: PieChartWithBreakdownDemoProps = {}) {
   const rawData = [
@@ -308,6 +311,8 @@ export default function PieChartWithBreakdownDemo({
                   onAction={(key) => {
                     if (key === "edit-file") {
                       onEdit?.(courseId, courseName);
+                    } else if (key === "add-word") {
+                      onAddWord?.(courseId, courseName);
                     } else if (key === "delete-file") {
                       onDelete?.(courseId, courseName);
                     }
@@ -316,6 +321,16 @@ export default function PieChartWithBreakdownDemo({
                   <Dropdown.Section>
                     <Header>操作</Header>
 
+                    {menuMode === "full" && (
+                      <Dropdown.Item id="add-word" textValue="添加单词">
+                        <div className="flex items-start justify-center pt-px">
+                          <Plus className="size-4 shrink-0 text-muted" />
+                        </div>
+                        <div className="flex flex-col">
+                          <Label>添加单词</Label>
+                        </div>
+                      </Dropdown.Item>
+                    )}
                     {menuMode === "full" && (
                       <Dropdown.Item id="edit-file" textValue="编辑">
                         <div className="flex items-start justify-center pt-px">
