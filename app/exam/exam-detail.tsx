@@ -911,7 +911,21 @@ export default function ExamDetailPage({
                 onInput={(value) => {
                   const previous = answersRef.current[item.id] ?? emptyAnswer();
 
-                  updateAnswer(item.id, { ...previous, value });
+                  updateAnswer(item.id, {
+                    ...previous,
+                    value,
+                    correct: value === "" ? undefined : previous.correct,
+                  });
+                  if (value === "") {
+                    setFeedback((current) => {
+                      if (!current[item.id]) return current;
+                      const next = { ...current };
+
+                      delete next[item.id];
+
+                      return next;
+                    });
+                  }
                 }}
                 onSpeech={() => void recognizeSpeech(item, index)}
                 onTextSubmit={() => validateText(item, index)}

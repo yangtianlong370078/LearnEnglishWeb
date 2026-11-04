@@ -2,6 +2,9 @@
 
 import type { AnswerState, ExamContent, ExamMode, ScoringMode } from "./types";
 
+import { useEffect, useState } from "react";
+import { Xmark } from "@gravity-ui/icons";
+
 import ExamModeIcon from "./mode-icon";
 
 import GlassCard from "@/components/common/glass-card";
@@ -58,15 +61,24 @@ export default function ExamQuestionCard({
   onDictationRetry,
   onActivate,
 }: ExamQuestionCardProps) {
+  const [shaking, setShaking] = useState(false);
   const running = phase === "running";
   const completed = phase === "completed";
   const dictationWaiting =
     running && active && !answer.completed && !dictationPlaying;
   const correct = completed
     ? word.isOk === true
-    : running && scoring === "realtime" && answer.completed
-      ? answer.correct
+    : running && scoring === "realtime"
+      ? feedback
+        ? feedback.correct
+        : answer.completed
+          ? answer.correct
+          : undefined
       : undefined;
+
+  useEffect(() => {
+    if (feedback && !feedback.correct) setShaking(true);
+  }, [feedback]);
   const resultBadge =
     completed && typeof word.isOk === "boolean"
       ? { key: word.id, correct: word.isOk }
@@ -97,8 +109,9 @@ export default function ExamQuestionCard({
         active && running
           ? "shadow-lg shadow-accent/15 ring-2 ring-accent/30"
           : ""
-      } ${feedback && !feedback.correct ? "cl-shake" : ""}`}
-      data-glass-motion-ignore={feedback && !feedback.correct ? "" : undefined}
+      } ${shaking ? "cl-shake" : ""}`}
+      data-glass-motion-ignore={shaking ? "" : undefined}
+      onAnimationEnd={() => setShaking(false)}
       onClick={onActivate}
     >
       <ConfettiBurst fireKey={feedback?.correct ? feedback.key : 0} />
@@ -106,19 +119,22 @@ export default function ExamQuestionCard({
         {correct === true ? "回答正确" : correct === false ? "回答错误" : ""}
       </span>
       {resultBadge ? (
-        <ResultPetalBadge key={resultBadge.key} correct={resultBadge.correct} />
+        <ResultPetalBadge
+          key={resultBadge.key}
+          className="courselearn-result-badge"
+          correct={resultBadge.correct}
+        />
       ) : null}
 
       <div
         className={`relative z-[1] flex min-h-[160px] flex-col rounded-3xl p-3 ${resultClass}`}
       >
-        <div className="flex items-center justify-between text-xs text-muted">
-          <span className="inline-flex size-6 items-center justify-center rounded-full bg-black/[0.04] font-semibold tabular-nums dark:bg-white/[0.06]">
-            {index + 1}
-          </span>
-          {running && mode === "speech" ? (
+        <div className="flex min-h-6 items-center justify-end text-xs text-muted">
+          {running ? (
             <span className="tabular-nums">
-              已试 {answer.attempts}/{maxAttempts}
+              {mode === "dictation"
+                ? `已读 ${dictationPlay}/${dictationPlayCount}`
+                : `已试 ${answer.attempts}/${maxAttempts}`}
             </span>
           ) : null}
         </div>
@@ -225,32 +241,51 @@ export default function ExamQuestionCard({
           ) : null}
 
           {running && mode !== "speech" ? (
-            <input
-              aria-label={`第${index + 1}题答案`}
-              autoComplete="off"
-              className="mt-1 w-full max-w-[240px] rounded-3xl border border-black/10 bg-white/40 px-4 py-2 text-center text-sm text-foreground outline-none transition-colors focus:border-accent/40 focus:bg-white/60 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:focus:bg-white/10"
-              disabled={inputDisabled}
-              placeholder={
-                mode === "en-cn"
-                  ? "输入中文释义，空格提交"
-                  : mode === "cn-en"
-                    ? "输入英文单词，空格提交"
-                    : "听到后输入单词"
-              }
-              spellCheck={false}
-              type="text"
-              value={answer.value}
-              onChange={(event) => onInput(event.target.value)}
-              onClick={(event) => event.stopPropagation()}
-              onKeyDown={(event) => {
-                if (mode === "dictation" || event.nativeEvent.isComposing)
-                  return;
-                if (event.key === " ") {
-                  event.preventDefault();
-                  if (!inputDisabled) onTextSubmit();
+            <div className="relative mt-1 w-full max-w-[240px]">
+              <input
+                aria-label={`第${index + 1}题答案`}
+                autoComplete="off"
+                className="w-full rounded-3xl border border-black/10 bg-white/40 px-8 py-2 text-center text-sm text-foreground outline-none transition-colors focus:border-accent/40 focus:bg-white/60 disabled:cursor-not-allowed disabled:opacity-60 dark:border-white/10 dark:bg-white/5 dark:focus:bg-white/10"
+                disabled={inputDisabled}
+                placeholder={
+                  mode === "en-cn"
+                    ? "输入中文释义，空格提交"
+                    : mode === "cn-en"
+                      ? "输入英文单词，空格提交"
+                      : "听到后输入单词"
                 }
-              }}
-            />
+                spellCheck={false}
+                type="text"
+                value={answer.value}
+                onChange={(event) => onInput(event.target.value)}
+                onClick={(event) => event.stopPropagation()}
+                onKeyDown={(event) => {
+                  if (mode === "dictation" || event.nativeEvent.isComposing)
+                    return;
+                  if (event.key === " ") {
+                    event.preventDefault();
+                    if (!inputDisabled) {
+                      if (feedback && !feedback.correct) onInput("");
+                      else onTextSubmit();
+                    }
+                  }
+                }}
+              />
+              {mode !== "dictation" && answer.value && !inputDisabled ? (
+                <button
+                  aria-label="清空输入"
+                  className="absolute right-2 top-1/2 inline-flex size-5 -translate-y-1/2 items-center justify-center rounded-full bg-black/10 text-muted transition-colors hover:bg-black/20 hover:text-foreground dark:bg-white/10 dark:hover:bg-white/20"
+                  type="button"
+                  onClick={(event) => {
+                    event.stopPropagation();
+                    onInput("");
+                  }}
+                  onMouseDown={(event) => event.preventDefault()}
+                >
+                  <Xmark className="size-3" />
+                </button>
+              ) : null}
+            </div>
           ) : null}
 
           {completed ? (
