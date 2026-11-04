@@ -62,6 +62,7 @@ export default function ExamQuestionCard({
   onActivate,
 }: ExamQuestionCardProps) {
   const [shaking, setShaking] = useState(false);
+  const idle = phase === "idle";
   const running = phase === "running";
   const completed = phase === "completed";
   const dictationWaiting =
@@ -98,6 +99,12 @@ export default function ExamQuestionCard({
         : word.en;
   const translation =
     mode === "cn-en" ? word.en : mode === "dictation" ? word.cn : word.cn;
+  const completedPrompt =
+    primary && primary !== standardAnswer
+      ? primary
+      : translation !== standardAnswer
+        ? translation
+        : "";
   const inputDisabled =
     submitting ||
     (mode === "dictation" && (!active || answer.completed)) ||
@@ -129,7 +136,9 @@ export default function ExamQuestionCard({
       <div
         className={`relative z-[1] flex min-h-[160px] flex-col rounded-3xl p-3 ${resultClass}`}
       >
-        <div className="flex min-h-6 items-center justify-end text-xs text-muted">
+        <div
+          className={`${idle ? "hidden" : "flex"} min-h-6 items-center justify-end text-xs text-muted`}
+        >
           {running ? (
             <span className="tabular-nums">
               {mode === "dictation"
@@ -139,8 +148,10 @@ export default function ExamQuestionCard({
           ) : null}
         </div>
 
-        <div className="flex flex-1 flex-col items-center justify-center gap-2 pb-3 text-center">
-          {primary ? (
+        <div
+          className={`flex flex-1 flex-col items-center justify-center gap-2 text-center ${idle ? "pb-0" : "pb-3"}`}
+        >
+          {!completed && primary ? (
             <span
               className={`${mode === "cn-en" ? "text-xl font-semibold" : "text-2xl font-bold"} break-words text-foreground`}
             >
@@ -148,7 +159,33 @@ export default function ExamQuestionCard({
             </span>
           ) : null}
           {completed ? (
-            <span className="text-sm text-muted">{translation}</span>
+            <div className="flex w-full max-w-[260px] flex-col items-center gap-3">
+              {completedPrompt ? (
+                <span
+                  className={`${mode === "cn-en" || completedPrompt === translation ? "text-xl font-semibold" : "text-2xl font-bold"} max-w-full break-words leading-snug tracking-[-0.02em] text-foreground`}
+                >
+                  {completedPrompt}
+                </span>
+              ) : null}
+              <div className="w-full border-t border-black/10 pt-3 dark:border-white/10">
+                <div className="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-3 gap-y-2 text-left">
+                  <span className="text-xs leading-5 text-muted">正确答案</span>
+                  <strong className="break-words text-sm font-semibold leading-5 text-foreground">
+                    {standardAnswer}
+                  </strong>
+                  {word.isOk === false ? (
+                    <>
+                      <span className="text-xs leading-5 text-muted">
+                        你的答案
+                      </span>
+                      <span className="break-words text-sm font-medium leading-5 text-danger">
+                        {word.answer || "未作答"}
+                      </span>
+                    </>
+                  ) : null}
+                </div>
+              </div>
+            </div>
           ) : null}
 
           {mode === "dictation" && !completed ? (
@@ -284,19 +321,6 @@ export default function ExamQuestionCard({
                 >
                   <Xmark className="size-3" />
                 </button>
-              ) : null}
-            </div>
-          ) : null}
-
-          {completed ? (
-            <div className="mt-1 flex max-w-full flex-col items-center gap-1 text-xs">
-              <span className="break-words text-foreground/85">
-                正确答案：<strong>{standardAnswer}</strong>
-              </span>
-              {word.isOk === false ? (
-                <span className="break-words text-danger">
-                  你的答案：{word.answer || "未作答"}
-                </span>
               ) : null}
             </div>
           ) : null}
