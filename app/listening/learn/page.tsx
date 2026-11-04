@@ -337,6 +337,95 @@ function ListeningLearnClient() {
     }
   }, [currentLesson]);
 
+  const selectLesson = useCallback(
+    (lessonId: number, autoPlay = false) => {
+      const lesson = lessons.find((item) => item.id === lessonId);
+
+      if (lesson) {
+        saveRecentListening({
+          courseId: lesson.courseId ?? parentCourseId,
+          courseName: lesson.courseName ?? parentCourseName,
+          subCourseId: lesson.subCourseId,
+          subCourseName: lesson.subCourseName ?? courseName,
+          lessonId: lesson.id,
+          lessonTitle: lesson.title,
+        });
+      }
+
+      resetShadow();
+      if (lessonId === selectedLessonId) {
+        if (autoPlay) {
+          const firstContentIndex = findFirstContentIndex(lines);
+          const start =
+            settings.mode === "shadow" || settings.skipIntro
+              ? (lines[firstContentIndex]?.start ?? 0)
+              : 0;
+
+          seekTo(start);
+          void safePlay();
+        }
+
+        return;
+      }
+
+      pendingAutoPlayRef.current = autoPlay;
+      audioRef.current?.pause();
+      setSelectedLessonId(lessonId);
+    },
+    [
+      courseName,
+      lessons,
+      lines,
+      parentCourseId,
+      parentCourseName,
+      resetShadow,
+      safePlay,
+      seekTo,
+      selectedLessonId,
+      settings.mode,
+      settings.skipIntro,
+    ],
+  );
+
+  const handleAfterPlay = useCallback(() => {
+    setPlaying(false);
+
+    if (settings.afterPlay === "repeat") {
+      const firstContentIndex = findFirstContentIndex(lines);
+      const start =
+        settings.mode === "shadow" || settings.skipIntro
+          ? (lines[firstContentIndex]?.start ?? 0)
+          : 0;
+
+      seekTo(start);
+      void safePlay();
+
+      return;
+    }
+
+    if (settings.afterPlay === "next" && nextLesson) {
+      selectLesson(nextLesson.id, true);
+
+      return;
+    }
+
+    if (settings.afterPlay === "all") {
+      const target = nextLesson ?? lessons[0];
+
+      if (target) selectLesson(target.id, true);
+    }
+  }, [
+    lessons,
+    lines,
+    nextLesson,
+    safePlay,
+    seekTo,
+    selectLesson,
+    settings.afterPlay,
+    settings.mode,
+    settings.skipIntro,
+  ]);
+
   const getShadowSegment = useCallback(
     (index: number) => {
       const start = lines[index]?.start ?? 0;
@@ -403,10 +492,11 @@ function ListeningLearnClient() {
       return;
     }
 
-    setPlaying(false);
+    handleAfterPlay();
   }, [
     clearShadowTimer,
     getShadowSegment,
+    handleAfterPlay,
     lines,
     queueShadowReplay,
     settings.shadowGap,
@@ -520,6 +610,9 @@ function ListeningLearnClient() {
       return;
     }
 
+    // 末句由原生 ended 事件完成课程，确保播完行为能够执行。
+    if (lineIndex === lines.length - 1) return;
+
     const line = lines[lineIndex];
     const audioDuration = Number.isFinite(audio.duration) ? audio.duration : 0;
     const end = getLineEnd(lines, lineIndex, audioDuration);
@@ -608,56 +701,6 @@ function ListeningLearnClient() {
     settings.skipIntro,
   ]);
 
-  const selectLesson = useCallback(
-    (lessonId: number, autoPlay = false) => {
-      const lesson = lessons.find((item) => item.id === lessonId);
-
-      if (lesson) {
-        saveRecentListening({
-          courseId: lesson.courseId ?? parentCourseId,
-          courseName: lesson.courseName ?? parentCourseName,
-          subCourseId: lesson.subCourseId,
-          subCourseName: lesson.subCourseName ?? courseName,
-          lessonId: lesson.id,
-          lessonTitle: lesson.title,
-        });
-      }
-
-      resetShadow();
-      if (lessonId === selectedLessonId) {
-        if (autoPlay) {
-          const firstContentIndex = findFirstContentIndex(lines);
-          const start =
-            settings.mode === "shadow" || settings.skipIntro
-              ? (lines[firstContentIndex]?.start ?? 0)
-              : 0;
-
-          seekTo(start);
-          void safePlay();
-        }
-
-        return;
-      }
-
-      pendingAutoPlayRef.current = autoPlay;
-      audioRef.current?.pause();
-      setSelectedLessonId(lessonId);
-    },
-    [
-      courseName,
-      lessons,
-      lines,
-      parentCourseId,
-      parentCourseName,
-      resetShadow,
-      safePlay,
-      seekTo,
-      selectedLessonId,
-      settings.mode,
-      settings.skipIntro,
-    ],
-  );
-
   const toggleFavorite = useCallback(
     async (lessonId: number) => {
       if (favoritePendingLessonId !== null) return;
@@ -732,43 +775,8 @@ function ListeningLearnClient() {
     }
 
     singleAwaitingRef.current = null;
-    setPlaying(false);
-
-    if (settings.afterPlay === "repeat") {
-      const firstContentIndex = findFirstContentIndex(lines);
-      const start = settings.skipIntro
-        ? (lines[firstContentIndex]?.start ?? 0)
-        : 0;
-
-      seekTo(start);
-      void safePlay();
-
-      return;
-    }
-
-    if (settings.afterPlay === "next" && nextLesson) {
-      selectLesson(nextLesson.id, true);
-
-      return;
-    }
-
-    if (settings.afterPlay === "all") {
-      const target = nextLesson ?? lessons[0];
-
-      if (target) selectLesson(target.id, true);
-    }
-  }, [
-    handleShadowSegmentEnd,
-    lessons,
-    lines,
-    nextLesson,
-    safePlay,
-    seekTo,
-    selectLesson,
-    settings.afterPlay,
-    settings.mode,
-    settings.skipIntro,
-  ]);
+    handleAfterPlay();
+  }, [handleAfterPlay, handleShadowSegmentEnd, settings.mode]);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {

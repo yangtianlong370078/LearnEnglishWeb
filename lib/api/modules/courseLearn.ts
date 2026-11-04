@@ -66,11 +66,8 @@ export async function queryWords(
 
 /**
  * 批量保存练习次数记录。
- * 后端以表单字段 data 接收 JSON 字符串。
- *
- * 注意：后端 updcnoV2 成功时返回体字段为 `succss`（拼写有误）而非 `success`，
- * 会被响应拦截器判为业务失败并 reject，但请求实际已抵达后端并执行落库。
- * 因此此处捕获该 reject 作为「尽力而为」保存，仅对真实网络错误记录日志。
+ * 后端以表单字段 data 接收 JSON 字符串，成功返回 success=true
+ * （旧版后端返回 succss 拼写有误，通过 transformResponse 做兼容）。
  */
 export async function saveNumberRecords(
   records: NumberUpdateRecord[],
@@ -81,12 +78,12 @@ export async function saveNumberRecords(
 
   form.append("data", JSON.stringify(records));
 
-  try {
-    await request.post("/Word/updcnoV2", form);
-  } catch (err) {
-    // eslint-disable-next-line no-console
-    console.warn("[courseLearn] 保存练习记录返回异常（可能已落库）:", err);
-  }
+  await request.post("/Word/updcnoV2", form, {
+    // 清除实例默认的 application/json，让浏览器生成 multipart 边界，
+    // 否则后端 [FromForm] string data 绑定失败导致接口调不通。
+    headers: { "Content-Type": undefined },
+    transformResponse: normalizeWordActionResponse,
+  });
 }
 
 /**
