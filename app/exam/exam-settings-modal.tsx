@@ -25,6 +25,7 @@ interface ExamSettingsModalProps {
   settings: ExamSettings;
   onAccentChange: (v: ExamAccentType) => void;
   onDictationPlayCountChange: (v: number) => void;
+  onDictationExtraIntervalChange: (v: number) => void;
   onRetryCountChange: (v: number) => void;
   onAsrModelChange: (v: ExamAsrModelType) => void;
 }
@@ -35,6 +36,7 @@ export default function ExamSettingsModal({
   settings,
   onAccentChange,
   onDictationPlayCountChange,
+  onDictationExtraIntervalChange,
   onRetryCountChange,
   onAsrModelChange,
 }: ExamSettingsModalProps) {
@@ -110,6 +112,35 @@ export default function ExamSettingsModal({
             variant="secondary"
             onChange={(v) =>
               onDictationPlayCountChange(Number.isNaN(v) ? 1 : v)
+            }
+          >
+            <NumberField.Group className="flex w-full">
+              <NumberField.DecrementButton className="px-[10px]" />
+              <NumberField.Input className="w-full text-center" />
+              <NumberField.IncrementButton className="px-[10px]" />
+            </NumberField.Group>
+          </NumberField>
+        </div>
+
+        {/* 听写追加间隔 */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-foreground">
+              听写追加间隔
+            </span>
+            <span className="text-xs text-muted">
+              单词时长 + 追加秒数（0-5秒）
+            </span>
+          </div>
+          <NumberField
+            aria-label="听写追加间隔"
+            className="w-[130px]"
+            maxValue={5}
+            minValue={0}
+            value={settings.dictationExtraInterval}
+            variant="secondary"
+            onChange={(v) =>
+              onDictationExtraIntervalChange(Number.isNaN(v) ? 0 : v)
             }
           >
             <NumberField.Group className="flex w-full">
@@ -198,6 +229,7 @@ export default function ExamSettingsModal({
           <ul className="list-inside list-disc space-y-0.5">
             <li>听写口音：影响听写模式的发音</li>
             <li>听写复读次数：每道听写题的朗读次数</li>
+            <li>听写追加间隔：单词时长之外追加的等待秒数</li>
             <li>错误重试次数：四种模式通用，答错后可重试</li>
             <li>语音识别模型：影响语音模式的识别准确率</li>
           </ul>

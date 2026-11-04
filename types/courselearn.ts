@@ -79,6 +79,8 @@ export interface CourseLearnSettings {
   accent: AccentType;
   /** 听写播放次数 */
   dictationCount: number;
+  /** 听写追加间隔：单词时长之外追加的秒数 */
+  dictationExtraInterval: number;
   /** 语音识别模型 */
   asrModelType: AsrModelType;
 }

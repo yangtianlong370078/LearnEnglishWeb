@@ -220,6 +220,7 @@ export default function ExamDetailPage({
     settings,
     setAccent,
     setDictationPlayCount,
+    setDictationExtraInterval,
     setRetryCount,
     setAsrModelType,
   } = useExamSettings();
@@ -246,6 +247,9 @@ export default function ExamDetailPage({
     play: 0,
     playing: false,
   });
+  const [dictationPlayCounts, setDictationPlayCounts] = useState<
+    Record<number, number>
+  >({});
 
   const itemsRef = useRef<ExamContent[]>([]);
   const answersRef = useRef<Record<number, AnswerState>>({});
@@ -444,10 +448,14 @@ export default function ExamDetailPage({
         for (let play = 1; play <= settings.dictationPlayCount; play += 1) {
           if (dictationRunRef.current !== runId || !sessionRef.current) return;
           setDictation({ itemId: item.id, play, playing: true });
+          setDictationPlayCounts((counts) => ({
+            ...counts,
+            [item.id]: play,
+          }));
           await playOnce(audio, url);
           if (dictationRunRef.current !== runId || !sessionRef.current) return;
           setDictation({ itemId: item.id, play, playing: false });
-          await wait(duration + 1000);
+          await wait(duration + settings.dictationExtraInterval * 1000);
         }
       } catch (reason) {
         if (dictationRunRef.current === runId && sessionRef.current) {
@@ -472,6 +480,7 @@ export default function ExamDetailPage({
       advanceAfterAudio,
       settings.accent,
       settings.dictationPlayCount,
+      settings.dictationExtraInterval,
       showFeedback,
       updateAnswer,
     ],
@@ -549,6 +558,7 @@ export default function ExamDetailPage({
       setCurrentIndex(0);
       setFeedback({});
       setDictation({ itemId: 0, play: 0, playing: false });
+      setDictationPlayCounts({});
       toast.success(auto ? "已自动交卷" : "交卷成功");
 
       try {
@@ -603,6 +613,7 @@ export default function ExamDetailPage({
       setCurrentIndex(0);
       setRemaining(duration * 60);
       setFeedback({});
+      setDictationPlayCounts({});
       setStartOpen(false);
       if (mode === "dictation") void runDictationRef.current(0, config);
     } catch (reason) {
@@ -881,7 +892,9 @@ export default function ExamDetailPage({
                 active={index === currentIndex}
                 answer={answers[item.id] ?? emptyAnswer()}
                 dictationPlay={
-                  dictation.itemId === item.id ? dictation.play : 0
+                  dictation.itemId === item.id
+                    ? dictation.play
+                    : (dictationPlayCounts[item.id] ?? 0)
                 }
                 dictationPlayCount={settings.dictationPlayCount}
                 dictationPlaying={
@@ -958,6 +971,7 @@ export default function ExamDetailPage({
         onAccentChange={setAccent}
         onAsrModelChange={setAsrModelType}
         onDictationPlayCountChange={setDictationPlayCount}
+        onDictationExtraIntervalChange={setDictationExtraInterval}
         onOpenChange={setSettingsOpen}
         onRetryCountChange={setRetryCount}
       />

@@ -15,6 +15,7 @@ export const DEFAULT_SETTINGS: CourseLearnSettings = {
   hideMeaning: false,
   accent: "Speech_US",
   dictationCount: 3,
+  dictationExtraInterval: 1,
   asrModelType: "2",
 };
 
@@ -34,6 +35,12 @@ function readSettings(): CourseLearnSettings {
         typeof parsed.dictationCount === "number" && parsed.dictationCount > 0
           ? Math.min(Math.floor(parsed.dictationCount), 20)
           : DEFAULT_SETTINGS.dictationCount,
+      dictationExtraInterval:
+        typeof parsed.dictationExtraInterval === "number" &&
+        Number.isFinite(parsed.dictationExtraInterval) &&
+        parsed.dictationExtraInterval >= 0
+          ? Math.min(Math.floor(parsed.dictationExtraInterval), 5)
+          : DEFAULT_SETTINGS.dictationExtraInterval,
     };
   } catch {
     return DEFAULT_SETTINGS;
@@ -82,6 +89,13 @@ export function useCourseLearnSettings() {
     (v: number) => update({ dictationCount: Math.max(1, Math.min(20, v)) }),
     [update],
   );
+  const setDictationExtraInterval = useCallback(
+    (v: number) =>
+      update({
+        dictationExtraInterval: Math.max(0, Math.min(5, Math.floor(v))),
+      }),
+    [update],
+  );
   const setAsrModelType = useCallback(
     (v: AsrModelType) => update({ asrModelType: v }),
     [update],
@@ -94,6 +108,7 @@ export function useCourseLearnSettings() {
     setHideMeaning,
     setAccent,
     setDictationCount,
+    setDictationExtraInterval,
     setAsrModelType,
   };
 }

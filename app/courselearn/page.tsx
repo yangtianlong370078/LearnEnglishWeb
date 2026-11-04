@@ -654,6 +654,7 @@ function CourseLearnClient() {
         onAsrModelChange={settingsHook.setAsrModelType}
         onAutoSpeakChange={settingsHook.setAutoSpeak}
         onDictationCountChange={settingsHook.setDictationCount}
+        onDictationExtraIntervalChange={settingsHook.setDictationExtraInterval}
         onHideMeaningChange={settingsHook.setHideMeaning}
         onOpenChange={setSettingsOpen}
       />

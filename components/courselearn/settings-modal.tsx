@@ -28,6 +28,7 @@ interface SettingsModalProps {
   onHideMeaningChange: (v: boolean) => void;
   onAccentChange: (v: AccentType) => void;
   onDictationCountChange: (v: number) => void;
+  onDictationExtraIntervalChange: (v: number) => void;
   onAsrModelChange: (v: AsrModelType) => void;
 }
 
@@ -39,6 +40,7 @@ export default function SettingsModal({
   onHideMeaningChange,
   onAccentChange,
   onDictationCountChange,
+  onDictationExtraIntervalChange,
   onAsrModelChange,
 }: SettingsModalProps) {
   return (
@@ -143,6 +145,35 @@ export default function SettingsModal({
             value={settings.dictationCount}
             variant="secondary"
             onChange={(v) => onDictationCountChange(Number.isNaN(v) ? 1 : v)}
+          >
+            <NumberField.Group className="flex w-full">
+              <NumberField.DecrementButton className="px-[10px]" />
+              <NumberField.Input className="w-full text-center" />
+              <NumberField.IncrementButton className="px-[10px]" />
+            </NumberField.Group>
+          </NumberField>
+        </div>
+
+        {/* 听写追加间隔 */}
+        <div className="flex items-center justify-between gap-4">
+          <div className="flex flex-col">
+            <span className="text-sm font-medium text-foreground">
+              听写追加间隔
+            </span>
+            <span className="text-xs text-muted">
+              单词时长 + 追加秒数（0-5秒）
+            </span>
+          </div>
+          <NumberField
+            aria-label="听写追加间隔"
+            className="w-[130px]"
+            maxValue={5}
+            minValue={0}
+            value={settings.dictationExtraInterval}
+            variant="secondary"
+            onChange={(v) =>
+              onDictationExtraIntervalChange(Number.isNaN(v) ? 0 : v)
+            }
           >
             <NumberField.Group className="flex w-full">
               <NumberField.DecrementButton className="px-[10px]" />

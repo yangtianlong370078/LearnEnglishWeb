@@ -14,6 +14,8 @@ export interface ExamSettings {
   accent: ExamAccentType;
   /** 听写复读次数：1-10次 */
   dictationPlayCount: number;
+  /** 听写追加间隔：单词时长之外追加的秒数 */
+  dictationExtraInterval: number;
   /** 错误重试次数：1-10次 */
   retryCount: number;
   /** 语音识别模型 */
@@ -24,6 +26,7 @@ export interface ExamSettings {
 export const DEFAULT_EXAM_SETTINGS: ExamSettings = {
   accent: "Speech_US",
   dictationPlayCount: 3,
+  dictationExtraInterval: 1,
   retryCount: 3,
   asrModelType: "2",
 };

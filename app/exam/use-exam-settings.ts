@@ -27,6 +27,12 @@ function readSettings(): ExamSettings {
         parsed.dictationPlayCount > 0
           ? Math.min(Math.floor(parsed.dictationPlayCount), 10)
           : DEFAULT_EXAM_SETTINGS.dictationPlayCount,
+      dictationExtraInterval:
+        typeof parsed.dictationExtraInterval === "number" &&
+        Number.isFinite(parsed.dictationExtraInterval) &&
+        parsed.dictationExtraInterval >= 0
+          ? Math.min(Math.floor(parsed.dictationExtraInterval), 5)
+          : DEFAULT_EXAM_SETTINGS.dictationExtraInterval,
       retryCount:
         typeof parsed.retryCount === "number" && parsed.retryCount > 0
           ? Math.min(Math.floor(parsed.retryCount), 10)
@@ -72,6 +78,14 @@ export function useExamSettings() {
     [update],
   );
 
+  const setDictationExtraInterval = useCallback(
+    (v: number) =>
+      update({
+        dictationExtraInterval: Math.max(0, Math.min(5, Math.floor(v))),
+      }),
+    [update],
+  );
+
   const setRetryCount = useCallback(
     (v: number) => update({ retryCount: Math.max(1, Math.min(10, v)) }),
     [update],
@@ -87,6 +101,7 @@ export function useExamSettings() {
     hydrated,
     setAccent,
     setDictationPlayCount,
+    setDictationExtraInterval,
     setRetryCount,
     setAsrModelType,
   };

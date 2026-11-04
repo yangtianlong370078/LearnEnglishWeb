@@ -360,9 +360,9 @@ function WordCardInner(
       setSpeakerState("playing");
       await playOnce();
       if (dictationRunRef.current !== runId) return;
-      // 每次播放完毕都等待（本条语音时长 + 1 秒），含最后一次
+      // 每次播放完毕都等待（本条语音时长 + 追加秒数），含最后一次
       setSpeakerState("waiting");
-      await wait(durationMs + 1000);
+      await wait(durationMs + settings.dictationExtraInterval * 1000);
       if (dictationRunRef.current !== runId) return;
     }
 
@@ -382,6 +382,7 @@ function WordCardInner(
     onAdvance,
     settings.accent,
     settings.dictationCount,
+    settings.dictationExtraInterval,
     word.en,
   ]);
 
