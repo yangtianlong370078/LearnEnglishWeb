@@ -182,8 +182,6 @@ export default function ListeningPage() {
       className="flex w-full min-w-0 flex-col gap-4"
       data-glass-continuous-scroll=""
     >
-     
-
       <section
         aria-label="收藏与最近学习"
         className="grid w-full gap-4 md:grid-cols-2"
@@ -363,26 +361,29 @@ export default function ListeningPage() {
                             .map((subCourse) => (
                               <Card
                                 key={subCourse.id}
-                                className="group gap-3 overflow-hidden rounded-2xl bg-white/35 shadow-none transition-colors hover:bg-white/50 dark:bg-black/15 dark:hover:bg-black/25"
+                                className="group flex h-full min-h-36 flex-col overflow-hidden rounded-2xl border border-black/[0.05] bg-white/30 shadow-none transition-colors hover:border-accent/20 hover:bg-white/45 dark:border-white/[0.07] dark:bg-black/10 dark:hover:bg-white/[0.07]"
                                 variant="transparent"
                               >
-                                <Card.Header className="flex-row items-start gap-3 p-4 pb-0">
+                                <Card.Header className="flex-row items-center gap-3 p-4 pb-3">
                                   <div className="flex size-10 shrink-0 items-center justify-center rounded-xl bg-accent/10 text-accent">
                                     <Headphones className="size-5" />
                                   </div>
                                   <div className="min-w-0 flex-1">
-                                    <Card.Title className="truncate text-base">
+                                    <Card.Title className="truncate text-base font-semibold leading-6 text-foreground">
                                       {subCourse.name}
                                     </Card.Title>
-                                    <Card.Description className="mt-1 truncate">
+                                    <Card.Description className="mt-0.5 truncate text-xs leading-5 text-muted">
                                       {subCourse.folderName || course.name}
                                     </Card.Description>
                                   </div>
                                 </Card.Header>
-                                <Card.Footer className="p-4 pt-1">
+                                <Card.Footer className="mt-auto flex-row items-center justify-between border-t border-black/[0.05] px-3 py-1.5 dark:border-white/[0.06]">
+                                  <span className="px-1 text-xs text-muted tabular-nums">
+                                    {subCourse.lessonCount} 个章节
+                                  </span>
                                   <Button
-                                    className="w-full justify-between"
-                                    variant="secondary"
+                                    className="rounded-lg px-2.5 text-foreground/75 hover:bg-accent/5 hover:text-accent"
+                                    variant="ghost"
                                     onPress={() =>
                                       openSubCourse(
                                         subCourse.id,
@@ -392,7 +393,9 @@ export default function ListeningPage() {
                                       )
                                     }
                                   >
-                                    查看详情 · {subCourse.lessonCount} 个章节
+                                    <span className="text-sm font-medium">
+                                      查看详情
+                                    </span>
                                     <ChevronRight className="size-4 transition-transform group-hover:translate-x-0.5" />
                                   </Button>
                                 </Card.Footer>
